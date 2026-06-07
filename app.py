@@ -2,7 +2,7 @@ import streamlit as st
 import streamlit.components.v1 as components
 
 st.set_page_config(
-    page_title="MKP | Portfolio Drive",
+    page_title="Portfolio Drive | Mkp-7",
     page_icon="🚗",
     layout="wide",
     initial_sidebar_state="collapsed"
@@ -10,654 +10,340 @@ st.set_page_config(
 
 st.markdown("""
 <style>
-    #MainMenu, header, footer { visibility: hidden; }
-    .block-container { padding: 0 !important; }
-    [data-testid="stAppViewContainer"] { background: #0d1117; }
+#MainMenu, header, footer {visibility: hidden;}
+.block-container {padding: 0 !important; max-width: 100% !important;}
+[data-testid="stAppViewContainer"] {background: #0d1117;}
+iframe {border: none !important;}
 </style>
 """, unsafe_allow_html=True)
 
-GAME_HTML = """
-<!DOCTYPE html>
+HTML = """<!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { width: 100%; height: 100%; overflow: hidden; background: #0d1117; font-family: 'Segoe UI', system-ui, sans-serif; }
-
-#intro {
-  position: fixed; inset: 0; background: #0d1117;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  z-index: 200; gap: 0;
-}
-.intro-title {
-  font-size: 52px; font-weight: 700; letter-spacing: -1px;
-  background: linear-gradient(135deg, #378add, #7f77dd, #1d9e75);
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  margin-bottom: 8px;
-}
-.intro-sub {
-  font-size: 16px; color: #7a8899; margin-bottom: 6px;
-}
-.intro-role {
-  font-size: 13px; color: #378add; background: rgba(55,138,221,0.1);
-  border: 1px solid rgba(55,138,221,0.2); border-radius: 20px;
-  padding: 4px 14px; margin-bottom: 40px;
-}
-.intro-car { font-size: 64px; margin-bottom: 20px; animation: bounce 1s ease-in-out infinite; }
-@keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
-.intro-instructions {
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
-  max-width: 520px; width: 90%; margin-bottom: 36px;
-}
-.intro-card {
-  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 12px; padding: 14px; text-align: center;
-}
-.intro-card .icon { font-size: 22px; margin-bottom: 6px; }
-.intro-card .label { font-size: 11px; color: #8b949e; line-height: 1.4; }
-.start-btn {
-  background: linear-gradient(135deg, #378add, #7f77dd);
-  border: none; border-radius: 12px; color: #fff;
-  font-size: 16px; font-weight: 600; padding: 14px 48px;
-  cursor: pointer; letter-spacing: 0.5px;
-  transition: transform 0.15s, box-shadow 0.15s;
-  box-shadow: 0 4px 24px rgba(55,138,221,0.35);
-}
-.start-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(55,138,221,0.5); }
-
-canvas { display: block; }
-
-#hud {
-  position: fixed; top: 16px; left: 16px;
-  background: rgba(13,17,23,0.92); border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 14px; padding: 12px 16px; z-index: 50; min-width: 180px;
-  backdrop-filter: blur(12px);
-}
-.hud-name { font-size: 15px; font-weight: 600; color: #fff; margin-bottom: 2px; }
-.hud-role { font-size: 11px; color: #378add; margin-bottom: 10px; }
-.hud-sep { height: 1px; background: rgba(255,255,255,0.06); margin-bottom: 10px; }
-.hud-speed-label { font-size: 10px; color: #5a6370; margin-bottom: 4px; }
-.hud-speed-bar { height: 4px; background: rgba(255,255,255,0.08); border-radius: 2px; overflow: hidden; }
-.hud-speed-fill { height: 100%; background: linear-gradient(90deg, #1d9e75, #378add); border-radius: 2px; transition: width 0.1s; }
-.hud-nearby { margin-top: 10px; font-size: 11px; color: #8b949e; }
-.hud-nearby span { color: #ffe066; }
-
-#minimap-wrap {
-  position: fixed; bottom: 16px; right: 16px;
-  background: rgba(13,17,23,0.92); border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 14px; padding: 10px; z-index: 50;
-  backdrop-filter: blur(12px);
-}
-.minimap-label { font-size: 9px; color: #5a6370; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; text-align:center; }
-
-#controls-hint {
-  position: fixed; bottom: 16px; left: 16px;
-  background: rgba(13,17,23,0.85); border: 1px solid rgba(255,255,255,0.06);
-  border-radius: 10px; padding: 8px 14px; z-index: 50;
-  font-size: 11px; color: #5a6370;
-}
-
-#modal-overlay {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.7);
-  display: none; align-items: center; justify-content: center; z-index: 100;
-  backdrop-filter: blur(6px);
-}
-#modal {
-  background: #161b22; border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 20px; padding: 28px; max-width: 420px; width: 90%;
-  animation: slideUp 0.25s ease;
-}
-@keyframes slideUp { from{transform:translateY(20px);opacity:0} to{transform:translateY(0);opacity:1} }
-.modal-header { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 16px; }
-.modal-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
-.modal-title { font-size: 18px; font-weight: 600; color: #fff; margin-bottom: 4px; }
-.modal-lang { font-size: 11px; padding: 2px 10px; border-radius: 20px; display: inline-block; }
-.modal-desc { font-size: 13px; color: #8b949e; line-height: 1.65; margin-bottom: 18px; }
-.modal-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 18px; }
-.modal-tag { font-size: 11px; color: #7a8899; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 3px 10px; }
-.modal-stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 20px; }
-.modal-stat { background: rgba(255,255,255,0.04); border-radius: 10px; padding: 10px; text-align: center; }
-.modal-stat .sv { font-size: 18px; font-weight: 600; color: #fff; }
-.modal-stat .sl { font-size: 10px; color: #5a6370; margin-top: 2px; }
-.modal-btns { display: flex; gap: 10px; }
-.btn-gh { flex: 1; padding: 10px; border-radius: 10px; font-size: 13px; font-weight: 500; text-align: center; text-decoration: none; background: rgba(255,255,255,0.06); color: #e6f1fb; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; transition: background 0.15s; display: block; }
-.btn-gh:hover { background: rgba(255,255,255,0.1); }
-.btn-live { flex: 1; padding: 10px; border-radius: 10px; font-size: 13px; font-weight: 600; text-align: center; text-decoration: none; background: linear-gradient(135deg, #378add, #7f77dd); color: #fff; border: none; cursor: pointer; display: block; transition: opacity 0.15s; }
-.btn-live:hover { opacity: 0.88; }
-.btn-close { width: 36px; height: 36px; border-radius: 8px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); color: #8b949e; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; position: absolute; top: 16px; right: 16px; }
-.btn-close:hover { background: rgba(255,255,255,0.1); color: #fff; }
-
-#dpad {
-  position: fixed; right: 16px; bottom: 140px; z-index: 50;
-  display: grid; grid-template-areas: ". u ." "l . r" ". d .";
-  grid-template-columns: repeat(3, 44px); grid-template-rows: repeat(3, 44px); gap: 4px;
-}
-.dp { background: rgba(20,26,36,0.92); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; color: #e6f1fb; cursor: pointer; user-select: none; -webkit-user-select: none; touch-action: none; transition: background 0.1s; }
-.dp:active, .dp.pressed { background: rgba(55,138,221,0.4); border-color: #378add; }
-#dp-u { grid-area: u; } #dp-l { grid-area: l; } #dp-r { grid-area: r; } #dp-d { grid-area: d; }
-
-.toast {
-  position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
-  background: rgba(29,158,117,0.9); color: #fff; border-radius: 20px;
-  padding: 8px 20px; font-size: 13px; font-weight: 500; z-index: 150;
-  animation: fadeInOut 2.5s ease forwards;
-}
-@keyframes fadeInOut { 0%{opacity:0;transform:translateX(-50%) translateY(-10px)} 15%,75%{opacity:1;transform:translateX(-50%) translateY(0)} 100%{opacity:0} }
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100vh;overflow:hidden;background:#0d1117;font-family:'Segoe UI',system-ui,sans-serif}
+#intro{position:fixed;inset:0;background:#0d1117;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;gap:5px}
+#intro .ca{font-size:58px;animation:bob 1.2s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+#intro h1{font-size:40px;font-weight:700;background:linear-gradient(120deg,#58a6ff,#bc8cff,#39d353);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-top:10px}
+#intro .sub{font-size:13px;color:#7d8590;margin-bottom:4px}
+#intro .badge{font-size:12px;color:#58a6ff;background:rgba(88,166,255,.1);border:1px solid rgba(88,166,255,.25);border-radius:20px;padding:4px 14px;margin-bottom:30px}
+#intro .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:460px;width:90%;margin-bottom:26px}
+#intro .card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:14px;text-align:center}
+#intro .card .ci{font-size:20px;margin-bottom:5px}
+#intro .card .ct{font-size:11px;color:#7d8590;line-height:1.4}
+#intro button{background:linear-gradient(135deg,#58a6ff,#bc8cff);border:none;border-radius:12px;color:#fff;font-size:15px;font-weight:600;padding:13px 44px;cursor:pointer;box-shadow:0 4px 20px rgba(88,166,255,.3);transition:transform .15s}
+#intro button:hover{transform:translateY(-2px)}
+canvas{display:block}
+#hud{position:fixed;top:14px;left:14px;background:rgba(13,17,23,.92);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:12px 16px;z-index:50;min-width:188px;backdrop-filter:blur(10px);display:none}
+.hn{font-size:14px;font-weight:600;color:#e6edf3}.hr{font-size:11px;color:#58a6ff;margin-bottom:10px}
+.hs{font-size:10px;color:#484f58;margin-bottom:3px}.hb{height:4px;background:rgba(255,255,255,.07);border-radius:2px;overflow:hidden;margin-bottom:10px}
+.hf{height:100%;background:linear-gradient(90deg,#39d353,#58a6ff);border-radius:2px;transition:width .1s;width:0%}
+.hn2{font-size:11px;color:#7d8590}.hn2 span{color:#e3b341}
+#mm{position:fixed;bottom:14px;right:14px;background:rgba(13,17,23,.92);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:10px;z-index:50;display:none}
+.ml{font-size:9px;color:#484f58;text-transform:uppercase;letter-spacing:1px;text-align:center;margin-bottom:5px}
+#hint{position:fixed;bottom:14px;left:14px;background:rgba(13,17,23,.85);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:7px 13px;z-index:50;font-size:11px;color:#484f58;display:none}
+#ov{position:fixed;inset:0;background:rgba(0,0,0,.72);display:none;align-items:center;justify-content:center;z-index:100;backdrop-filter:blur(8px)}
+#mo{background:#161b22;border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:26px;max-width:400px;width:90%;position:relative;animation:su .22s ease}
+@keyframes su{from{transform:translateY(18px);opacity:0}to{transform:translateY(0);opacity:1}}
+.mh{display:flex;align-items:flex-start;gap:13px;margin-bottom:14px}
+.mi{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.mt2{font-size:17px;font-weight:600;color:#e6edf3;margin-bottom:4px}
+.ml2{font-size:11px;padding:2px 10px;border-radius:20px;display:inline-block}
+.md{font-size:13px;color:#7d8590;line-height:1.65;margin-bottom:14px}
+.mtags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.mtag{font-size:11px;color:#7d8590;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:6px;padding:3px 10px}
+.mbtns{display:flex;gap:8px}
+.bgh{flex:1;padding:10px;border-radius:10px;font-size:13px;font-weight:500;text-align:center;text-decoration:none;background:rgba(255,255,255,.06);color:#e6edf3;border:1px solid rgba(255,255,255,.1);cursor:pointer;display:block;transition:background .15s}
+.bgh:hover{background:rgba(255,255,255,.1)}
+.bli{flex:1;padding:10px;border-radius:10px;font-size:13px;font-weight:600;text-align:center;text-decoration:none;background:linear-gradient(135deg,#58a6ff,#bc8cff);color:#fff;border:none;cursor:pointer;display:block}
+.bcl{position:absolute;top:14px;right:14px;width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);color:#7d8590;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.bcl:hover{background:rgba(255,255,255,.1);color:#e6edf3}
+#dp{position:fixed;right:14px;bottom:128px;z-index:50;display:none;grid-template-areas:'. u .' 'l . r' '. d .';grid-template-columns:repeat(3,42px);grid-template-rows:repeat(3,42px);gap:3px}
+.db{background:rgba(22,27,34,.92);border:1px solid rgba(255,255,255,.1);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;color:#e6edf3;cursor:pointer;user-select:none;-webkit-user-select:none;touch-action:none;transition:background .1s}
+.db.on{background:rgba(88,166,255,.35);border-color:#58a6ff}
+#dpu{grid-area:u}#dpd{grid-area:d}#dpl{grid-area:l}#dpr{grid-area:r}
+.toast{position:fixed;top:14px;left:50%;transform:translateX(-50%);background:rgba(57,211,83,.88);color:#fff;border-radius:20px;padding:7px 18px;font-size:12px;font-weight:500;z-index:200;animation:tf 2.6s ease forwards;white-space:nowrap}
+@keyframes tf{0%{opacity:0;transform:translateX(-50%) translateY(-8px)}12%,78%{opacity:1;transform:translateX(-50%) translateY(0)}100%{opacity:0}}
 </style>
 </head>
 <body>
 
 <div id="intro">
-  <div class="intro-car">🚗</div>
-  <div class="intro-title">Portfolio Drive</div>
-  <div class="intro-sub">Mustafa Kazi Pasha · Data Scientist & AI Engineer</div>
-  <div class="intro-role">🤖 ML · AI Agents · Analytics · Streamlit</div>
-  <div class="intro-instructions">
-    <div class="intro-card"><div class="icon">🎮</div><div class="label">WASD or Arrow keys to drive</div></div>
-    <div class="intro-card"><div class="icon">🏢</div><div class="label">Pull up to a glowing building</div></div>
-    <div class="intro-card"><div class="icon">⏎</div><div class="label">Press Enter or Space to open</div></div>
+  <div class="ca">🚗</div>
+  <h1>Portfolio Drive</h1>
+  <div class="sub">GitHub: Mkp-7 &nbsp;·&nbsp; Data Scientist & AI Engineer</div>
+  <div class="badge">🤖 AI Agents · Analytics · Streamlit · Python</div>
+  <div class="cards">
+    <div class="card"><div class="ci">🎮</div><div class="ct">WASD or Arrow keys to drive</div></div>
+    <div class="card"><div class="ci">🏢</div><div class="ct">Drive near a glowing building</div></div>
+    <div class="card"><div class="ci">⏎</div><div class="ct">Press Enter or Space to open</div></div>
   </div>
-  <button class="start-btn" onclick="startGame()">Start Driving →</button>
+  <button onclick="startGame()">Start Driving →</button>
 </div>
 
 <canvas id="c"></canvas>
 
-<div id="hud" style="display:none">
-  <div class="hud-name">Mustafa Kazi Pasha</div>
-  <div class="hud-role">Data Scientist & AI Engineer</div>
-  <div class="hud-sep"></div>
-  <div class="hud-speed-label">SPEED</div>
-  <div class="hud-speed-bar"><div class="hud-speed-fill" id="speed-fill" style="width:0%"></div></div>
-  <div class="hud-nearby" id="hud-nearby">Drive to a glowing building</div>
+<div id="hud">
+  <div class="hn">Mkp-7</div>
+  <div class="hr">Data Scientist & AI Engineer</div>
+  <div class="hs">SPEED</div>
+  <div class="hb"><div class="hf" id="sf"></div></div>
+  <div class="hn2" id="hn">Drive to a glowing building</div>
 </div>
 
-<div id="minimap-wrap" style="display:none">
-  <div class="minimap-label">City Map</div>
-  <canvas id="mini" width="110" height="110"></canvas>
-</div>
+<div id="mm"><div class="ml">Map</div><canvas id="mc" width="108" height="108"></canvas></div>
+<div id="hint">WASD / Arrow keys &nbsp;·&nbsp; Mobile: D-pad</div>
 
-<div id="controls-hint" style="display:none">WASD / ↑↓←→ · Mobile: D-pad</div>
-
-<div id="modal-overlay">
-  <div id="modal" style="position:relative">
-    <button class="btn-close" onclick="closeModal()">×</button>
-    <div class="modal-header">
-      <div class="modal-icon" id="m-icon"></div>
-      <div>
-        <div class="modal-title" id="m-title"></div>
-        <div class="modal-lang" id="m-lang"></div>
-      </div>
+<div id="ov">
+  <div id="mo">
+    <button class="bcl" onclick="closeM()">×</button>
+    <div class="mh">
+      <div class="mi" id="micon"></div>
+      <div><div class="mt2" id="mtitle"></div><div class="ml2" id="mlang2"></div></div>
     </div>
-    <div class="modal-desc" id="m-desc"></div>
-    <div class="modal-tags" id="m-tags"></div>
-    <div class="modal-stats">
-      <div class="modal-stat"><div class="sv" id="m-stars">–</div><div class="sl">⭐ Stars</div></div>
-      <div class="modal-stat"><div class="sv" id="m-lang2">–</div><div class="sl">Language</div></div>
-      <div class="modal-stat"><div class="sv" id="m-status">Live</div><div class="sl">Status</div></div>
-    </div>
-    <div class="modal-btns">
-      <a class="btn-gh" id="m-gh" href="#" target="_blank">⑂ GitHub Repo</a>
-      <a class="btn-live" id="m-live" href="#" target="_blank">🚀 Live Demo</a>
+    <div class="md" id="mdesc"></div>
+    <div class="mtags" id="mtags"></div>
+    <div class="mbtns">
+      <a class="bgh" id="mgh" href="#" target="_blank">⑂ GitHub</a>
+      <a class="bli" id="mli" href="#" target="_blank">🚀 Live Demo</a>
     </div>
   </div>
 </div>
 
-<div id="dpad" style="display:none">
-  <div class="dp" id="dp-u">↑</div>
-  <div class="dp" id="dp-l">←</div>
-  <div class="dp" id="dp-r">→</div>
-  <div class="dp" id="dp-d">↓</div>
+<div id="dp">
+  <div class="db" id="dpu">↑</div>
+  <div class="db" id="dpl">←</div>
+  <div class="db" id="dpr">→</div>
+  <div class="db" id="dpd">↓</div>
 </div>
 
 <script>
-const PROJECTS = [
-  {
-    name: "Retail Intelligence Platform",
-    icon: "🛒", color: "#1d9e75", langColor: "rgba(29,158,117,0.15)", textColor: "#1d9e75",
-    lang: "Python", stars: 12,
-    desc: "End-to-end retail analytics platform with AI-powered demand forecasting, customer segmentation, inventory optimization, and real-time sales dashboards. Built with multi-page Streamlit architecture.",
-    tags: ["Streamlit", "Machine Learning", "Forecasting", "Retail Analytics", "AI"],
-    github: "https://github.com/Mkp-7/Retail-Intelligence-Platform",
-    live: "https://retail-intelligence-platform-zvdrhjrf6hcmsuwgnvurd9.streamlit.app/?page=home"
-  },
-  {
-    name: "Revenue Management Agent",
-    icon: "💰", color: "#378add", langColor: "rgba(55,138,221,0.15)", textColor: "#378add",
-    lang: "Python", stars: 9,
-    desc: "AI-powered revenue management system using autonomous agents for dynamic pricing, yield optimization, and revenue forecasting. Integrates LLM-based decision making for hospitality and travel industries.",
-    tags: ["AI Agents", "LLM", "Dynamic Pricing", "Revenue Ops", "Streamlit"],
-    github: "https://github.com/Mkp-7/Revenue-Management-Agent",
-    live: "https://revenue-management-agent-rpyqjvfpghplga6ls4gph3.streamlit.app/"
-  },
-  {
-    name: "EcoRoute Optimizer",
-    icon: "🌿", color: "#639922", langColor: "rgba(99,153,34,0.15)", textColor: "#639922",
-    lang: "Python", stars: 7,
-    desc: "Sustainable logistics platform that optimizes delivery routes to minimize carbon emissions. Uses OR-Tools and genetic algorithms with real-time traffic integration and environmental impact scoring.",
-    tags: ["OR-Tools", "Optimization", "Sustainability", "Logistics", "Routing"],
-    github: "https://github.com/Mkp-7/EcoRoute-Optimizer",
-    live: "https://ecoroute-optimizer-9zxsy43vdkaqwlrmo5fafj.streamlit.app/"
-  },
-  {
-    name: "AI Pricing Agent",
-    icon: "🤖", color: "#7f77dd", langColor: "rgba(127,119,221,0.15)", textColor: "#7f77dd",
-    lang: "Python", stars: 15,
-    desc: "Autonomous AI agent for competitive price intelligence. Monitors competitor pricing in real-time, runs ML models to recommend optimal prices, and automates repricing decisions with explainable AI.",
-    tags: ["AI Agent", "Pricing Strategy", "NLP", "Explainable AI", "Automation"],
-    github: "https://github.com/Mkp-7/AI-Pricing-Agent",
-    live: "https://ai-pricing-agent-ev34sy7v4zposplwcc2cyo.streamlit.app/"
-  },
-  {
-    name: "Banking Risk Analytics",
-    icon: "🏦", color: "#d85a30", langColor: "rgba(216,90,48,0.15)", textColor: "#d85a30",
-    lang: "Python", stars: 11,
-    desc: "Comprehensive banking risk intelligence platform covering credit risk, market risk, and operational risk. Features stress testing, PD/LGD/EAD modeling, and regulatory capital calculations (Basel III).",
-    tags: ["Risk Modeling", "Basel III", "Credit Risk", "Finance", "ML"],
-    github: "https://github.com/Mkp-7/Banking-Risk-Analytics",
-    live: "https://banking-risk-analytics-gqfn6y23ifuiuace8tgw5h.streamlit.app/"
-  },
-  {
-    name: "MedMedia Analytics",
-    icon: "🏥", color: "#d4537e", langColor: "rgba(212,83,126,0.15)", textColor: "#d4537e",
-    lang: "Python", stars: 8,
-    desc: "Healthcare media analytics platform analyzing pharmaceutical marketing effectiveness, patient engagement, and HCP outreach. Combines NLP sentiment analysis with multi-channel attribution modeling.",
-    tags: ["Healthcare", "NLP", "Sentiment Analysis", "Marketing Analytics", "Pharma"],
-    github: "https://github.com/Mkp-7/MedMedia-Analytics",
-    live: "https://medmedia-analytics-app-qdbzvc6gctzvtcyn5936dg.streamlit.app/"
-  }
+const PROJECTS=[
+  {name:"Revenue Management Agent",icon:"🚗",color:"#58a6ff",bg:"rgba(88,166,255,.12)",tc:"#58a6ff",
+   lang:"Python · Groq AI",
+   desc:"Autonomous AI agent monitoring competitor car rental pricing across 10 US airports. Uses Groq llama-3.3-70b, GitHub Actions pipeline every 6h, and a 5-tab Streamlit dashboard with anomaly alerts and AI-driven pricing recommendations.",
+   tags:["AI Agents","Groq LLM","Streamlit","GitHub Actions","Revenue Ops"],
+   gh:"https://github.com/Mkp-7/Revenue-Management-Agent",
+   live:"https://revenue-management-agent-rpyqjvfpghplga6ls4gph3.streamlit.app/"},
+  {name:"AI Pricing Agent",icon:"🤖",color:"#bc8cff",bg:"rgba(188,140,255,.12)",tc:"#bc8cff",
+   lang:"Python · Claude API",
+   desc:"AI-powered competitive pricing intelligence system using the Claude API. Monitors competitor prices in real-time, applies ML models to recommend optimal pricing, and delivers explainable AI decisions for business stakeholders.",
+   tags:["Claude API","Competitive Intel","ML","Pricing Strategy","Explainable AI"],
+   gh:"https://github.com/Mkp-7/AI-Pricing-Agent",
+   live:"https://ai-pricing-agent-ev34sy7v4zposplwcc2cyo.streamlit.app/"},
+  {name:"EcoRoute Optimizer",icon:"🌿",color:"#39d353",bg:"rgba(57,211,83,.12)",tc:"#39d353",
+   lang:"Python · OR-Tools",
+   desc:"Sustainable logistics platform optimizing delivery routes to minimize carbon emissions. Uses Google OR-Tools and genetic algorithms with real-time traffic data and environmental impact scoring.",
+   tags:["OR-Tools","Optimization","Sustainability","Logistics","Green Tech"],
+   gh:"https://github.com/Mkp-7/EcoRoute-Optimizer",
+   live:"https://ecoroute-optimizer-9zxsy43vdkaqwlrmo5fafj.streamlit.app/"},
+  {name:"Banking Risk Analytics",icon:"🏦",color:"#f78166",bg:"rgba(247,129,102,.12)",tc:"#f78166",
+   lang:"Python · Streamlit",
+   desc:"Comprehensive banking risk intelligence platform covering credit, market, and operational risk. Features Basel III stress testing, PD/LGD/EAD modeling, and regulatory capital calculation dashboards.",
+   tags:["Basel III","Credit Risk","Stress Testing","Finance","Risk Modeling"],
+   gh:"https://github.com/Mkp-7/Banking-Risk-Analytics",
+   live:"https://banking-risk-analytics-gqfn6y23ifuiuace8tgw5h.streamlit.app/"},
+  {name:"Supply Chain Analytics BI",icon:"📦",color:"#e3b341",bg:"rgba(227,179,65,.12)",tc:"#e3b341",
+   lang:"Python · Power BI",
+   desc:"End-to-end supply chain BI platform with demand forecasting, supplier performance tracking, inventory optimization, and logistics KPI dashboards integrating predictive ML with interactive visualizations.",
+   tags:["Supply Chain","BI","Demand Forecasting","Inventory","Power BI"],
+   gh:"https://github.com/Mkp-7/Supply-Chain-Analytics-BI",
+   live:"https://github.com/Mkp-7/Supply-Chain-Analytics-BI"},
+  {name:"Sales Forecasting Analysis",icon:"📈",color:"#79c0ff",bg:"rgba(121,192,255,.12)",tc:"#79c0ff",
+   lang:"Python · Tableau",
+   desc:"Tableau dashboard analyzing and forecasting sales performance using historical data. Implements time-series forecasting, seasonal decomposition, and interactive drill-down visualizations for sales trend analysis.",
+   tags:["Tableau","Time Series","Forecasting","Sales Analytics","Visualization"],
+   gh:"https://github.com/Mkp-7/Sales-Forecasting-Analysis",
+   live:"https://github.com/Mkp-7/Sales-Forecasting-Analysis"}
 ];
 
-const W = 1400, H = 1400;
-const ROAD_COLOR = '#161d2a';
-const ROAD_LINE = '#1e2a3d';
-const GROUND = '#0f1520';
-const SIDEWALK = '#131924';
+const W=1400,H=1400;
+const SLOTS=[{x:210,y:210},{x:700,y:180},{x:1190,y:210},{x:180,y:700},{x:1220,y:700},{x:210,y:1190},{x:700,y:1220},{x:1190,y:1190}];
 
-const ROAD_LAYOUT = [
-  {x:0, y:430, w:W, h:90},
-  {x:0, y:880, w:W, h:90},
-  {x:430, y:0, w:90, h:H},
-  {x:880, y:0, w:90, h:H},
-];
+let buildings=[],car={x:700,y:700,angle:0,speed:0},cam={x:700,y:700};
+let keys={},dp={up:0,down:0,left:0,right:0},near=null,modal=false;
+let particles=[],frame=0,canvas,ctx,mc,mctx;
 
-const BUILDING_SLOTS = [
-  {x:215, y:215}, {x:655, y:215}, {x:1185, y:215},
-  {x:215, y:655}, {x:1185, y:655},
-  {x:215, y:1185}, {x:655, y:1185}, {x:1185, y:1185},
-  // center district
-  {x:655, y:655},
-];
-
-let buildings = [];
-let car = {x:700, y:700, angle:0, speed:0};
-let cam = {x:700, y:700};
-let keys = {};
-let dpad = {up:false,down:false,left:false,right:false};
-let near = null, modal = false, animId = null;
-let canvas, ctx, mini, mctx;
-let particles = [], stars = [];
-let frame = 0;
-
-function initStars() {
-  for (let i = 0; i < 120; i++) {
-    stars.push({x: Math.random()*W, y: Math.random()*H, r: Math.random()*1.5+0.5, a: Math.random()});
-  }
+function placeBuildings(){
+  buildings=PROJECTS.map((p,i)=>({...p,x:SLOTS[i].x,y:SLOTS[i].y,w:108,h:108,lit:Array.from({length:16},()=>Math.random()>.38)}));
 }
 
-function placeBuildings() {
-  buildings = PROJECTS.map((p, i) => {
-    const slot = BUILDING_SLOTS[i];
-    return { ...p, x: slot.x, y: slot.y, w: 110, h: 110, lit: Array.from({length:15}, ()=>Math.random()>0.35) };
-  });
+function startGame(){
+  document.getElementById('intro').style.display='none';
+  document.getElementById('hud').style.display='block';
+  document.getElementById('mm').style.display='block';
+  document.getElementById('hint').style.display='block';
+  document.getElementById('dp').style.display='grid';
+  canvas=document.getElementById('c');ctx=canvas.getContext('2d');
+  mc=document.getElementById('mc');mctx=mc.getContext('2d');
+  resize();window.addEventListener('resize',resize);
+  placeBuildings();bindKeys();bindDpad();loop();
+  toast('Drive to a glowing building and press Enter!');
 }
 
-function startGame() {
-  document.getElementById('intro').style.display = 'none';
-  document.getElementById('hud').style.display = 'block';
-  document.getElementById('minimap-wrap').style.display = 'block';
-  document.getElementById('controls-hint').style.display = 'block';
-  document.getElementById('dpad').style.display = 'grid';
-  canvas = document.getElementById('c');
-  ctx = canvas.getContext('2d');
-  mini = document.getElementById('mini');
-  mctx = mini.getContext('2d');
-  resize();
-  window.addEventListener('resize', resize);
-  placeBuildings();
-  initStars();
-  bindInput();
-  loop();
-  showToast("Welcome! Drive to a glowing building 🏢");
+function resize(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;}
+
+function shadeHex(hex,amt){
+  const n=parseInt(hex.replace('#',''),16);
+  const r=Math.max(0,Math.min(255,(n>>16)+amt));
+  const g=Math.max(0,Math.min(255,((n>>8)&255)+amt));
+  const b=Math.max(0,Math.min(255,(n&255)+amt));
+  return 'rgb('+r+','+g+','+b+')';
 }
 
-function resize() {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-}
-
-function drawGround() {
-  ctx.fillStyle = GROUND;
-  ctx.fillRect(0, 0, W, H);
-
-  // decorative grid
-  ctx.strokeStyle = 'rgba(30,42,61,0.4)';
-  ctx.lineWidth = 0.5;
-  for (let x = 0; x < W; x += 80) {
-    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
-  }
-  for (let y = 0; y < H; y += 80) {
-    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
-  }
-
-  // ambient stars (decorative ground marks)
-  stars.forEach(s => {
-    ctx.globalAlpha = s.a * 0.3;
-    ctx.fillStyle = '#378add';
-    ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI*2); ctx.fill();
-  });
-  ctx.globalAlpha = 1;
-}
-
-function drawRoads() {
-  ROAD_LAYOUT.forEach(r => {
-    ctx.fillStyle = ROAD_COLOR;
-    ctx.fillRect(r.x, r.y, r.w, r.h);
-  });
-
-  // dashes
-  ctx.setLineDash([28, 18]);
-  ctx.strokeStyle = ROAD_LINE;
-  ctx.lineWidth = 2;
-  ctx.beginPath(); ctx.moveTo(0, 475); ctx.lineTo(W, 475); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(0, 925); ctx.lineTo(W, 925); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(475, 0); ctx.lineTo(475, H); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(925, 0); ctx.lineTo(925, H); ctx.stroke();
+function drawWorld(){
+  ctx.fillStyle='#0d1117';ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle='rgba(33,45,60,.5)';ctx.lineWidth=.5;
+  for(let x=0;x<W;x+=80){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+  for(let y=0;y<H;y+=80){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+  const roads=[{x:0,y:420,w:W,h:90},{x:0,y:890,w:W,h:90},{x:420,y:0,w:90,h:H},{x:890,y:0,w:90,h:H}];
+  roads.forEach(r=>{ctx.fillStyle='#161b22';ctx.fillRect(r.x,r.y,r.w,r.h);});
+  ctx.setLineDash([26,18]);ctx.strokeStyle='#21262d';ctx.lineWidth=2;
+  [[0,465,W,465],[0,935,W,935],[465,0,465,H],[935,0,935,H]].forEach(([x1,y1,x2,y2])=>{ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();});
   ctx.setLineDash([]);
-
-  // intersection fills
-  [[430,430,90,90],[430,880,90,90],[880,430,90,90],[880,880,90,90]].forEach(([x,y,w,h]) => {
-    ctx.fillStyle = '#1a2133';
-    ctx.fillRect(x, y, w, h);
-  });
+  [[420,420],[420,890],[890,420],[890,890]].forEach(([x,y])=>{ctx.fillStyle='#1c2128';ctx.fillRect(x,y,90,90);});
 }
 
-function drawBuilding(b) {
-  const bx = b.x - b.w/2, by = b.y - b.h/2;
-  const isNear = near === b;
-  const pulse = isNear ? Math.sin(frame * 0.07) * 0.4 + 0.6 : 1;
-
-  // sidewalk pad
-  ctx.fillStyle = SIDEWALK;
-  ctx.beginPath(); ctx.roundRect(bx - 12, by - 12, b.w + 24, b.h + 24, 8); ctx.fill();
-
-  // glow
-  if (isNear) {
-    ctx.shadowColor = b.color;
-    ctx.shadowBlur = 28 * pulse;
+function drawBuilding(b){
+  const bx=b.x-b.w/2,by=b.y-b.h/2,isN=near===b;
+  const pulse=isN?Math.sin(frame*.07)*.4+.7:1;
+  ctx.fillStyle='#131924';ctx.beginPath();ctx.roundRect(bx-10,by-10,b.w+20,b.h+20,8);ctx.fill();
+  if(isN){ctx.shadowColor=b.color;ctx.shadowBlur=30*pulse;}
+  ctx.fillStyle=isN?b.color:shadeHex(b.color,-65);
+  ctx.beginPath();ctx.roundRect(bx,by,b.w,b.h,10);ctx.fill();
+  ctx.shadowBlur=0;
+  ctx.fillStyle=b.color;ctx.globalAlpha=.55;
+  ctx.beginPath();ctx.roundRect(bx,by,b.w,13,[10,10,0,0]);ctx.fill();
+  ctx.globalAlpha=1;
+  for(let r=0;r<4;r++) for(let c=0;c<4;c++){
+    const wx=bx+11+c*22,wy=by+19+r*19,lit=b.lit[r*4+c];
+    ctx.fillStyle=lit?'#ffd700':'rgba(120,180,255,.1)';
+    ctx.globalAlpha=lit?(isN?1:.75):.35;
+    ctx.fillRect(wx,wy,12,9);ctx.globalAlpha=1;
   }
-
-  // main body
-  ctx.fillStyle = isNear ? b.color : adjustColor(b.color, -60);
-  ctx.beginPath(); ctx.roundRect(bx, by, b.w, b.h, 10); ctx.fill();
-  ctx.shadowBlur = 0;
-
-  // top accent bar
-  ctx.fillStyle = b.color;
-  ctx.globalAlpha = 0.6;
-  ctx.beginPath(); ctx.roundRect(bx, by, b.w, 14, [10,10,0,0]); ctx.fill();
-  ctx.globalAlpha = 1;
-
-  // windows
-  const cols = 4, rows = 4;
-  const ww = 12, wh = 9, px = 12, py = 20;
-  const sx = (b.w - px*2 - ww*(cols)) / (cols-1);
-  const sy = (b.h - py - 12 - wh*(rows)) / (rows-1);
-  for (let r = 0; r < rows; r++) {
-    for (let c = 0; c < cols; c++) {
-      const wx = bx + px + c*(ww+sx);
-      const wy = by + py + r*(wh+sy);
-      const lit = b.lit[r*cols+c];
-      ctx.fillStyle = lit ? '#ffe877' : 'rgba(130,190,255,0.15)';
-      ctx.globalAlpha = lit ? (isNear ? 1 : 0.8) : 0.4;
-      ctx.fillRect(wx, wy, ww, wh);
-      ctx.globalAlpha = 1;
-    }
-  }
-
-  // icon
-  ctx.font = '20px serif';
-  ctx.textAlign = 'center';
-  ctx.fillText(b.icon, b.x, by - 16);
-
-  // label
-  ctx.font = `${isNear ? '600' : '500'} 11px system-ui`;
-  ctx.fillStyle = isNear ? '#fff' : 'rgba(200,210,225,0.75)';
-  ctx.fillText(b.name.length > 18 ? b.name.slice(0,18)+'…' : b.name, b.x, by + b.h + 20);
-
-  // enter prompt
-  if (isNear) {
-    ctx.font = '700 10px system-ui';
-    ctx.fillStyle = '#ffe066';
-    ctx.globalAlpha = pulse;
-    ctx.fillText('▶ PRESS ENTER', b.x, by - 30);
-    ctx.globalAlpha = 1;
+  ctx.font='18px serif';ctx.textAlign='center';ctx.fillText(b.icon,b.x,by-14);
+  const short=b.name.length>17?b.name.slice(0,17)+'…':b.name;
+  ctx.font=(isN?'600':'500')+' 11px system-ui';
+  ctx.fillStyle=isN?'#e6edf3':'rgba(180,195,215,.7)';
+  ctx.fillText(short,b.x,by+b.h+18);
+  if(isN){
+    ctx.font='700 10px system-ui';ctx.fillStyle='#e3b341';
+    ctx.globalAlpha=pulse;ctx.fillText('PRESS ENTER',b.x,by-28);ctx.globalAlpha=1;
   }
 }
 
-function adjustColor(hex, amt) {
-  const n = parseInt(hex.slice(1), 16);
-  const r = Math.max(0, Math.min(255, (n>>16) + amt));
-  const g = Math.max(0, Math.min(255, ((n>>8)&0xff) + amt));
-  const b2 = Math.max(0, Math.min(255, (n&0xff) + amt));
-  return `rgb(${r},${g},${b2})`;
-}
-
-function drawCar() {
-  const cw = 24, ch = 38;
-  ctx.save();
-  ctx.translate(car.x, car.y);
-  ctx.rotate(car.angle);
-
-  // shadow
-  ctx.fillStyle = 'rgba(0,0,0,0.3)';
-  ctx.beginPath(); ctx.ellipse(2, 4, cw/2+4, ch/4+2, 0, 0, Math.PI*2); ctx.fill();
-
-  // body
-  ctx.fillStyle = '#f1c40f';
-  ctx.beginPath(); ctx.roundRect(-cw/2, -ch/2, cw, ch, 6); ctx.fill();
-
-  // roof/windshield
-  ctx.fillStyle = '#e67e22';
-  ctx.fillRect(-cw/2, -ch/2, cw, 10);
-  ctx.fillStyle = 'rgba(160,230,255,0.7)';
-  ctx.fillRect(-cw/2+3, -ch/2+2, cw-6, 7);
-
-  // headlights
-  ctx.fillStyle = 'rgba(255,245,180,0.95)';
-  ctx.fillRect(-cw/2+2, -ch/2+1, 5, 4);
-  ctx.fillRect(cw/2-7, -ch/2+1, 5, 4);
-
-  // taillights
-  ctx.fillStyle = '#e74c3c';
-  ctx.fillRect(-cw/2+2, ch/2-6, 5, 4);
-  ctx.fillRect(cw/2-7, ch/2-6, 5, 4);
-
-  // speed lines when fast
-  if (Math.abs(car.speed) > 3) {
-    ctx.strokeStyle = 'rgba(255,255,255,0.15)';
-    ctx.lineWidth = 1;
-    for (let i = 0; i < 4; i++) {
-      const lx = (-cw/2 + 4) + i * 6;
-      ctx.beginPath(); ctx.moveTo(lx, ch/2); ctx.lineTo(lx - 2, ch/2 + 12); ctx.stroke();
-    }
+function drawCar(){
+  const cw=24,ch=38;
+  ctx.save();ctx.translate(car.x,car.y);ctx.rotate(car.angle);
+  ctx.fillStyle='rgba(0,0,0,.28)';ctx.beginPath();ctx.ellipse(2,5,cw/2+4,7,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#f0c000';ctx.beginPath();ctx.roundRect(-cw/2,-ch/2,cw,ch,6);ctx.fill();
+  ctx.fillStyle='#c87000';ctx.fillRect(-cw/2,-ch/2,cw,11);
+  ctx.fillStyle='rgba(140,220,255,.72)';ctx.fillRect(-cw/2+3,-ch/2+2,cw-6,8);
+  ctx.fillStyle='rgba(255,248,180,.95)';
+  ctx.fillRect(-cw/2+2,-ch/2+1,5,4);ctx.fillRect(cw/2-7,-ch/2+1,5,4);
+  ctx.fillStyle='#e74c3c';
+  ctx.fillRect(-cw/2+2,ch/2-6,5,4);ctx.fillRect(cw/2-7,ch/2-6,5,4);
+  if(Math.abs(car.speed)>2.5){
+    ctx.strokeStyle='rgba(255,255,255,.13)';ctx.lineWidth=1;
+    for(let i=0;i<4;i++){ctx.beginPath();ctx.moveTo(-cw/2+4+i*6,ch/2);ctx.lineTo(-cw/2+2+i*6,ch/2+11);ctx.stroke();}
   }
   ctx.restore();
-
-  // exhaust particles
-  if (Math.abs(car.speed) > 1 && frame % 3 === 0) {
-    const px = car.x - Math.sin(car.angle) * 20 + (Math.random()-0.5)*6;
-    const py = car.y + Math.cos(car.angle) * 20 + (Math.random()-0.5)*6;
-    particles.push({x:px, y:py, vx:(Math.random()-0.5)*0.4, vy:(Math.random()-0.5)*0.4, life:1, r:3});
+  if(Math.abs(car.speed)>1&&frame%3===0){
+    particles.push({x:car.x-Math.sin(car.angle)*20+(Math.random()-.5)*6,y:car.y+Math.cos(car.angle)*20+(Math.random()-.5)*6,life:1,r:3});
   }
 }
 
-function drawParticles() {
-  particles = particles.filter(p => p.life > 0);
-  particles.forEach(p => {
-    ctx.globalAlpha = p.life * 0.4;
-    ctx.fillStyle = '#aaa';
-    ctx.beginPath(); ctx.arc(p.x, p.y, p.r * p.life, 0, Math.PI*2); ctx.fill();
-    p.x += p.vx; p.y += p.vy; p.life -= 0.06;
+function drawParticles(){
+  particles=particles.filter(p=>p.life>0);
+  particles.forEach(p=>{
+    ctx.globalAlpha=p.life*.35;ctx.fillStyle='#8b949e';
+    ctx.beginPath();ctx.arc(p.x,p.y,p.r*p.life,0,Math.PI*2);ctx.fill();
+    p.life-=.065;
+  });ctx.globalAlpha=1;
+}
+
+function drawMini(){
+  const s=108/W;
+  mctx.fillStyle='#0d1117';mctx.fillRect(0,0,108,108);
+  mctx.fillStyle='#161b22';
+  [{x:0,y:420,w:W,h:90},{x:0,y:890,w:W,h:90},{x:420,y:0,w:90,h:H},{x:890,y:0,w:90,h:H}]
+    .forEach(r=>mctx.fillRect(r.x*s,r.y*s,r.w*s,r.h*s));
+  buildings.forEach(b=>{mctx.fillStyle=b.color;mctx.beginPath();mctx.arc(b.x*s,b.y*s,4,0,Math.PI*2);mctx.fill();});
+  mctx.fillStyle='#f0c000';mctx.beginPath();mctx.arc(car.x*s,car.y*s,4,0,Math.PI*2);mctx.fill();
+}
+
+const ACCEL=.24,FRIC=.87,MSPD=6.5,TURN=.054;
+function update(){
+  if(modal)return;frame++;
+  const U=keys['ArrowUp']||keys['w']||keys['W']||dp.up;
+  const D=keys['ArrowDown']||keys['s']||keys['S']||dp.down;
+  const L=keys['ArrowLeft']||keys['a']||keys['A']||dp.left;
+  const R=keys['ArrowRight']||keys['d']||keys['D']||dp.right;
+  if(U) car.speed=Math.min(car.speed+ACCEL,MSPD);
+  else if(D) car.speed=Math.max(car.speed-ACCEL,-MSPD*.5);
+  else car.speed*=FRIC;
+  if(Math.abs(car.speed)>.15){const d=car.speed>0?1:-1;if(L)car.angle-=TURN*d;if(R)car.angle+=TURN*d;}
+  car.x+=Math.sin(car.angle)*car.speed;car.y-=Math.cos(car.angle)*car.speed;
+  car.x=Math.max(20,Math.min(W-20,car.x));car.y=Math.max(20,Math.min(H-20,car.y));
+  cam.x+=(car.x-cam.x)*.1;cam.y+=(car.y-cam.y)*.1;
+  near=null;
+  for(const b of buildings){const dx=car.x-b.x,dy=car.y-b.y;if(Math.sqrt(dx*dx+dy*dy)<88){near=b;break;}}
+  document.getElementById('sf').style.width=(Math.abs(car.speed)/MSPD*100).toFixed(0)+'%';
+  document.getElementById('hn').innerHTML=near?'Near: <span>'+near.name+'</span>':'Drive to a glowing building';
+}
+
+function render(){
+  const cw=canvas.width,ch=canvas.height;
+  ctx.clearRect(0,0,cw,ch);
+  ctx.save();ctx.translate(-cam.x+cw/2,-cam.y+ch/2);
+  drawWorld();drawParticles();buildings.forEach(drawBuilding);drawCar();
+  ctx.restore();drawMini();
+}
+
+function loop(){update();render();requestAnimationFrame(loop);}
+
+function openM(b){
+  modal=true;
+  document.getElementById('micon').textContent=b.icon;
+  document.getElementById('micon').style.background=b.bg;
+  document.getElementById('mtitle').textContent=b.name;
+  document.getElementById('mlang2').textContent=b.lang;
+  document.getElementById('mlang2').style.cssText='background:'+b.bg+';color:'+b.tc+';border:1px solid '+b.color+'44';
+  document.getElementById('mdesc').textContent=b.desc;
+  document.getElementById('mtags').innerHTML=b.tags.map(t=>'<span class="mtag">'+t+'</span>').join('');
+  document.getElementById('mgh').href=b.gh;
+  document.getElementById('mli').href=b.live;
+  document.getElementById('ov').style.display='flex';
+}
+function closeM(){document.getElementById('ov').style.display='none';modal=false;}
+document.getElementById('ov').addEventListener('click',e=>{if(e.target===document.getElementById('ov'))closeM();});
+
+function bindKeys(){
+  document.addEventListener('keydown',e=>{
+    keys[e.key]=true;
+    if((e.key==='Enter'||e.key===' ')&&near&&!modal)openM(near);
+    if(e.key==='Escape'&&modal)closeM();
   });
-  ctx.globalAlpha = 1;
+  document.addEventListener('keyup',e=>{keys[e.key]=false;});
 }
-
-function drawMini() {
-  const s = 110 / W;
-  mctx.fillStyle = '#0a0f18';
-  mctx.fillRect(0, 0, 110, 110);
-  mctx.fillStyle = '#1a2235';
-  ROAD_LAYOUT.forEach(r => mctx.fillRect(r.x*s, r.y*s, r.w*s, r.h*s));
-  buildings.forEach(b => {
-    mctx.fillStyle = b.color;
-    mctx.beginPath(); mctx.arc(b.x*s, b.y*s, 4, 0, Math.PI*2); mctx.fill();
+function bindDpad(){
+  [['dpu','up'],['dpd','down'],['dpl','left'],['dpr','right']].forEach(([id,dir])=>{
+    const el=document.getElementById(id);
+    const on=()=>{dp[dir]=1;el.classList.add('on');};
+    const off=()=>{dp[dir]=0;el.classList.remove('on');};
+    el.addEventListener('pointerdown',e=>{e.preventDefault();on();});
+    el.addEventListener('pointerup',off);el.addEventListener('pointerleave',off);
   });
-  mctx.fillStyle = '#f1c40f';
-  mctx.beginPath(); mctx.arc(car.x*s, car.y*s, 4, 0, Math.PI*2); mctx.fill();
-
-  // viewport rect
-  const vw = (canvas.width / W) * 110;
-  const vh = (canvas.height / H) * 110;
-  const vx = ((cam.x - canvas.width/2) / W) * 110;
-  const vy = ((cam.y - canvas.height/2) / H) * 110;
-  mctx.strokeStyle = 'rgba(255,255,255,0.2)';
-  mctx.lineWidth = 1;
-  mctx.strokeRect(Math.max(0,vx), Math.max(0,vy), Math.min(110,vw), Math.min(110,vh));
 }
-
-const ACCEL = 0.25, FRICTION = 0.87, MAX_SPD = 6.5, TURN = 0.055;
-
-function update() {
-  if (modal) return;
-  frame++;
-  const up = keys['ArrowUp']||keys['w']||keys['W']||dpad.up;
-  const dn = keys['ArrowDown']||keys['s']||keys['S']||dpad.down;
-  const lt = keys['ArrowLeft']||keys['a']||keys['A']||dpad.left;
-  const rt = keys['ArrowRight']||keys['d']||keys['D']||dpad.right;
-
-  if (up) car.speed = Math.min(car.speed + ACCEL, MAX_SPD);
-  else if (dn) car.speed = Math.max(car.speed - ACCEL, -MAX_SPD * 0.5);
-  else car.speed *= FRICTION;
-
-  if (Math.abs(car.speed) > 0.15) {
-    const dir = car.speed > 0 ? 1 : -1;
-    if (lt) car.angle -= TURN * dir;
-    if (rt) car.angle += TURN * dir;
-  }
-
-  car.x += Math.sin(car.angle) * car.speed;
-  car.y -= Math.cos(car.angle) * car.speed;
-  car.x = Math.max(24, Math.min(W-24, car.x));
-  car.y = Math.max(24, Math.min(H-24, car.y));
-
-  cam.x += (car.x - cam.x) * 0.1;
-  cam.y += (car.y - cam.y) * 0.1;
-
-  near = null;
-  for (const b of buildings) {
-    const dx = car.x - b.x, dy = car.y - b.y;
-    if (Math.sqrt(dx*dx+dy*dy) < 85) { near = b; break; }
-  }
-
-  const fill = (Math.abs(car.speed)/MAX_SPD*100).toFixed(0);
-  document.getElementById('speed-fill').style.width = fill + '%';
-  document.getElementById('hud-nearby').innerHTML = near
-    ? `Near: <span>${near.name}</span>`
-    : 'Drive to a glowing building';
+function toast(msg){
+  const t=document.createElement('div');t.className='toast';t.textContent=msg;
+  document.body.appendChild(t);setTimeout(()=>t.remove(),2700);
 }
-
-function render() {
-  const cw = canvas.width, ch = canvas.height;
-  ctx.clearRect(0, 0, cw, ch);
-  ctx.save();
-  ctx.translate(-cam.x + cw/2, -cam.y + ch/2);
-  drawGround();
-  drawRoads();
-  drawParticles();
-  buildings.forEach(drawBuilding);
-  drawCar();
-  ctx.restore();
-  drawMini();
-}
-
-function loop() {
-  update();
-  render();
-  animId = requestAnimationFrame(loop);
-}
-
-function openModal(b) {
-  modal = true;
-  document.getElementById('m-icon').textContent = b.icon;
-  document.getElementById('m-icon').style.background = b.langColor;
-  document.getElementById('m-title').textContent = b.name;
-  document.getElementById('m-lang').textContent = b.lang;
-  document.getElementById('m-lang').style.background = b.langColor;
-  document.getElementById('m-lang').style.color = b.textColor;
-  document.getElementById('m-lang').style.border = `1px solid ${b.color}44`;
-  document.getElementById('m-desc').textContent = b.desc;
-  document.getElementById('m-tags').innerHTML = b.tags.map(t => `<span class="modal-tag">${t}</span>`).join('');
-  document.getElementById('m-stars').textContent = b.stars;
-  document.getElementById('m-lang2').textContent = b.lang;
-  document.getElementById('m-gh').href = b.github;
-  document.getElementById('m-live').href = b.live;
-  document.getElementById('modal-overlay').style.display = 'flex';
-}
-
-function closeModal() {
-  document.getElementById('modal-overlay').style.display = 'none';
-  modal = false;
-}
-
-function showToast(msg) {
-  const t = document.createElement('div');
-  t.className = 'toast'; t.textContent = msg;
-  document.body.appendChild(t);
-  setTimeout(() => t.remove(), 2600);
-}
-
-document.addEventListener('keydown', e => {
-  keys[e.key] = true;
-  if ((e.key === 'Enter' || e.key === ' ') && near && !modal) openModal(near);
-  if (e.key === 'Escape' && modal) closeModal();
-});
-document.addEventListener('keyup', e => { keys[e.key] = false; });
-
-document.getElementById('modal-overlay').addEventListener('click', e => {
-  if (e.target === document.getElementById('modal-overlay')) closeModal();
-});
-
-function bindDpad(id, dir) {
-  const el = document.getElementById(id);
-  const on = () => dpad[dir] = true;
-  const off = () => dpad[dir] = false;
-  el.addEventListener('pointerdown', e => { e.preventDefault(); on(); el.classList.add('pressed'); });
-  el.addEventListener('pointerup', () => { off(); el.classList.remove('pressed'); });
-  el.addEventListener('pointerleave', () => { off(); el.classList.remove('pressed'); });
-}
-bindDpad('dp-u','up'); bindDpad('dp-d','down');
-bindDpad('dp-l','left'); bindDpad('dp-r','right');
 </script>
 </body>
-</html>
-"""
+</html>"""
 
-components.html(GAME_HTML, height=700, scrolling=False)
-
-st.markdown("""
-<div style="text-align:center; color: #30363d; font-size:12px; margin-top:4px;">
-  Built with Streamlit · <a href="https://github.com/Mkp-7" style="color:#378add; text-decoration:none;">github.com/Mkp-7</a>
-</div>
-""", unsafe_allow_html=True)
+components.html(HTML, height=750, scrolling=False)
