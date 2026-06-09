@@ -721,9 +721,15 @@ function projPos(p){
   const distProjs=PROJECTS.filter(x=>x.district===p.district);
   const col=distProjs.indexOf(p);
   const cols=ROW_COLS[p.district];
-  const startX=-((cols-1)*BLK_X)/2;
+  // All districts anchored to same left edge so vertical roads line up perfectly
+  const startX=-((5-1)*BLK_X)/2; // always use max cols=5 as reference
   const startZ=-((DIST_ORDER.length-1)*BLK_Z)/2;
-  return{x:startX+col*BLK_X,z:startZ+row*BLK_Z};
+  // Offset X to centre each district within its columns
+  const distOffsetX=((5-cols)*BLK_X)/2;
+  return{
+    x: startX + distOffsetX + col*BLK_X,
+    z: startZ + row*BLK_Z   // buildings stay at row Z; roads are between rows at ±BLK_Z/2
+  };
 }
 
 function buildCity(){
@@ -743,7 +749,7 @@ function makeRoads(){
   const startZ=-((ROWS-1)*BLK_Z)/2;
   for(let r=-1;r<=ROWS;r++) makeHR(startZ+r*BLK_Z-BLK_Z/2+BLK_Z/2,rM,lM,sM);
   const startX=-((5-1)*BLK_X)/2;
-  for(let c=-1;c<=5;c++) makeVR(startX+c*BLK_X-BLK_X/2+BLK_X/2,rM,lM,sM);
+  for(let c=0;c<=5;c++) makeVR(startX+c*BLK_X-BLK_X/2,rM,lM,sM);
 }
 
 function makeHR(rz,rM,lM,sM){
@@ -776,28 +782,31 @@ function makeVR(rx,rM,lM,sM){
 
 function makeDistrictZones(){
   const startZ=-((DIST_ORDER.length-1)*BLK_Z)/2;
+  const baseX=-((5-1)*BLK_X)/2;
   DIST_ORDER.forEach((dk,row)=>{
     const dist=DISTRICTS[dk];
     const cols=ROW_COLS[dk];
-    const startX=-((cols-1)*BLK_X)/2;
+    const distOffsetX=((5-cols)*BLK_X)/2;
+    const cx=baseX+distOffsetX+(cols-1)*BLK_X/2;
     const zone=new THREE.Mesh(
-      new THREE.PlaneGeometry(cols*BLK_X+3,BLK_Z-ROAD_W-1),
-      new THREE.MeshLambertMaterial({color:dist.color,transparent:true,opacity:0.038})
+      new THREE.PlaneGeometry(cols*BLK_X-ROAD_W,BLK_Z-ROAD_W),
+      new THREE.MeshLambertMaterial({color:dist.color,transparent:true,opacity:0.04})
     );
     zone.rotation.x=-Math.PI/2;
-    zone.position.set(startX+(cols-1)*BLK_X/2,0.055,startZ+row*BLK_Z);
+    zone.position.set(cx,0.055,startZ+row*BLK_Z);
     scene.add(zone);
   });
 }
 
 function makeDistrictSigns(){
   const startZ=-((DIST_ORDER.length-1)*BLK_Z)/2;
+  const baseX=-((5-1)*BLK_X)/2;
   DIST_ORDER.forEach((dk,row)=>{
     const dist=DISTRICTS[dk];
     const cols=ROW_COLS[dk];
-    const startX=-((cols-1)*BLK_X)/2;
-    const cx=startX+(cols-1)*BLK_X/2;
-    const rz=startZ+row*BLK_Z-BLK_Z/2+1.5;
+    const distOffsetX=((5-cols)*BLK_X)/2;
+    const cx=baseX+distOffsetX+(cols-1)*BLK_X/2;
+    const rz=startZ+row*BLK_Z+BLK_Z/2-1; // in front of buildings (positive Z side)
     makeSign(cx,rz,dist.name,dist.color);
   });
 }
@@ -829,32 +838,31 @@ function makeSign(x,z,label,color){
 }
 
 function makeDistrictRoadBanners(){
-  // Paint a large district name on the road surface before each row of buildings
   const startZ=-((DIST_ORDER.length-1)*BLK_Z)/2;
+  const baseX=-((5-1)*BLK_X)/2;
   DIST_ORDER.forEach((dk,row)=>{
     const dist=DISTRICTS[dk];
     const cols=ROW_COLS[dk];
-    const startX=-((cols-1)*BLK_X)/2;
-    const cx=startX+(cols-1)*BLK_X/2;
-    const rz=startZ+row*BLK_Z-BLK_Z/2+BLK_Z/2; // center of the road before the row
+    const distOffsetX=((5-cols)*BLK_X)/2;
+    const cx=baseX+distOffsetX+(cols-1)*BLK_X/2;
+    // Road on positive-Z side = the road car drives through BEFORE reaching this district
+    const roadZ=startZ+row*BLK_Z+BLK_Z/2;
 
-    // Canvas texture — district name large + colored
-    const can=document.createElement('canvas');can.width=1024;can.height=128;
-    const ctx=can.getContext('2d');ctx.clearRect(0,0,1024,128);
-    ctx.font='900 68px Segoe UI,Arial';ctx.fillStyle=dist.hex;
-    ctx.textAlign='center';ctx.textBaseline='middle';ctx.globalAlpha=0.55;
-    ctx.fillText(('— '+dist.name.toUpperCase()+' —'),512,64);
-    ctx.globalAlpha=1;
+    const can=document.createElement('canvas');can.width=1024;can.height=160;
+    const ctx=can.getContext('2d');ctx.clearRect(0,0,1024,160);
+    ctx.fillStyle=dist.hex;ctx.globalAlpha=0.1;ctx.fillRect(0,0,1024,160);ctx.globalAlpha=1;
+    ctx.font='900 62px Segoe UI,Arial';ctx.fillStyle=dist.hex;
+    ctx.textAlign='center';ctx.textBaseline='middle';ctx.globalAlpha=0.8;
+    ctx.fillText(dist.name.toUpperCase(),512,82);ctx.globalAlpha=1;
     const tex=new THREE.CanvasTexture(can);
 
-    // Width spans the whole district
-    const bannerW=cols*BLK_X+10;
+    const bannerW=Math.max(cols*BLK_X+20,60);
     const banner=new THREE.Mesh(
-      new THREE.PlaneGeometry(bannerW,5),
-      new THREE.MeshBasicMaterial({map:tex,transparent:true,depthWrite:false})
+      new THREE.PlaneGeometry(bannerW,7),
+      new THREE.MeshBasicMaterial({map:tex,transparent:true,depthWrite:false,side:THREE.DoubleSide})
     );
     banner.rotation.x=-Math.PI/2;
-    banner.position.set(cx,0.09,rz-BLK_Z/2+4);
+    banner.position.set(cx,0.09,roadZ-3.5);
     scene.add(banner);
   });
 }
@@ -1240,13 +1248,20 @@ function drawMinimap(){
   });
   const cpx=ox+carPos.x*scale,cpz=oz+carPos.z*scale;
   mmCtx.save();mmCtx.translate(cpx,cpz);
-  // carAngle: 0=facing +Z (down on minimap), PI=facing -Z (up on minimap)
-  // Canvas: positive Y is down, so rotate by carAngle directly (not negated)
-  mmCtx.rotate(carAngle);
-  mmCtx.fillStyle='#ffffff';mmCtx.beginPath();
-  // Arrow pointing up = forward direction
-  mmCtx.moveTo(0,-6);mmCtx.lineTo(3.5,5);mmCtx.lineTo(0,3);mmCtx.lineTo(-3.5,5);
-  mmCtx.closePath();mmCtx.fill();mmCtx.restore();
+  // carAngle=0 → facing +Z → down on canvas (+Y). carAngle=PI → facing -Z → up on canvas (-Y).
+  // Arrow drawn pointing up (tip at y=-6). Rotate by (carAngle + PI) so tip points toward -Z when angle=PI, +Z when angle=0.
+  mmCtx.rotate(carAngle+Math.PI);
+  mmCtx.fillStyle='#f5c842';
+  mmCtx.beginPath();
+  mmCtx.moveTo(0,-6.5);       // tip = forward
+  mmCtx.lineTo(3.5,5);
+  mmCtx.lineTo(0,2.5);
+  mmCtx.lineTo(-3.5,5);
+  mmCtx.closePath();mmCtx.fill();
+  // Yellow dot at centre
+  mmCtx.fillStyle='#ffffff';
+  mmCtx.beginPath();mmCtx.arc(0,0,1.8,0,Math.PI*2);mmCtx.fill();
+  mmCtx.restore();
   mmCtx.strokeStyle='rgba(74,144,217,.14)';mmCtx.lineWidth=1;mmCtx.strokeRect(0,0,mw,mh);
 }
 
