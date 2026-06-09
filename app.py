@@ -77,7 +77,27 @@ html,body{width:100%;height:100vh;overflow:hidden;background:#04080f;font-family
 .lsec-inner{width:100%;max-width:820px;margin:0 auto}
 .lsec-eye{font-size:10px;letter-spacing:3px;color:#4a90d9;text-transform:uppercase;margin-bottom:8px}
 .lsec-title{font-size:clamp(24px,4vw,36px);font-weight:700;color:#eef2ff;letter-spacing:-1px;margin-bottom:8px}
-.lsec-div{width:32px;height:2px;background:#4a90d9;margin:0 0 26px}
+.lsec-div{width:32px;height:2px;background:#4a90d9;margin:0 0 26px;
+  transform:scaleX(0);transform-origin:left;transition:transform .6s .2s ease}
+
+/* Scroll-reveal base state */
+.reveal{opacity:0;transform:translateY(32px);transition:opacity .65s ease,transform .65s ease}
+.reveal.in{opacity:1;transform:translateY(0)}
+.reveal-left{opacity:0;transform:translateX(-32px);transition:opacity .65s ease,transform .65s ease}
+.reveal-left.in{opacity:1;transform:translateX(0)}
+.reveal-scale{opacity:0;transform:scale(.94);transition:opacity .55s ease,transform .55s ease}
+.reveal-scale.in{opacity:1;transform:scale(1)}
+/* stagger children */
+.stagger>*{opacity:0;transform:translateY(20px);transition:opacity .5s ease,transform .5s ease}
+.stagger.in>*{opacity:1;transform:translateY(0)}
+.stagger.in>*:nth-child(1){transition-delay:.05s}
+.stagger.in>*:nth-child(2){transition-delay:.15s}
+.stagger.in>*:nth-child(3){transition-delay:.25s}
+.stagger.in>*:nth-child(4){transition-delay:.35s}
+.stagger.in>*:nth-child(5){transition-delay:.45s}
+.stagger.in>*:nth-child(6){transition-delay:.55s}
+/* div bar animation trigger */
+.lsec-inner.in .lsec-div{transform:scaleX(1)}
 
 /* SUMMARY LINE */
 .lsummary,.hero-summary{font-size:13.5px;color:#4a6080;line-height:1.82;max-width:640px;
@@ -345,7 +365,7 @@ html,body{width:100%;height:100vh;overflow:hidden;background:#04080f;font-family
     <div class="avail-pill"><span class="avail-dot"></span>Open to full-time opportunities</div>
     <div class="intro-name">Mukund <span class="accent">Patel</span></div>
     <div class="intro-role"><strong>Data Scientist</strong> &nbsp;·&nbsp; <strong>AI Engineer</strong> &nbsp;·&nbsp; <strong>Analytics Professional</strong></div>
-    <div class="lsummary">MS Data Science graduate from <strong>Montclair State University</strong> (GPA 4.0) with hands-on experience at the <strong>MTA New York</strong> building data pipelines, and BI dashboards. I build end-to-end analytics solutions — from SQL pipelines and ML models to deployed AI applications — across transportation, finance, healthcare, retail, and logistics.</div>
+    <div class="lsummary">MS Data Science graduate from <strong>Montclair State University</strong> (GPA 4.0) with hands-on experience at the <strong>MTA New York</strong> building data pipelines, and BI dashboards. I build end-to-end analytics solutions - from SQL pipelines and ML models to deployed AI applications - across transportation, finance, healthcare, retail, and logistics.</div>
     <div class="domain-row">
       <span class="domain-tag">AI Agents &amp; LLMs</span>
       <span class="domain-tag">Revenue Management</span>
@@ -391,10 +411,10 @@ html,body{width:100%;height:100vh;overflow:hidden;background:#04080f;font-family
 <!-- ABOUT -->
 <section class="lsec" id="s-about">
   <div class="lsec-inner">
-    <div class="lsec-eye">About</div>
-    <div class="lsec-title">Who Am I</div>
+    <div class="lsec-eye reveal">About</div>
+    <div class="lsec-title reveal">Who Am I</div>
     <div class="lsec-div"></div>
-    <div class="l2col">
+    <div class="l2col stagger">
       <div class="lcard">
         <div class="lcard-head">Education</div>
         <div class="lfield"><div class="lfield-lbl">Master of Science &middot; Data Science</div><div class="lfield-val"><strong>Montclair State University</strong></div><div class="lfield-val">New Jersey, USA &nbsp;&middot;&nbsp; GPA 4.0 / 4.0</div><div class="lfield-val">Sep 2024 &ndash; May 2026</div></div>
@@ -419,9 +439,10 @@ html,body{width:100%;height:100vh;overflow:hidden;background:#04080f;font-family
 <!-- EXPERIENCE -->
 <section class="lsec" id="s-exp">
   <div class="lsec-inner">
-    <div class="lsec-eye">Career</div>
-    <div class="lsec-title">Professional Experience</div>
+    <div class="lsec-eye reveal">Career</div>
+    <div class="lsec-title reveal">Professional Experience</div>
     <div class="lsec-div"></div>
+    <div class="stagger">
     <div class="lexp" style="border-left-color:#4a90d9">
       <div class="lexp-hd"><div><div class="lexp-role">Data Analyst Intern</div><div class="lexp-org" style="color:#4a90d9">MTA &mdash; Metropolitan Transportation Authority &middot; New York, NY</div><div class="lexp-tags"><span class="letag" style="color:#4a90d9;background:rgba(74,144,217,.08);border-color:rgba(74,144,217,.2)">Computer Vision</span><span class="letag" style="color:#4a90d9;background:rgba(74,144,217,.08);border-color:rgba(74,144,217,.2)">ArcGIS</span><span class="letag" style="color:#4a90d9;background:rgba(74,144,217,.08);border-color:rgba(74,144,217,.2)">Tableau</span><span class="letag" style="color:#4a90d9;background:rgba(74,144,217,.08);border-color:rgba(74,144,217,.2)">Python ETL</span><span class="letag" style="color:#4a90d9;background:rgba(74,144,217,.08);border-color:rgba(74,144,217,.2)">SQL</span></div></div><div class="lexp-date">Oct 2025 &ndash; May 2026</div></div>
       <ul class="lexp-ul"><li>Automated data processing and validation for 8,500+ events using Python and Office Scripts, improving data quality.</li><li>Managed master data for 1,400+ bus routes via SQL and Excel; ArcGIS spatial analysis to identify route overlaps.</li><li>Built computer vision pipeline detecting bus lane violations from 900+ cameras at 92% accuracy; integrated with Tableau dashboards.</li><li>Developed ETL workflow processing driver trip logs to calculate pull-in/pull-out counts per depot at 30-minute intervals.</li></ul>
@@ -438,22 +459,23 @@ html,body{width:100%;height:100vh;overflow:hidden;background:#04080f;font-family
       <div class="lexp-hd"><div><div class="lexp-role">Research Volunteer</div><div class="lexp-org" style="color:#3ecf8e">Montclair State University &middot; New Jersey</div></div><div class="lexp-date">Nov 2024</div></div>
       <ul class="lexp-ul"><li>Processed NJ weather data (1915&ndash;2024) contributing to research showing ARIMA/SARIMA outperform deep learning for time-series forecasting.</li></ul>
     </div>
+  </div><!-- end stagger -->
   </div>
 </section>
 
 <!-- CONTACT -->
 <section class="lsec" id="s-contact">
   <div class="lsec-inner">
-    <div class="lsec-eye">Get In Touch</div>
-    <div class="lsec-title">Contact</div>
+    <div class="lsec-eye reveal">Get In Touch</div>
+    <div class="lsec-title reveal">Contact</div>
     <div class="lsec-div"></div>
-    <div class="lcont-grid">
+    <div class="lcont-grid stagger">
       <a class="lcont-card" href="mailto:mkpatel4102@gmail.com"><div class="lcont-icon">&#9993;&#65039;</div><div class="lcont-lbl">Email</div><div class="lcont-val">mkpatel4102@gmail.com</div></a>
       <a class="lcont-card" href="https://www.linkedin.com/in/mukund-patel7" target="_blank"><div class="lcont-icon">&#128188;</div><div class="lcont-lbl">LinkedIn</div><div class="lcont-val">linkedin.com/in/mukund-patel7</div></a>
       <a class="lcont-card" href="https://github.com/Mkp-7" target="_blank"><div class="lcont-icon">&#128187;</div><div class="lcont-lbl">GitHub</div><div class="lcont-val">github.com/Mkp-7</div></a>
       <div class="lcont-card" style="cursor:default"><div class="lcont-icon">&#128205;</div><div class="lcont-lbl">Location</div><div class="lcont-val">Clifton, New Jersey, USA</div></div>
     </div>
-    <div class="lexplore-banner">
+    <div class="lexplore-banner reveal">
       <div style="font-size:17px;font-weight:600;color:#eef2ff;margin-bottom:8px">Explore Projects Interactively</div>
       <div style="font-size:13px;color:#4a6080;margin-bottom:16px;line-height:1.7">Drive through a 3D city where each building is a project. Pull into any glowing entrance and press Enter to view details, live demo, and GitHub.</div>
       <button class="btn-primary" onclick="startGame()">&#9654; &nbsp;Enter Portfolio City</button>
@@ -489,7 +511,7 @@ html,body{width:100%;height:100vh;overflow:hidden;background:#04080f;font-family
 </div>
 
 <div id="hint-box">
-  <span style="color:#8aaccc">W A S D</span> / Arrows — Drive &nbsp;·&nbsp; <span style="color:#8aaccc">Enter</span> — Open project
+  <span style="color:#8aaccc">W A S D</span> / Arrows - Drive &nbsp;·&nbsp; <span style="color:#8aaccc">Enter</span> - Open project
 </div>
 
 <!-- D-PAD for mobile -->
@@ -626,7 +648,7 @@ const CAM_BACK=11,CAM_UP=5.5,CAM_LAG=0.09;
 let camPos=new THREE.Vector3(0,8,157);
 const BLK_X=32,BLK_Z=48,ROAD_W=10,CITY_H=220;
 
-// NAV SCROLL
+// NAV SCROLL + SCROLL REVEAL
 function navTo(id){
   const el=document.getElementById(id);
   const sc=document.getElementById('lscroll');
@@ -636,6 +658,8 @@ function navTo(id){
 document.addEventListener('DOMContentLoaded',()=>{
   const sc=document.getElementById('lscroll');
   if(!sc)return;
+
+  // Nav active state
   const secs=['s-hero','s-about','s-exp','s-contact'];
   const links=document.querySelectorAll('.lnav-link');
   sc.addEventListener('scroll',()=>{
@@ -649,6 +673,21 @@ document.addEventListener('DOMContentLoaded',()=>{
       }
     });
   });
+
+  // Scroll reveal via IntersectionObserver
+  const obs=new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        e.target.classList.add('in');
+        // Also trigger lsec-inner for div bar
+        const inner=e.target.closest('.lsec-inner');
+        if(inner)inner.classList.add('in');
+      }
+    });
+  },{root:sc,threshold:0.15});
+
+  // Observe all reveal elements and stagger containers
+  sc.querySelectorAll('.reveal,.reveal-left,.reveal-scale,.stagger').forEach(el=>obs.observe(el));
 });
 // ════════════════════════════════════
 function startGame(){
@@ -871,53 +910,33 @@ function makeBuilding(p,bx,bz,idx){
     new THREE.MeshLambertMaterial({color:0x0e1826}));
   pave.position.y=0.1;pave.receiveShadow=true;g.add(pave);
 
-  // Body
+  // Solid body - clean dark concrete, no style variations
   const body=new THREE.Mesh(new THREE.BoxGeometry(bW,bH,bD),
-    new THREE.MeshLambertMaterial({color:0x0c1422}));
+    new THREE.MeshLambertMaterial({color:0x111824}));
   body.position.y=bH/2+0.2;body.castShadow=true;body.receiveShadow=true;g.add(body);
 
-  if(style===0){
-    const gM=new THREE.MeshLambertMaterial({color:hc,emissive:hc,emissiveIntensity:0.06,transparent:true,opacity:0.78});
-    const s=new THREE.Mesh(new THREE.BoxGeometry(bW-1.5,bH,0.09),gM);
-    s.position.set(0,bH/2+0.2,bD/2+0.06);g.add(s);
-    const s2=s.clone();s2.position.z=-bD/2-0.06;g.add(s2);
-  }else if(style===1){
-    for(let b=1;b<Math.floor(bH/3.2);b++){
-      const band=new THREE.Mesh(new THREE.BoxGeometry(bW+0.1,0.2,bD+0.1),
-        new THREE.MeshLambertMaterial({color:hc,emissive:hc,emissiveIntensity:0.14}));
-      band.position.y=0.2+b*3.2;g.add(band);
-    }
-  }else if(style===2){
-    const cM=new THREE.MeshLambertMaterial({color:0x182236});
-    for(const[cx2,cz2]of[[-bW/2+0.5,-bD/2+0.5],[bW/2-0.5,-bD/2+0.5],[-bW/2+0.5,bD/2-0.5],[bW/2-0.5,bD/2-0.5]]){
-      const col=new THREE.Mesh(new THREE.BoxGeometry(0.9,bH,0.9),cM);
-      col.position.set(cx2,bH/2+0.2,cz2);g.add(col);
-    }
-  }else{
-    const top=new THREE.Mesh(new THREE.BoxGeometry(bW*0.62,bH*0.38,bD*0.62),
-      new THREE.MeshLambertMaterial({color:0x0c1422}));
-    top.position.y=bH+bH*0.38/2-0.4;top.castShadow=true;g.add(top);
-    const ledge=new THREE.Mesh(new THREE.BoxGeometry(bW+0.4,0.32,bD+0.4),
-      new THREE.MeshLambertMaterial({color:hc,emissive:hc,emissiveIntensity:0.22}));
-    ledge.position.y=bH+0.2;g.add(ledge);
-  }
+  // Colored top cap - category color, full width
+  const cap=new THREE.Mesh(new THREE.BoxGeometry(bW+0.1,0.6,bD+0.1),
+    new THREE.MeshLambertMaterial({color:hc,emissive:hc,emissiveIntensity:0.5}));
+  cap.position.y=bH+0.5;g.add(cap);
+
+  // Thin colored ledge at base
+  const base=new THREE.Mesh(new THREE.BoxGeometry(bW+0.2,0.25,bD+0.2),
+    new THREE.MeshLambertMaterial({color:hc,emissive:hc,emissiveIntensity:0.2}));
+  base.position.y=0.32;g.add(base);
 
   addWins(g,bW,bH,bD);
-
-  // ── 4-SIDE POSTERS ──
   makePoster(g,p,dist,bW,bH,bD);
 
-  const roofBar=new THREE.Mesh(new THREE.BoxGeometry(bW,0.4,bD),
-    new THREE.MeshLambertMaterial({color:hc,emissive:hc,emissiveIntensity:0.55}));
-  roofBar.position.y=bH+0.42;g.add(roofBar);
-  const rL=new THREE.PointLight(hc,0.8,30);rL.position.set(0,bH+2,0);g.add(rL);
+  // Category glow light above cap
+  const rL=new THREE.PointLight(hc,0.8,30);rL.position.set(0,bH+3,0);g.add(rL);
 
   // Particles
   const pg=makeParticles(p.district,hc,bW,bH);
   g.add(pg);allParticleGroups.push({group:pg,building:null});
 
   // ── PERIMETER ENTRANCE ZONE ──
-  // Full rectangle around building — glowing floor plane
+  // Full rectangle around building - glowing floor plane
   const zoneW=bW+10,zoneD=bD+10;
   const eMat=new THREE.MeshBasicMaterial({color:hc,transparent:true,opacity:0.08,depthWrite:false});
   const ePlane=new THREE.Mesh(new THREE.PlaneGeometry(zoneW,zoneD),eMat);
@@ -963,73 +982,80 @@ function makeBuilding(p,bx,bz,idx){
 }
 
 function makePoster(g,p,dist,bW,bH,bD){
-  // 128 px per world unit → canvas exactly matches face aspect ratio = zero stretch = sharp
-  const PX=128;
+  const PX=96; // texels per world unit
   const cw=Math.round(bW*PX), ch=Math.round(bH*PX);
   const can=document.createElement('canvas');
   can.width=cw; can.height=ch;
   const ctx=can.getContext('2d');
 
-  // Background
-  ctx.fillStyle='#090f1e'; ctx.fillRect(0,0,cw,ch);
-  // Top colour bar (3% height)
-  ctx.fillStyle=dist.hex; ctx.fillRect(0,0,cw,ch*0.03);
-  // Bottom bar
-  ctx.fillStyle=dist.hex; ctx.globalAlpha=0.25;
-  ctx.fillRect(0,ch*0.97,cw,ch*0.03); ctx.globalAlpha=1;
+  // Solid background matching building color
+  ctx.fillStyle='#111824'; ctx.fillRect(0,0,cw,ch);
+  // Colored top strip (matches physical cap)
+  ctx.fillStyle=dist.hex;
+  ctx.fillRect(0,0,cw,ch*0.045);
 
   ctx.textAlign='center'; ctx.textBaseline='middle';
+  const pad=cw*0.07;
 
-  // Icon centred upper quarter
-  ctx.font=`${cw*0.18}px serif`;
-  ctx.fillText(p.icon, cw/2, ch*0.22);
+  // Helper: wrap text into lines that fit within maxW
+  function wrapText(text,maxW,font){
+    ctx.font=font;
+    const words=text.split(' ');
+    const lines=[];
+    let line='';
+    words.forEach(w=>{
+      const test=line?line+' '+w:w;
+      if(ctx.measureText(test).width>maxW&&line){lines.push(line);line=w;}
+      else line=test;
+    });
+    if(line)lines.push(line);
+    return lines;
+  }
 
-  // Project name — bold white, sized to fill width
-  let nm=p.name;
-  const nameSz=cw*0.095;
-  ctx.font=`900 ${nameSz}px Segoe UI,Arial`;
-  while(ctx.measureText(nm).width>cw*0.88&&nm.length>3) nm=nm.slice(0,-1);
-  if(nm!==p.name) nm=nm.trim()+'…';
+  // Icon
+  const iconSz=cw*0.14;
+  ctx.font=`${iconSz}px serif`;
+  ctx.fillText(p.icon, cw/2, ch*0.13);
+
+  // Project name - wrapped, bold white
+  const nameSz=cw*0.078;
+  const nameFont=`900 ${nameSz}px Segoe UI,Arial`;
+  const nameLines=wrapText(p.name, cw-pad*2, nameFont);
+  ctx.font=nameFont;
   ctx.fillStyle='#f0f4ff';
-  ctx.fillText(nm, cw/2, ch*0.47);
+  const nameBlockH=nameLines.length*nameSz*1.25;
+  const nameStartY=ch*0.3;
+  nameLines.forEach((line,i)=>{
+    ctx.fillText(line, cw/2, nameStartY + i*nameSz*1.25);
+  });
 
-  // Thin divider
+  // Divider
+  const divY=nameStartY+nameBlockH+nameSz*0.4;
   ctx.fillStyle=dist.hex; ctx.globalAlpha=0.4;
-  ctx.fillRect(cw*0.1, ch*0.56, cw*0.8, 2); ctx.globalAlpha=1;
+  ctx.fillRect(pad,divY,cw-pad*2,2); ctx.globalAlpha=1;
 
-  // Category — district colour
-  const catSz=nameSz*0.6;
-  ctx.font=`700 ${catSz}px Segoe UI,Arial`;
-  ctx.fillStyle=dist.hex;
-  let cat=p.cat;
-  while(ctx.measureText(cat).width>cw*0.88&&cat.length>3) cat=cat.slice(0,-1);
-  if(cat!==p.cat) cat=cat.trim()+'…';
-  ctx.fillText(cat, cw/2, ch*0.66);
-
-  // Stat line — softer
-  const statSz=nameSz*0.5;
-  ctx.font=`${statSz}px Segoe UI,Arial`;
-  ctx.fillStyle='rgba(140,190,240,0.65)';
-  let stat=p.stat;
-  while(ctx.measureText(stat).width>cw*0.88&&stat.length>3) stat=stat.slice(0,-1);
-  ctx.fillText(stat, cw/2, ch*0.78);
+  // Category
+  const catSz=nameSz*0.62;
+  const catFont=`700 ${catSz}px Segoe UI,Arial`;
+  const catLines=wrapText(p.cat, cw-pad*2, catFont);
+  ctx.font=catFont; ctx.fillStyle=dist.hex;
+  catLines.forEach((line,i)=>{
+    ctx.fillText(line, cw/2, divY+catSz*1.1+i*catSz*1.3);
+  });
 
   const tex=new THREE.CanvasTexture(can);
   tex.anisotropy=renderer.capabilities.getMaxAnisotropy();
-
   const mat=new THREE.MeshBasicMaterial({map:tex,transparent:true,depthWrite:false});
   const eps=0.05;
 
   // FRONT (+Z)
   const front=new THREE.Mesh(new THREE.PlaneGeometry(bW,bH), mat);
-  front.position.set(0, bH/2+0.2, bD/2+eps);
-  g.add(front);
+  front.position.set(0, bH/2+0.2, bD/2+eps); g.add(front);
 
-  // BACK (-Z) — same texture, mirrored
+  // BACK (-Z)
   const back=new THREE.Mesh(new THREE.PlaneGeometry(bW,bH), mat.clone());
   back.position.set(0, bH/2+0.2, -bD/2-eps);
-  back.rotation.y=Math.PI;
-  g.add(back);
+  back.rotation.y=Math.PI; g.add(back);
 }
 
 function makeParticles(dk,color,bW,bH){
@@ -1141,12 +1167,12 @@ function buildCar(){
     wg.position.set(wx,wy,wz);
     wg.userData.isWheel=true;
 
-    // Inner spin group — this is what we rotate to spin the wheel
+    // Inner spin group - this is what we rotate to spin the wheel
     const spin=new THREE.Group();
     wg.add(spin);
     wg.userData.spin=spin;
 
-    // Tyre — cylinder lying on its side (axis along X = car width)
+    // Tyre - cylinder lying on its side (axis along X = car width)
     const tyre=new THREE.Mesh(new THREE.CylinderGeometry(0.42,0.42,0.26,20),yM);
     tyre.rotation.z=Math.PI/2; tyre.castShadow=true; spin.add(tyre);
 
@@ -1246,7 +1272,7 @@ function loop(){
     if(!blocked){carPos.x=nx;carPos.z=nz;}else{carSpeed*=-.25;}
 
     carGroup.position.x=carPos.x;carGroup.position.z=carPos.z;carGroup.rotation.y=carAngle;
-    // Spin wheels — rotate the inner spin group around Z axis (wheel's roll axis)
+    // Spin wheels - rotate the inner spin group around Z axis (wheel's roll axis)
     carWheels.forEach(wg=>{
       if(wg.userData.spin) wg.userData.spin.rotation.x+=carSpeed*2.5;
     });
@@ -1277,11 +1303,11 @@ function loop(){
     camera.lookAt(carPos.x+Math.sin(carAngle)*4,1.2,carPos.z+Math.cos(carAngle)*4);
   }
 
-  // Entrance detection + glow — perimeter zone around whole building
+  // Entrance detection + glow - perimeter zone around whole building
   nearEntry=null;let bestD=9999;
   buildings.forEach(b=>{
     const dx=carPos.x-b.cx,dz=carPos.z-b.cz;
-    // Distance to building perimeter (not centre) — use Chebyshev distance to rectangle
+    // Distance to building perimeter (not centre) - use Chebyshev distance to rectangle
     const px=Math.max(0,Math.abs(dx)-b.hw),pz=Math.max(0,Math.abs(dz)-b.hd);
     const d=Math.sqrt(px*px+pz*pz); // 0 when inside perimeter ring
     const inZone=d<5.5;
