@@ -635,7 +635,7 @@ let carGroup,carWheels=[];
 let buildings=[];
 let nearEntry=null,modalOpen=false;
 let keys={},dpadState={up:0,down:0,left:0,right:0};
-let carPos=new THREE.Vector3(0,0,145);
+let carPos=new THREE.Vector3(0,0,160);
 let carAngle=Math.PI,carSpeed=0;
 let frame=0;
 let mmCanvas,mmCtx;
@@ -645,7 +645,7 @@ let audioCtx=null,engineOsc=null,engineGain=null;
 let lastNearEntry=null;
 
 const CAM_BACK=11,CAM_UP=5.5,CAM_LAG=0.09;
-let camPos=new THREE.Vector3(0,8,157);
+let camPos=new THREE.Vector3(0,8,172);
 const BLK_X=32,BLK_Z=48,ROAD_W=10,CITY_H=220;
 
 // NAV SCROLL + SCROLL REVEAL
@@ -746,14 +746,26 @@ function projPos(p){
   const distProjs=PROJECTS.filter(x=>x.district===p.district);
   const col=distProjs.indexOf(p);
   const cols=ROW_COLS[p.district];
-  // All districts anchored to same left edge so vertical roads line up perfectly
-  const startX=-((5-1)*BLK_X)/2; // always use max cols=5 as reference
+  const startX=-((5-1)*BLK_X)/2;
   const startZ=-((DIST_ORDER.length-1)*BLK_Z)/2;
-  // Offset X to centre each district within its columns
   const distOffsetX=((5-cols)*BLK_X)/2;
-  return{
+  // Buildings sit at col*BLK_X (between vertical roads at c*BLK_X-BLK_X/2)
+  // and row*BLK_Z (horizontal roads are at row*BLK_Z ± BLK_Z/2 — i.e. between rows)
+  // Vertical roads: startX + c*BLK_X - BLK_X/2  for c=0..5 → at -64, -32, 0, 32, 64, 96
+  // Buildings at: startX + distOffsetX + col*BLK_X → at -64+16=−48, −16, 16... wait
+  // Simpler: put building X midway between two vertical roads = startX + distOffsetX + col*BLK_X
+  // Vertical roads at startX + c*BLK_X - BLK_X/2
+  // Building col=0 → startX + distOffsetX + 0 = startX + distOffsetX
+  // Nearest road: startX + 0*BLK_X - BLK_X/2 = startX - 16  AND  startX + 1*BLK_X - BLK_X/2 = startX + 16
+  // Building at startX+distOffsetX — centred between roads when distOffsetX=0: startX+0=startX, roads at startX-16 and startX+16 ✓
+  // Horizontal roads at startZ + r*BLK_Z for r=-1..ROWS (between rows)
+  // Buildings at startZ + row*BLK_Z — but roads also pass through startZ+row*BLK_Z when r==row!
+  // Fix: offset building Z by +BLK_Z/2 so it sits BETWEEN horizontal roads
+  // Horizontal roads: startZ + r*BLK_Z, r=-1,0,1,2,3,4,5
+  // With offset: building z = startZ + row*BLK_Z + BLK_Z/2 → sits between road[row] and road[row+1] ✓
+  return {
     x: startX + distOffsetX + col*BLK_X,
-    z: startZ + row*BLK_Z   // buildings stay at row Z; roads are between rows at ±BLK_Z/2
+    z: startZ + row*BLK_Z + BLK_Z/2
   };
 }
 
@@ -772,7 +784,9 @@ function makeRoads(){
   const sM=new THREE.MeshLambertMaterial({color:0x111c2c});
   const ROWS=DIST_ORDER.length;
   const startZ=-((ROWS-1)*BLK_Z)/2;
-  for(let r=-1;r<=ROWS;r++) makeHR(startZ+r*BLK_Z-BLK_Z/2+BLK_Z/2,rM,lM,sM);
+  // Horizontal roads sit AT startZ + r*BLK_Z (between rows — buildings are at +BLK_Z/2 offset)
+  for(let r=-1;r<=ROWS;r++) makeHR(startZ+r*BLK_Z,rM,lM,sM);
+  // Vertical roads at startX + c*BLK_X - BLK_X/2 (buildings at col*BLK_X = midway between roads)
   const startX=-((5-1)*BLK_X)/2;
   for(let c=0;c<=5;c++) makeVR(startX+c*BLK_X-BLK_X/2,rM,lM,sM);
 }
@@ -813,18 +827,18 @@ function makeDistrictZones(){
     const cols=ROW_COLS[dk];
     const distOffsetX=((5-cols)*BLK_X)/2;
     const cx=baseX+distOffsetX+(cols-1)*BLK_X/2;
+    // Buildings now at startZ + row*BLK_Z + BLK_Z/2, spanning BLK_Z-ROAD_W
     const zone=new THREE.Mesh(
       new THREE.PlaneGeometry(cols*BLK_X-ROAD_W,BLK_Z-ROAD_W),
       new THREE.MeshLambertMaterial({color:dist.color,transparent:true,opacity:0.04})
     );
     zone.rotation.x=-Math.PI/2;
-    zone.position.set(cx,0.055,startZ+row*BLK_Z);
+    zone.position.set(cx,0.055,startZ+row*BLK_Z+BLK_Z/2);
     scene.add(zone);
   });
 }
 
 function makeDistrictSigns(){
-  // Paint category name at every road intersection within each district's column range
   const startZ=-((DIST_ORDER.length-1)*BLK_Z)/2;
   const baseX=-((5-1)*BLK_X)/2;
 
@@ -832,47 +846,72 @@ function makeDistrictSigns(){
     const dist=DISTRICTS[dk];
     const cols=ROW_COLS[dk];
     const distOffsetX=((5-cols)*BLK_X)/2;
-    const rowZ=startZ+row*BLK_Z;
 
-    // Road intersection Z positions bordering this district row
-    const interZ=[rowZ-BLK_Z/2, rowZ+BLK_Z/2];
+    // The two horizontal roads bounding this district row
+    const roadZ_front=startZ+row*BLK_Z+BLK_Z; // road AFTER district (positive Z = car approaches)
+    const roadZ_back =startZ+row*BLK_Z;         // road BEFORE district
 
-    interZ.forEach(iz=>{
-      // One label per column intersection within this district
-      for(let c=0;c<cols;c++){
-        const ix=baseX+distOffsetX+c*BLK_X-BLK_X/2;
-
-        // Canvas label — district name, both readable directions
-        const can=document.createElement('canvas');
-        can.width=512; can.height=512;
-        const ctx=can.getContext('2d');
-        ctx.clearRect(0,0,512,512);
-
-        // Draw label for one direction
-        ctx.save();
-        ctx.translate(256,256);
-        ctx.font=`900 52px Segoe UI,Arial`;
-        ctx.fillStyle=dist.hex;
-        ctx.textAlign='center';
-        ctx.textBaseline='middle';
-        ctx.globalAlpha=0.75;
-        ctx.fillText(dist.name.toUpperCase(),0,-60);
-        // Second direction (rotated 180 = same text readable from other side)
-        ctx.rotate(Math.PI);
-        ctx.fillText(dist.name.toUpperCase(),0,-60);
-        ctx.restore();
-
-        const tex=new THREE.CanvasTexture(can);
-        const mesh=new THREE.Mesh(
-          new THREE.PlaneGeometry(BLK_X*0.85,BLK_X*0.85),
-          new THREE.MeshBasicMaterial({map:tex,transparent:true,depthWrite:false})
-        );
-        mesh.rotation.x=-Math.PI/2;
-        mesh.position.set(ix+BLK_X/2,0.1,iz);
-        scene.add(mesh);
-      }
-    });
+    // Vertical road X positions within this district's column span
+    // Vertical roads at baseX + c*BLK_X - BLK_X/2 for c covering this district
+    const colStart=Math.round(distOffsetX/BLK_X);
+    for(let c=colStart;c<=colStart+cols;c++){
+      const rx=baseX+c*BLK_X-BLK_X/2;
+      // Place sign at each boundary road, at each vertical road crossing
+      [roadZ_front, roadZ_back].forEach(rz=>{
+        makePoleSign(rx, rz, dist.name, dist.color);
+      });
+    }
   });
+}
+
+function makePoleSign(x,z,label,color){
+  const g=new THREE.Group();
+  g.position.set(x,0,z);
+
+  const pM=new THREE.MeshLambertMaterial({color:0x3a4f62});
+
+  // Single centre pole
+  const pole=new THREE.Mesh(new THREE.CylinderGeometry(0.08,0.1,5,8),pM);
+  pole.position.y=2.5; g.add(pole);
+
+  // Horizontal cross-arm (perpendicular to Z road so readable both directions)
+  const arm=new THREE.Mesh(new THREE.BoxGeometry(5,0.1,0.1),pM);
+  arm.position.y=5.1; g.add(arm);
+
+  // Sign board facing +Z (readable driving toward -Z)
+  function board(rotY){
+    const can=document.createElement('canvas');
+    can.width=512; can.height=96;
+    const ctx=can.getContext('2d');
+    ctx.fillStyle='#0a1220';
+    ctx.fillRect(0,0,512,96);
+    ctx.fillStyle=color;
+    ctx.fillRect(0,0,512,8);
+    ctx.fillRect(0,88,512,8);
+    ctx.font='bold 40px Segoe UI,Arial';
+    ctx.fillStyle='#e8f0ff';
+    ctx.textAlign='center';
+    ctx.textBaseline='middle';
+    ctx.fillText(label.toUpperCase(),256,52);
+    const tex=new THREE.CanvasTexture(can);
+    const mesh=new THREE.Mesh(
+      new THREE.PlaneGeometry(4.8,0.9),
+      new THREE.MeshBasicMaterial({map:tex,transparent:true,side:THREE.DoubleSide})
+    );
+    mesh.position.set(0,5.1,0);
+    mesh.rotation.y=rotY;
+    return mesh;
+  }
+
+  // Two boards — one facing each driving direction
+  g.add(board(0));          // facing +Z
+  g.add(board(Math.PI));    // facing -Z
+
+  // Colored glow light
+  const pl=new THREE.PointLight(color,0.4,12);
+  pl.position.set(0,5.5,0); g.add(pl);
+
+  scene.add(g);
 }
 
 
@@ -884,8 +923,8 @@ function makeDistrictRoadBanners(){
     const cols=ROW_COLS[dk];
     const distOffsetX=((5-cols)*BLK_X)/2;
     const cx=baseX+distOffsetX+(cols-1)*BLK_X/2;
-    // Road on positive-Z side = the road car drives through BEFORE reaching this district
-    const roadZ=startZ+row*BLK_Z+BLK_Z/2;
+    // Road BEFORE this district (car approaches from +Z, buildings now at row*BLK_Z + BLK_Z/2)
+    const roadZ=startZ+row*BLK_Z+BLK_Z;
 
     const can=document.createElement('canvas');can.width=2048;can.height=256;
     const ctx=can.getContext('2d');ctx.clearRect(0,0,2048,256);
@@ -1126,13 +1165,11 @@ function placeLamps(){
   const bM=new THREE.MeshLambertMaterial({color:0xffeedd,emissive:0xffeedd,emissiveIntensity:1});
   const startZ=-((DIST_ORDER.length-1)*BLK_Z)/2;
   const startX=-((5-1)*BLK_X)/2;
-
-  // Place one lamp at each road intersection (where H and V roads cross)
+  // Intersections: horizontal roads at startZ+r*BLK_Z, vertical roads at startX+c*BLK_X-BLK_X/2
   for(let c=0;c<=5;c++){
     for(let r=0;r<=DIST_ORDER.length;r++){
       const lx=startX+c*BLK_X-BLK_X/2;
-      const lz=startZ+r*BLK_Z-BLK_Z/2;
-      // Skip every other intersection to keep it minimal
+      const lz=startZ+r*BLK_Z;
       if((c+r)%2!==0) continue;
       const lg=new THREE.Group();lg.position.set(lx,0,lz);
       const pole=new THREE.Mesh(new THREE.CylinderGeometry(0.06,0.08,5,8),pM);
