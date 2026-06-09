@@ -96,10 +96,11 @@ body{width:100%;background:#04080f;font-family:'Segoe UI',system-ui,sans-serif;c
   border:1px solid rgba(62,207,142,.22);border-radius:8px;color:#3ecf8e;font-size:11px;
   font-weight:600;padding:10px 18px;cursor:pointer;text-decoration:none;transition:all .2s}
 .btn-resume:hover{background:rgba(62,207,142,.16)}
-.dist-chips{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;animation:fadeUp .8s .43s ease both}
-.dchip{display:inline-flex;align-items:center;gap:6px;font-size:10px;letter-spacing:.5px;
-  color:#2a3a52;padding:4px 10px;border-radius:4px;border:1px solid rgba(255,255,255,.05)}
-.dchip-pip{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.dist-chips{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;animation:fadeUp .8s .43s ease both;margin-top:4px}
+.dchip{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;
+  padding:8px 16px;border-radius:8px;border:1px solid;cursor:default;transition:all .25s}
+.dchip:hover{transform:translateY(-2px)}
+.dchip-pip{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 .scroll-cue{margin-top:24px;font-size:9px;letter-spacing:2.5px;color:#1a2a3a;
   text-transform:uppercase;animation:fadeUp .8s .5s ease both}
 @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
@@ -270,11 +271,11 @@ body{width:100%;background:#04080f;font-family:'Segoe UI',system-ui,sans-serif;c
 """    <button class="btn-enter" onclick="startGame()">&#9654; Explore Portfolio</button>
   </div>
   <div class="dist-chips">
-    <div class="dchip"><div class="dchip-pip" style="background:#4a90d9"></div>Retail &amp; Commerce</div>
-    <div class="dchip"><div class="dchip-pip" style="background:#e85555"></div>Finance &amp; Banking</div>
-    <div class="dchip"><div class="dchip-pip" style="background:#f5a623"></div>Operations &amp; Logistics</div>
-    <div class="dchip"><div class="dchip-pip" style="background:#3ecf8e"></div>Healthcare &amp; Life Sci.</div>
-    <div class="dchip"><div class="dchip-pip" style="background:#9b6dff"></div>Research &amp; Education</div>
+    <div class="dchip" style="color:#7eb8f7;background:rgba(74,144,217,.12);border-color:rgba(74,144,217,.35)"><div class="dchip-pip" style="background:#4a90d9;box-shadow:0 0 6px #4a90d9"></div>Retail &amp; Commerce</div>
+    <div class="dchip" style="color:#f08080;background:rgba(232,85,85,.12);border-color:rgba(232,85,85,.35)"><div class="dchip-pip" style="background:#e85555;box-shadow:0 0 6px #e85555"></div>Finance &amp; Banking</div>
+    <div class="dchip" style="color:#f5c87a;background:rgba(245,166,35,.12);border-color:rgba(245,166,35,.35)"><div class="dchip-pip" style="background:#f5a623;box-shadow:0 0 6px #f5a623"></div>Operations &amp; Logistics</div>
+    <div class="dchip" style="color:#6ee8b4;background:rgba(62,207,142,.12);border-color:rgba(62,207,142,.35)"><div class="dchip-pip" style="background:#3ecf8e;box-shadow:0 0 6px #3ecf8e"></div>Healthcare &amp; Life Sci.</div>
+    <div class="dchip" style="color:#c4a8ff;background:rgba(155,109,255,.12);border-color:rgba(155,109,255,.35)"><div class="dchip-pip" style="background:#9b6dff;box-shadow:0 0 6px #9b6dff"></div>Research &amp; Education</div>
   </div>
   <div class="scroll-cue">&#8595; &nbsp; scroll to explore &nbsp; &#8595;</div>
 </div>
@@ -581,6 +582,12 @@ function startGame(){
   ['hud','mm-wrap','hint-box'].forEach(id=>document.getElementById(id).style.display='block');
   document.getElementById('dpad').style.display='grid';
   if(!gameReady){gameReady=true;initGame();}
+  else{
+    // Already initialised — just force a resize
+    renderer.setSize(window.innerWidth,window.innerHeight);
+    camera.aspect=window.innerWidth/window.innerHeight;
+    camera.updateProjectionMatrix();
+  }
 }
 function backToLanding(){
   document.getElementById('game-wrap').style.display='none';
@@ -636,9 +643,19 @@ const BX=24,BZ=30,RW=10,CH=155;
 
 function initGame(){
   mmCv=document.getElementById('mm');mmCx=mmCv.getContext('2d');
+  // Force canvas to full size before Three.js init (was hidden, so had 0 dimensions)
+  const cv=document.getElementById('c');
+  cv.width=window.innerWidth;cv.height=window.innerHeight;
   init3D();buildCity();buildCar();bindInput();initAudio();
-  clock=new THREE.Clock();gameLoop();
-  showToast('Drive into a glowing zone \u00b7 Press Enter to open a project');
+  clock=new THREE.Clock();
+  // Short delay so the game-wrap is fully visible before first render
+  setTimeout(()=>{
+    renderer.setSize(window.innerWidth,window.innerHeight);
+    camera.aspect=window.innerWidth/window.innerHeight;
+    camera.updateProjectionMatrix();
+    gameLoop();
+    showToast('Drive into a glowing zone \u00b7 Press Enter to open a project');
+  },80);
 }
 
 function init3D(){
