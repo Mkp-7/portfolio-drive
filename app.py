@@ -365,7 +365,7 @@ html,body{width:100%;height:100vh;overflow:hidden;background:#04080f;font-family
     <div class="avail-pill"><span class="avail-dot"></span>Open to full-time opportunities</div>
     <div class="intro-name">Mukund <span class="accent">Patel</span></div>
     <div class="intro-role"><strong>Data Scientist</strong> &nbsp;·&nbsp; <strong>AI Engineer</strong> &nbsp;·&nbsp; <strong>Analytics Professional</strong></div>
-    <div class="lsummary">MS Data Science graduate from <strong>Montclair State University</strong> (GPA 4.0) with hands-on experience at the <strong>MTA New York</strong> building data pipelines, and BI dashboards. I build end-to-end analytics solutions - from SQL pipelines and ML models to deployed AI applications - across transportation, finance, healthcare, retail, and logistics.</div>
+    <div class="lsummary">MS Data Science graduate from <strong>Montclair State University</strong> (GPA 4.0) with hands-on experience at the <strong>MTA New York</strong> building data pipelines, and BI dashboards. I build end-to-end analytics solutions — from SQL pipelines and ML models to deployed AI applications — across transportation, finance, healthcare, retail, and logistics.</div>
     <div class="domain-row">
       <span class="domain-tag">AI Agents &amp; LLMs</span>
       <span class="domain-tag">Revenue Management</span>
@@ -511,7 +511,7 @@ html,body{width:100%;height:100vh;overflow:hidden;background:#04080f;font-family
 </div>
 
 <div id="hint-box">
-  <span style="color:#8aaccc">W A S D</span> / Arrows - Drive &nbsp;·&nbsp; <span style="color:#8aaccc">Enter</span> - Open project
+  <span style="color:#8aaccc">W A S D</span> / Arrows — Drive &nbsp;·&nbsp; <span style="color:#8aaccc">Enter</span> — Open project
 </div>
 
 <!-- D-PAD for mobile -->
@@ -824,43 +824,57 @@ function makeDistrictZones(){
 }
 
 function makeDistrictSigns(){
+  // Paint category name at every road intersection within each district's column range
   const startZ=-((DIST_ORDER.length-1)*BLK_Z)/2;
   const baseX=-((5-1)*BLK_X)/2;
+
   DIST_ORDER.forEach((dk,row)=>{
     const dist=DISTRICTS[dk];
     const cols=ROW_COLS[dk];
     const distOffsetX=((5-cols)*BLK_X)/2;
-    const cx=baseX+distOffsetX+(cols-1)*BLK_X/2;
-    const rz=startZ+row*BLK_Z+BLK_Z/2-1; // in front of buildings (positive Z side)
-    makeSign(cx,rz,dist.name,dist.color);
+    const rowZ=startZ+row*BLK_Z;
+
+    // Road intersection Z positions bordering this district row
+    const interZ=[rowZ-BLK_Z/2, rowZ+BLK_Z/2];
+
+    interZ.forEach(iz=>{
+      // One label per column intersection within this district
+      for(let c=0;c<cols;c++){
+        const ix=baseX+distOffsetX+c*BLK_X-BLK_X/2;
+
+        // Canvas label — district name, both readable directions
+        const can=document.createElement('canvas');
+        can.width=512; can.height=512;
+        const ctx=can.getContext('2d');
+        ctx.clearRect(0,0,512,512);
+
+        // Draw label for one direction
+        ctx.save();
+        ctx.translate(256,256);
+        ctx.font=`900 52px Segoe UI,Arial`;
+        ctx.fillStyle=dist.hex;
+        ctx.textAlign='center';
+        ctx.textBaseline='middle';
+        ctx.globalAlpha=0.75;
+        ctx.fillText(dist.name.toUpperCase(),0,-60);
+        // Second direction (rotated 180 = same text readable from other side)
+        ctx.rotate(Math.PI);
+        ctx.fillText(dist.name.toUpperCase(),0,-60);
+        ctx.restore();
+
+        const tex=new THREE.CanvasTexture(can);
+        const mesh=new THREE.Mesh(
+          new THREE.PlaneGeometry(BLK_X*0.85,BLK_X*0.85),
+          new THREE.MeshBasicMaterial({map:tex,transparent:true,depthWrite:false})
+        );
+        mesh.rotation.x=-Math.PI/2;
+        mesh.position.set(ix+BLK_X/2,0.1,iz);
+        scene.add(mesh);
+      }
+    });
   });
 }
 
-function makeSign(x,z,label,color){
-  const g=new THREE.Group();g.position.set(x,0,z);
-  const pM=new THREE.MeshLambertMaterial({color:0x3a4558});
-  for(const ox of[-3.2,3.2]){
-    const pole=new THREE.Mesh(new THREE.CylinderGeometry(0.09,0.11,4.2,8),pM);
-    pole.position.set(ox,2.1,0);g.add(pole);
-  }
-  const board=new THREE.Mesh(new THREE.BoxGeometry(7.5,1.1,0.18),
-    new THREE.MeshLambertMaterial({color:0x08101e}));
-  board.position.set(0,4.2,0);g.add(board);
-  const strip=new THREE.Mesh(new THREE.BoxGeometry(7.5,0.18,0.22),
-    new THREE.MeshLambertMaterial({color,emissive:color,emissiveIntensity:0.6}));
-  strip.position.set(0,4.79,0);g.add(strip);
-  const can=document.createElement('canvas');can.width=1024;can.height=160;
-  const ctx=can.getContext('2d');ctx.clearRect(0,0,1024,160);
-  ctx.font='bold 80px Segoe UI,Arial';ctx.fillStyle='#c8d8f0';
-  ctx.textAlign='center';ctx.textBaseline='middle';
-  ctx.fillText(label.toUpperCase(),512,80);
-  const tex=new THREE.CanvasTexture(can);
-  const sign=new THREE.Mesh(new THREE.PlaneGeometry(7,0.9),
-    new THREE.MeshBasicMaterial({map:tex,transparent:true}));
-  sign.position.set(0,4.2,0.1);g.add(sign);
-  const pl=new THREE.PointLight(color,0.45,14);pl.position.set(0,4.5,1.2);g.add(pl);
-  scene.add(g);
-}
 
 function makeDistrictRoadBanners(){
   const startZ=-((DIST_ORDER.length-1)*BLK_Z)/2;
@@ -902,7 +916,7 @@ function placeBuildings(){
 function makeBuilding(p,bx,bz,idx){
   const dist=DISTRICTS[p.district];
   const hc=dist.color;
-  const style=idx%4, bH=10+(idx%5)*2, bW=11, bD=11; // square footprint, moderate height
+  const style=idx%4, bH=9, bW=11, bD=11; // uniform height — poster fills face cleanly
   const g=new THREE.Group();g.position.set(bx,0,bz);
 
   // Pavement
@@ -910,12 +924,12 @@ function makeBuilding(p,bx,bz,idx){
     new THREE.MeshLambertMaterial({color:0x0e1826}));
   pave.position.y=0.1;pave.receiveShadow=true;g.add(pave);
 
-  // Solid body - clean dark concrete, no style variations
+  // Solid body — clean dark concrete, no style variations
   const body=new THREE.Mesh(new THREE.BoxGeometry(bW,bH,bD),
     new THREE.MeshLambertMaterial({color:0x111824}));
   body.position.y=bH/2+0.2;body.castShadow=true;body.receiveShadow=true;g.add(body);
 
-  // Colored top cap - category color, full width
+  // Colored top cap — category color, full width
   const cap=new THREE.Mesh(new THREE.BoxGeometry(bW+0.1,0.6,bD+0.1),
     new THREE.MeshLambertMaterial({color:hc,emissive:hc,emissiveIntensity:0.5}));
   cap.position.y=bH+0.5;g.add(cap);
@@ -925,7 +939,6 @@ function makeBuilding(p,bx,bz,idx){
     new THREE.MeshLambertMaterial({color:hc,emissive:hc,emissiveIntensity:0.2}));
   base.position.y=0.32;g.add(base);
 
-  addWins(g,bW,bH,bD);
   makePoster(g,p,dist,bW,bH,bD);
 
   // Category glow light above cap
@@ -936,7 +949,7 @@ function makeBuilding(p,bx,bz,idx){
   g.add(pg);allParticleGroups.push({group:pg,building:null});
 
   // ── PERIMETER ENTRANCE ZONE ──
-  // Full rectangle around building - glowing floor plane
+  // Full rectangle around building — glowing floor plane
   const zoneW=bW+10,zoneD=bD+10;
   const eMat=new THREE.MeshBasicMaterial({color:hc,transparent:true,opacity:0.08,depthWrite:false});
   const ePlane=new THREE.Mesh(new THREE.PlaneGeometry(zoneW,zoneD),eMat);
@@ -982,79 +995,78 @@ function makeBuilding(p,bx,bz,idx){
 }
 
 function makePoster(g,p,dist,bW,bH,bD){
-  const PX=96; // texels per world unit
+  const PX=96;
   const cw=Math.round(bW*PX), ch=Math.round(bH*PX);
-  const can=document.createElement('canvas');
-  can.width=cw; can.height=ch;
-  const ctx=can.getContext('2d');
 
-  // Solid background matching building color
-  ctx.fillStyle='#111824'; ctx.fillRect(0,0,cw,ch);
-  // Colored top strip (matches physical cap)
-  ctx.fillStyle=dist.hex;
-  ctx.fillRect(0,0,cw,ch*0.045);
+  function buildCanvas(){
+    const can=document.createElement('canvas');
+    can.width=cw; can.height=ch;
+    const ctx=can.getContext('2d');
 
-  ctx.textAlign='center'; ctx.textBaseline='middle';
-  const pad=cw*0.07;
+    // Solid background matching body
+    ctx.fillStyle='#111824'; ctx.fillRect(0,0,cw,ch);
+    // Coloured top strip (matches cap)
+    ctx.fillStyle=dist.hex; ctx.fillRect(0,0,cw,ch*0.055);
 
-  // Helper: wrap text into lines that fit within maxW
-  function wrapText(text,maxW,font){
-    ctx.font=font;
-    const words=text.split(' ');
-    const lines=[];
-    let line='';
-    words.forEach(w=>{
-      const test=line?line+' '+w:w;
-      if(ctx.measureText(test).width>maxW&&line){lines.push(line);line=w;}
-      else line=test;
-    });
-    if(line)lines.push(line);
-    return lines;
+    ctx.textAlign='center'; ctx.textBaseline='top';
+    const pad=cw*0.08;
+    const maxW=cw-pad*2;
+
+    // Text wrapping helper
+    function wrap(text,font,mW){
+      ctx.font=font;
+      const words=text.split(' ');
+      const lines=[];let line='';
+      words.forEach(w=>{
+        const t=line?line+' '+w:w;
+        if(ctx.measureText(t).width>mW&&line){lines.push(line);line=w;}
+        else line=t;
+      });
+      if(line)lines.push(line);
+      return lines;
+    }
+
+    // Start drawing from 18% down so text sits in lower portion
+    let y=ch*0.18;
+
+    // Project name — bold white, wrapped
+    const nameSz=cw*0.082;
+    const nameFont=`900 ${nameSz}px Segoe UI,Arial`;
+    const nameLines=wrap(p.name,nameFont,maxW);
+    ctx.font=nameFont; ctx.fillStyle='#f0f4ff';
+    const nameLineH=nameSz*1.28;
+    nameLines.forEach((line,i)=>{ ctx.fillText(line,cw/2,y+i*nameLineH); });
+    y+=nameLines.length*nameLineH+nameSz*0.5;
+
+    // Thin divider
+    ctx.fillStyle=dist.hex; ctx.globalAlpha=0.4;
+    ctx.fillRect(pad,y,maxW,2); ctx.globalAlpha=1;
+    y+=nameSz*0.55;
+
+    // Category — district colour, wrapped
+    const catSz=nameSz*0.62;
+    const catFont=`700 ${catSz}px Segoe UI,Arial`;
+    const catLines=wrap(p.cat,catFont,maxW);
+    ctx.font=catFont; ctx.fillStyle=dist.hex;
+    const catLineH=catSz*1.3;
+    catLines.forEach((line,i)=>{ ctx.fillText(line,cw/2,y+i*catLineH); });
+
+    const tex=new THREE.CanvasTexture(can);
+    tex.anisotropy=renderer.capabilities.getMaxAnisotropy();
+    return tex;
   }
 
-  // Icon
-  const iconSz=cw*0.14;
-  ctx.font=`${iconSz}px serif`;
-  ctx.fillText(p.icon, cw/2, ch*0.13);
-
-  // Project name - wrapped, bold white
-  const nameSz=cw*0.078;
-  const nameFont=`900 ${nameSz}px Segoe UI,Arial`;
-  const nameLines=wrapText(p.name, cw-pad*2, nameFont);
-  ctx.font=nameFont;
-  ctx.fillStyle='#f0f4ff';
-  const nameBlockH=nameLines.length*nameSz*1.25;
-  const nameStartY=ch*0.3;
-  nameLines.forEach((line,i)=>{
-    ctx.fillText(line, cw/2, nameStartY + i*nameSz*1.25);
-  });
-
-  // Divider
-  const divY=nameStartY+nameBlockH+nameSz*0.4;
-  ctx.fillStyle=dist.hex; ctx.globalAlpha=0.4;
-  ctx.fillRect(pad,divY,cw-pad*2,2); ctx.globalAlpha=1;
-
-  // Category
-  const catSz=nameSz*0.62;
-  const catFont=`700 ${catSz}px Segoe UI,Arial`;
-  const catLines=wrapText(p.cat, cw-pad*2, catFont);
-  ctx.font=catFont; ctx.fillStyle=dist.hex;
-  catLines.forEach((line,i)=>{
-    ctx.fillText(line, cw/2, divY+catSz*1.1+i*catSz*1.3);
-  });
-
-  const tex=new THREE.CanvasTexture(can);
-  tex.anisotropy=renderer.capabilities.getMaxAnisotropy();
-  const mat=new THREE.MeshBasicMaterial({map:tex,transparent:true,depthWrite:false});
   const eps=0.05;
+  const mat=new THREE.MeshBasicMaterial({map:buildCanvas(),transparent:true,depthWrite:false});
+  const mat2=new THREE.MeshBasicMaterial({map:buildCanvas(),transparent:true,depthWrite:false});
 
   // FRONT (+Z)
-  const front=new THREE.Mesh(new THREE.PlaneGeometry(bW,bH), mat);
-  front.position.set(0, bH/2+0.2, bD/2+eps); g.add(front);
+  const front=new THREE.Mesh(new THREE.PlaneGeometry(bW,bH),mat);
+  front.position.set(0,bH/2+0.2,bD/2+eps); g.add(front);
 
   // BACK (-Z)
-  const back=new THREE.Mesh(new THREE.PlaneGeometry(bW,bH), mat.clone());
-  back.position.set(0, bH/2+0.2, -bD/2-eps);
+  const back=new THREE.Mesh(new THREE.PlaneGeometry(bW,bH),mat2);
+  back.position.set(0,bH/2+0.2,-bD/2-eps);
   back.rotation.y=Math.PI; g.add(back);
 }
 
@@ -1109,21 +1121,30 @@ function addWins(g,bW,bH,bD){
 }
 
 function placeLamps(){
-  const pM=new THREE.MeshLambertMaterial({color:0x606878});
+  // Only place one lamp per road intersection — minimal, clean
+  const pM=new THREE.MeshLambertMaterial({color:0x506070});
   const bM=new THREE.MeshLambertMaterial({color:0xffeedd,emissive:0xffeedd,emissiveIntensity:1});
   const startZ=-((DIST_ORDER.length-1)*BLK_Z)/2;
-  for(let c=-1;c<=5;c++) for(let r=-1;r<=DIST_ORDER.length;r++){
-    const lx=-((5-1)*BLK_X)/2+c*BLK_X-BLK_X/2;
-    const lz=startZ+r*BLK_Z-BLK_Z/2;
-    const lg=new THREE.Group();lg.position.set(lx,0,lz);
-    const pole=new THREE.Mesh(new THREE.CylinderGeometry(0.07,0.09,5,8),pM);
-    pole.position.y=2.5;lg.add(pole);
-    const arm=new THREE.Mesh(new THREE.BoxGeometry(0.07,0.07,1.1),pM);
-    arm.position.set(0,5.1,0.55);lg.add(arm);
-    const head=new THREE.Mesh(new THREE.BoxGeometry(0.34,0.15,0.55),bM);
-    head.position.set(0,4.98,1.0);lg.add(head);
-    const pl=new THREE.PointLight(0xfff0e0,0.28,16);pl.position.set(0,4.9,1.0);lg.add(pl);
-    scene.add(lg);
+  const startX=-((5-1)*BLK_X)/2;
+
+  // Place one lamp at each road intersection (where H and V roads cross)
+  for(let c=0;c<=5;c++){
+    for(let r=0;r<=DIST_ORDER.length;r++){
+      const lx=startX+c*BLK_X-BLK_X/2;
+      const lz=startZ+r*BLK_Z-BLK_Z/2;
+      // Skip every other intersection to keep it minimal
+      if((c+r)%2!==0) continue;
+      const lg=new THREE.Group();lg.position.set(lx,0,lz);
+      const pole=new THREE.Mesh(new THREE.CylinderGeometry(0.06,0.08,5,8),pM);
+      pole.position.y=2.5; lg.add(pole);
+      const arm=new THREE.Mesh(new THREE.BoxGeometry(0.06,0.06,1.0),pM);
+      arm.position.set(0,5.05,0.5); lg.add(arm);
+      const head=new THREE.Mesh(new THREE.BoxGeometry(0.3,0.14,0.5),bM);
+      head.position.set(0,4.95,0.95); lg.add(head);
+      const pl=new THREE.PointLight(0xfff0e0,0.22,18);
+      pl.position.set(0,4.9,0.95); lg.add(pl);
+      scene.add(lg);
+    }
   }
 }
 
@@ -1167,12 +1188,12 @@ function buildCar(){
     wg.position.set(wx,wy,wz);
     wg.userData.isWheel=true;
 
-    // Inner spin group - this is what we rotate to spin the wheel
+    // Inner spin group — this is what we rotate to spin the wheel
     const spin=new THREE.Group();
     wg.add(spin);
     wg.userData.spin=spin;
 
-    // Tyre - cylinder lying on its side (axis along X = car width)
+    // Tyre — cylinder lying on its side (axis along X = car width)
     const tyre=new THREE.Mesh(new THREE.CylinderGeometry(0.42,0.42,0.26,20),yM);
     tyre.rotation.z=Math.PI/2; tyre.castShadow=true; spin.add(tyre);
 
@@ -1272,7 +1293,7 @@ function loop(){
     if(!blocked){carPos.x=nx;carPos.z=nz;}else{carSpeed*=-.25;}
 
     carGroup.position.x=carPos.x;carGroup.position.z=carPos.z;carGroup.rotation.y=carAngle;
-    // Spin wheels - rotate the inner spin group around Z axis (wheel's roll axis)
+    // Spin wheels — rotate the inner spin group around Z axis (wheel's roll axis)
     carWheels.forEach(wg=>{
       if(wg.userData.spin) wg.userData.spin.rotation.x+=carSpeed*2.5;
     });
@@ -1303,11 +1324,11 @@ function loop(){
     camera.lookAt(carPos.x+Math.sin(carAngle)*4,1.2,carPos.z+Math.cos(carAngle)*4);
   }
 
-  // Entrance detection + glow - perimeter zone around whole building
+  // Entrance detection + glow — perimeter zone around whole building
   nearEntry=null;let bestD=9999;
   buildings.forEach(b=>{
     const dx=carPos.x-b.cx,dz=carPos.z-b.cz;
-    // Distance to building perimeter (not centre) - use Chebyshev distance to rectangle
+    // Distance to building perimeter (not centre) — use Chebyshev distance to rectangle
     const px=Math.max(0,Math.abs(dx)-b.hw),pz=Math.max(0,Math.abs(dz)-b.hd);
     const d=Math.sqrt(px*px+pz*pz); // 0 when inside perimeter ring
     const inZone=d<5.5;
