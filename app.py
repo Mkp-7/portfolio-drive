@@ -602,7 +602,7 @@ const PROJECTS=[
   {name:"Book Recommendation Engine",   icon:"📚",district:"research",stat:"10K books · 1M+ ratings",   cat:"ML & Python",             stack:"Python · TF-IDF · SVD",             desc:"Recommendation engine trained on 10,000 books and 1M+ ratings. Employs TF-IDF with Cosine Similarity and SVD for personalized recommendations. Addresses cold start, scalability, and relevance challenges for accurate suggestions across diverse reader profiles.",                                                                                                  tags:["TF-IDF","SVD","Cosine Similarity","Collaborative Filtering","1M+ Ratings"],    gh:"https://github.com/Mkp-7/Book_Recommendation",                                    live:""},
 ];
 
-const DIST_ORDER=['retail','finance','ops','health','research'];
+const DIST_ORDER=['research','health','ops','finance','retail'];
 const ROW_COLS={retail:5,finance:3,ops:4,health:2,research:4};
 
 // ════════════════════════════════════
@@ -613,7 +613,7 @@ let carGroup,carWheels=[];
 let buildings=[];
 let nearEntry=null,modalOpen=false;
 let keys={},dpadState={up:0,down:0,left:0,right:0};
-let carPos=new THREE.Vector3(0,0,110);
+let carPos=new THREE.Vector3(0,0,145);
 let carAngle=Math.PI,carSpeed=0;
 let frame=0;
 let mmCanvas,mmCtx;
@@ -623,8 +623,8 @@ let audioCtx=null,engineOsc=null,engineGain=null;
 let lastNearEntry=null;
 
 const CAM_BACK=11,CAM_UP=5.5,CAM_LAG=0.09;
-let camPos=new THREE.Vector3(0,8,122);
-const BLK_X=32,BLK_Z=38,ROAD_W=10,CITY_H=180;
+let camPos=new THREE.Vector3(0,8,157);
+const BLK_X=32,BLK_Z=48,ROAD_W=10,CITY_H=220;
 
 // NAV SCROLL
 function navTo(id){
@@ -863,7 +863,7 @@ function placeBuildings(){
 function makeBuilding(p,bx,bz,idx){
   const dist=DISTRICTS[p.district];
   const hc=dist.color;
-  const style=idx%4,bH=18+(idx%7)*4,bW=14,bD=12;
+  const style=idx%4, bH=10+(idx%5)*2, bW=11, bD=11; // square footprint, moderate height
   const g=new THREE.Group();g.position.set(bx,0,bz);
 
   // Pavement
@@ -963,101 +963,73 @@ function makeBuilding(p,bx,bz,idx){
 }
 
 function makePoster(g,p,dist,bW,bH,bD){
-  // Build a canvas texture that exactly matches the given face dimensions
-  // Texel density: 128 px per world unit for crisp text at any distance
+  // 128 px per world unit → canvas exactly matches face aspect ratio = zero stretch = sharp
   const PX=128;
+  const cw=Math.round(bW*PX), ch=Math.round(bH*PX);
+  const can=document.createElement('canvas');
+  can.width=cw; can.height=ch;
+  const ctx=can.getContext('2d');
 
-  function faceTex(faceW,faceH,isSide){
-    const cw=Math.round(faceW*PX), ch=Math.round(faceH*PX);
-    const can=document.createElement('canvas');
-    can.width=cw; can.height=ch;
-    const ctx=can.getContext('2d');
-    // Background
-    ctx.fillStyle='#080f1e';ctx.fillRect(0,0,cw,ch);
-    // Top bar
-    ctx.fillStyle=dist.hex;ctx.fillRect(0,0,cw,ch*0.028);
-    // Bottom bar
-    ctx.fillStyle=dist.hex;ctx.globalAlpha=0.3;
-    ctx.fillRect(0,ch*0.972,cw,ch*0.028);ctx.globalAlpha=1;
+  // Background
+  ctx.fillStyle='#090f1e'; ctx.fillRect(0,0,cw,ch);
+  // Top colour bar (3% height)
+  ctx.fillStyle=dist.hex; ctx.fillRect(0,0,cw,ch*0.03);
+  // Bottom bar
+  ctx.fillStyle=dist.hex; ctx.globalAlpha=0.25;
+  ctx.fillRect(0,ch*0.97,cw,ch*0.03); ctx.globalAlpha=1;
 
-    ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.textAlign='center'; ctx.textBaseline='middle';
 
-    // Scale fonts relative to face dimensions
-    const baseF=Math.min(cw,ch);
+  // Icon centred upper quarter
+  ctx.font=`${cw*0.18}px serif`;
+  ctx.fillText(p.icon, cw/2, ch*0.22);
 
-    // Icon (only front face to distinguish)
-    if(!isSide){
-      ctx.font=`${baseF*0.14}px serif`;
-      ctx.fillText(p.icon,cw/2,ch*0.2);
-    }
+  // Project name — bold white, sized to fill width
+  let nm=p.name;
+  const nameSz=cw*0.095;
+  ctx.font=`900 ${nameSz}px Segoe UI,Arial`;
+  while(ctx.measureText(nm).width>cw*0.88&&nm.length>3) nm=nm.slice(0,-1);
+  if(nm!==p.name) nm=nm.trim()+'…';
+  ctx.fillStyle='#f0f4ff';
+  ctx.fillText(nm, cw/2, ch*0.47);
 
-    // Project name — always shown, fills width
-    const nameY=isSide?ch*0.38:ch*0.47;
-    let nm=p.name;
-    const nameFontSize=baseF*(isSide?0.13:0.12);
-    ctx.font=`900 ${nameFontSize}px Segoe UI,Arial`;
-    while(ctx.measureText(nm).width>cw*0.9&&nm.length>3)nm=nm.slice(0,-1);
-    if(nm!==p.name)nm=nm.trim()+'…';
-    ctx.fillStyle='#f0f4ff';
-    ctx.fillText(nm,cw/2,nameY);
+  // Thin divider
+  ctx.fillStyle=dist.hex; ctx.globalAlpha=0.4;
+  ctx.fillRect(cw*0.1, ch*0.56, cw*0.8, 2); ctx.globalAlpha=1;
 
-    // Divider
-    ctx.fillStyle=dist.hex;ctx.globalAlpha=0.45;
-    ctx.fillRect(cw*0.08,nameY+nameFontSize*0.8,cw*0.84,Math.max(2,ch*0.004));
-    ctx.globalAlpha=1;
+  // Category — district colour
+  const catSz=nameSz*0.6;
+  ctx.font=`700 ${catSz}px Segoe UI,Arial`;
+  ctx.fillStyle=dist.hex;
+  let cat=p.cat;
+  while(ctx.measureText(cat).width>cw*0.88&&cat.length>3) cat=cat.slice(0,-1);
+  if(cat!==p.cat) cat=cat.trim()+'…';
+  ctx.fillText(cat, cw/2, ch*0.66);
 
-    // Category
-    const catFontSize=nameFontSize*0.65;
-    ctx.font=`700 ${catFontSize}px Segoe UI,Arial`;
-    ctx.fillStyle=dist.hex;
-    ctx.fillText(p.cat.toUpperCase(),cw/2,nameY+nameFontSize*1.35);
+  // Stat line — softer
+  const statSz=nameSz*0.5;
+  ctx.font=`${statSz}px Segoe UI,Arial`;
+  ctx.fillStyle='rgba(140,190,240,0.65)';
+  let stat=p.stat;
+  while(ctx.measureText(stat).width>cw*0.88&&stat.length>3) stat=stat.slice(0,-1);
+  ctx.fillText(stat, cw/2, ch*0.78);
 
-    // Stat (front only — less space on sides)
-    if(!isSide){
-      ctx.font=`${nameFontSize*0.55}px Segoe UI,Arial`;
-      ctx.fillStyle='rgba(160,200,240,0.7)';
-      ctx.fillText(p.stat,cw/2,nameY+nameFontSize*2.1);
-    }
+  const tex=new THREE.CanvasTexture(can);
+  tex.anisotropy=renderer.capabilities.getMaxAnisotropy();
 
-    const tex=new THREE.CanvasTexture(can);
-    tex.anisotropy=renderer.capabilities.getMaxAnisotropy(); // max sharpness at angles
-    return tex;
-  }
-
-  // Front face (+Z): bW wide × bH tall
-  const frontTex=faceTex(bW,bH,false);
-  // Back face (-Z): same aspect
-  const backTex=faceTex(bW,bH,false);
-  // Left/Right faces: bD wide × bH tall
-  const sideTex=faceTex(bD,bH,true);
-
-  const mkMat=(t)=>new THREE.MeshBasicMaterial({map:t,transparent:true,depthWrite:false});
-
-  // Place planes flush on building face — no offset gap that causes z-fight blur
-  const eps=0.05; // tiny offset to avoid z-fighting with building body
+  const mat=new THREE.MeshBasicMaterial({map:tex,transparent:true,depthWrite:false});
+  const eps=0.05;
 
   // FRONT (+Z)
-  const front=new THREE.Mesh(new THREE.PlaneGeometry(bW,bH),mkMat(frontTex));
-  front.position.set(0,bH/2+0.2,bD/2+eps);
+  const front=new THREE.Mesh(new THREE.PlaneGeometry(bW,bH), mat);
+  front.position.set(0, bH/2+0.2, bD/2+eps);
   g.add(front);
 
-  // BACK (-Z)
-  const back=new THREE.Mesh(new THREE.PlaneGeometry(bW,bH),mkMat(backTex));
-  back.position.set(0,bH/2+0.2,-bD/2-eps);
+  // BACK (-Z) — same texture, mirrored
+  const back=new THREE.Mesh(new THREE.PlaneGeometry(bW,bH), mat.clone());
+  back.position.set(0, bH/2+0.2, -bD/2-eps);
   back.rotation.y=Math.PI;
   g.add(back);
-
-  // LEFT (-X)
-  const left=new THREE.Mesh(new THREE.PlaneGeometry(bD,bH),mkMat(sideTex));
-  left.position.set(-bW/2-eps,bH/2+0.2,0);
-  left.rotation.y=-Math.PI/2;
-  g.add(left);
-
-  // RIGHT (+X)
-  const right=new THREE.Mesh(new THREE.PlaneGeometry(bD,bH),mkMat(sideTex));
-  right.position.set(bW/2+eps,bH/2+0.2,0);
-  right.rotation.y=Math.PI/2;
-  g.add(right);
 }
 
 function makeParticles(dk,color,bW,bH){
@@ -1166,14 +1138,34 @@ function buildCar(){
 
   [[-1.14,0.42,1.52],[1.14,0.42,1.52],[-1.14,0.42,-1.52],[1.14,0.42,-1.52]].forEach(([wx,wy,wz])=>{
     const wg=new THREE.Group();
-    const tyre=new THREE.Mesh(new THREE.CylinderGeometry(0.42,0.42,0.26,20),yM);tyre.rotation.z=Math.PI/2;tyre.castShadow=true;wg.add(tyre);
-    const rim=new THREE.Mesh(new THREE.CylinderGeometry(0.27,0.27,0.27,10),rM);rim.rotation.z=Math.PI/2;wg.add(rim);
+    wg.position.set(wx,wy,wz);
+    wg.userData.isWheel=true;
+
+    // Inner spin group — this is what we rotate to spin the wheel
+    const spin=new THREE.Group();
+    wg.add(spin);
+    wg.userData.spin=spin;
+
+    // Tyre — cylinder lying on its side (axis along X = car width)
+    const tyre=new THREE.Mesh(new THREE.CylinderGeometry(0.42,0.42,0.26,20),yM);
+    tyre.rotation.z=Math.PI/2; tyre.castShadow=true; spin.add(tyre);
+
+    // Rim
+    const rim=new THREE.Mesh(new THREE.CylinderGeometry(0.27,0.27,0.27,10),rM);
+    rim.rotation.z=Math.PI/2; spin.add(rim);
+
+    // 5 spokes
     for(let s=0;s<5;s++){
       const spk=new THREE.Mesh(new THREE.BoxGeometry(0.05,0.52,0.05),rM);
-      spk.rotation.z=Math.PI/2;spk.rotation.x=(s/5)*Math.PI*2;
-      spk.position.y=Math.sin((s/5)*Math.PI*2)*0.14;spk.position.z=Math.cos((s/5)*Math.PI*2)*0.14;wg.add(spk);
+      spk.rotation.z=Math.PI/2;
+      spk.rotation.x=(s/5)*Math.PI*2;
+      spk.position.y=Math.sin((s/5)*Math.PI*2)*0.14;
+      spk.position.z=Math.cos((s/5)*Math.PI*2)*0.14;
+      spin.add(spk);
     }
-    wg.position.set(wx,wy,wz);wg.userData.isWheel=true;carGroup.add(wg);carWheels.push(wg);
+
+    carGroup.add(wg);
+    carWheels.push(wg);
   });
   carGroup.position.copy(carPos);scene.add(carGroup);
 }
@@ -1254,7 +1246,10 @@ function loop(){
     if(!blocked){carPos.x=nx;carPos.z=nz;}else{carSpeed*=-.25;}
 
     carGroup.position.x=carPos.x;carGroup.position.z=carPos.z;carGroup.rotation.y=carAngle;
-    carWheels.forEach(wg=>{wg.children[0].rotation.x+=carSpeed*2.2;});
+    // Spin wheels — rotate the inner spin group around Z axis (wheel's roll axis)
+    carWheels.forEach(wg=>{
+      if(wg.userData.spin) wg.userData.spin.rotation.x+=carSpeed*2.5;
+    });
 
     if(engineOsc&&audioCtx){
       engineOsc.frequency.value=55+Math.abs(carSpeed)/mspd*80;
