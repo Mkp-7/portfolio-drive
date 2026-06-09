@@ -696,7 +696,9 @@ function startGame(){
   document.getElementById('back-btn').style.display='block';
   ['hud','mm-wrap','hint-box'].forEach(id=>document.getElementById(id).style.display='block');
   document.getElementById('dpad').style.display='grid';
-  mmCanvas=document.getElementById('mm');mmCtx=mmCanvas.getContext('2d');
+  mmCanvas=document.getElementById('mm');
+  mmCanvas.width=140; mmCanvas.height=140;
+  mmCtx=mmCanvas.getContext('2d');
   init3D();buildCity();buildCar();bindInput();initAudio();
   clock=new THREE.Clock();loop();
   showToast('Drive into a glowing zone · Press Enter to open a project');
@@ -840,52 +842,55 @@ function makeDistrictZones(){
 
 function makeDistrictSigns(){
   const startZ=-((DIST_ORDER.length-1)*BLK_Z)/2;
-  const baseX=-((5-1)*BLK_X)/2;
   const ROWS=DIST_ORDER.length;
 
-  // One billboard straddling each horizontal road, at every vertical road crossing
   for(let r=0;r<=ROWS;r++){
     const roadZ=startZ+r*BLK_Z;
-    // District car is about to enter (ahead = lower Z for car driving toward -Z)
-    const distAhead  = r < ROWS ? DISTRICTS[DIST_ORDER[r]]   : null;
-    // District car is leaving
-    const distBehind = r > 0    ? DISTRICTS[DIST_ORDER[r-1]] : null;
-    if(!distAhead && !distBehind) continue;
-    const frontDist = distAhead  || distBehind;
-    const backDist  = distBehind || distAhead;
+    // Car drives toward -Z. DIST_ORDER[0]=research=most +Z, DIST_ORDER[4]=retail=most -Z.
+    // Road r separates row r-1 (higher Z, behind) from row r (lower Z, ahead).
+    // Driver coming from +Z sees the face facing +Z BEFORE they cross = they are ENTERING row r.
+    // So face toward +Z = show district[r] (entering). face toward -Z = show district[r-1] (leaving).
+    const distEntering = r < ROWS ? DISTRICTS[DIST_ORDER[r]]   : null;
+    const distLeaving  = r > 0    ? DISTRICTS[DIST_ORDER[r-1]] : null;
+    if(!distEntering && !distLeaving) continue;
+    const facePlusZ  = distEntering || distLeaving;  // face +Z = entering district
+    const faceMinusZ = distLeaving  || distEntering; // face -Z = leaving district
 
-    // Column span covering both adjacent districts
-    const cA = distAhead  ? ROW_COLS[DIST_ORDER[r]]   : 0;
-    const cB = distBehind ? ROW_COLS[DIST_ORDER[r-1]] : 0;
-    const offA = distAhead  ? ((5-cA)*BLK_X)/2 : 9999;
-    const offB = distBehind ? ((5-cB)*BLK_X)/2 : 9999;
-    const leftCol  = Math.round(Math.min(offA,offB)/BLK_X);
-    const rightCol = leftCol + Math.max(cA,cB);
+    // Place one billboard at centre of district column span
+    // Use the wider of the two adjacent districts for centering
+    const useRow   = distEntering ? r : r-1;
+    const cols     = ROW_COLS[DIST_ORDER[useRow]];
+    const baseX    = -((5-1)*BLK_X)/2;
+    const offX     = ((5-cols)*BLK_X)/2;
+    const centreX  = baseX + offX + (cols-1)*BLK_X/2;
 
-    for(let c=leftCol;c<=rightCol;c++){
-      const vx=baseX+c*BLK_X-BLK_X/2;
-      makeBillboard(vx, roadZ, frontDist, backDist);
-    }
+    makeBillboard(centreX, roadZ, facePlusZ, faceMinusZ);
   }
 }
 
-function makeBillboard(x, roadZ, frontDist, backDist){
-  const poleOff = ROAD_W/2 + 1.4;
-  const pH = 6.5;
-  const bH = 1.1;
-  const bW = BLK_X - 4;
-  const pM = new THREE.MeshLambertMaterial({color:0x2e3e50});
+function makeBillboard(centreX, roadZ, facePlusZ, faceMinusZ){
+  // Horizontal road runs along X. Car drives along Z.
+  // LEFT pole  = centreX - halfSpan  (left side of the road span, in X)
+  // RIGHT pole = centreX + halfSpan  (right side of the road span, in X)
+  // Both poles at roadZ (centre of horizontal road), slightly outside road in Z via kerb gap.
+  // Board hangs between both poles, spans in X, faces Z so driver reads it head-on.
+
+  const halfSpan  = ROAD_W * 0.65;   // board width slightly narrower than road width
+  const boardW    = halfSpan * 2;
+  const boardH    = 0.95;
+  const poleH     = 5.8;
+  const kerbGap   = 0.5;             // pole sits just inside kerb, not on road surface
+  const pM = new THREE.MeshLambertMaterial({color:0x2a3a4e});
 
   function makeTex(dist){
-    const cw=1024, ch=192;
+    const cw=512, ch=96;
     const can=document.createElement('canvas');
     can.width=cw; can.height=ch;
     const ctx=can.getContext('2d');
     ctx.fillStyle='#08111e'; ctx.fillRect(0,0,cw,ch);
     ctx.fillStyle=dist.hex;
-    ctx.fillRect(0,0,cw,14);
-    ctx.fillRect(0,ch-14,cw,14);
-    ctx.font='bold 68px Segoe UI,Arial';
+    ctx.fillRect(0,0,cw,8); ctx.fillRect(0,ch-8,cw,8);
+    ctx.font='bold 38px Segoe UI,Arial';
     ctx.fillStyle=dist.hex;
     ctx.textAlign='center'; ctx.textBaseline='middle';
     ctx.fillText(dist.name.toUpperCase(), cw/2, ch/2);
@@ -894,34 +899,40 @@ function makeBillboard(x, roadZ, frontDist, backDist){
     return tex;
   }
 
-  // Two poles - one each side of horizontal road in Z
-  [roadZ-poleOff, roadZ+poleOff].forEach(pz=>{
-    const pole=new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.12,pH,8),pM);
-    pole.position.set(x,pH/2,pz);
+  const leftX  = centreX - halfSpan;
+  const rightX = centreX + halfSpan;
+
+  // Two poles - left and right of the road span, sitting AT roadZ (road centre)
+  [leftX, rightX].forEach(px=>{
+    const pole=new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.12,poleH,8),pM);
+    pole.position.set(px, poleH/2, roadZ);
     scene.add(pole);
   });
 
-  // Connecting arm
-  const arm=new THREE.Mesh(new THREE.BoxGeometry(0.08,0.08,poleOff*2),pM);
-  arm.position.set(x,pH,roadZ); scene.add(arm);
+  // Top horizontal beam connecting both poles (spans in X)
+  const beam=new THREE.Mesh(new THREE.BoxGeometry(boardW+0.2,0.1,0.1),pM);
+  beam.position.set(centreX, poleH, roadZ);
+  scene.add(beam);
 
-  const boardY=pH-bH*0.6;
+  const boardY = poleH - boardH*0.6;
 
-  // Front face - faces +Z (driver coming from +Z = entering sees frontDist name)
-  const fm=new THREE.Mesh(new THREE.PlaneGeometry(bW,bH),
-    new THREE.MeshBasicMaterial({map:makeTex(frontDist),transparent:true,depthWrite:false}));
-  fm.position.set(x,boardY,roadZ); fm.rotation.y=0;
+  // Face +Z - driver approaching from +Z sees ENTERING district
+  const fm=new THREE.Mesh(new THREE.PlaneGeometry(boardW, boardH),
+    new THREE.MeshBasicMaterial({map:makeTex(facePlusZ),transparent:true,depthWrite:false}));
+  fm.position.set(centreX, boardY, roadZ - 0.06);
+  fm.rotation.y = 0;   // faces +Z
   scene.add(fm);
 
-  // Back face - faces -Z
-  const bm=new THREE.Mesh(new THREE.PlaneGeometry(bW,bH),
-    new THREE.MeshBasicMaterial({map:makeTex(backDist),transparent:true,depthWrite:false}));
-  bm.position.set(x,boardY,roadZ); bm.rotation.y=Math.PI;
+  // Face -Z - driver approaching from -Z sees ENTERING district (which is distLeaving from other side)
+  const bm=new THREE.Mesh(new THREE.PlaneGeometry(boardW, boardH),
+    new THREE.MeshBasicMaterial({map:makeTex(faceMinusZ),transparent:true,depthWrite:false}));
+  bm.position.set(centreX, boardY, roadZ + 0.06);
+  bm.rotation.y = Math.PI;  // faces -Z
   scene.add(bm);
 
-  // Subtle glow
-  const pl=new THREE.PointLight(frontDist.color,0.28,10);
-  pl.position.set(x,pH+0.4,roadZ); scene.add(pl);
+  const pl=new THREE.PointLight(facePlusZ.color, 0.22, 12);
+  pl.position.set(centreX, poleH+0.3, roadZ);
+  scene.add(pl);
 }
 
 
@@ -1402,7 +1413,7 @@ function drawMinimap(){
   // carAngle=0 → moving +Z → down canvas. carAngle=PI → moving -Z → up canvas.
   // carAngle=PI → car faces -Z → up on canvas (-Y). Arrow tip at (0,-6.5) = up.
   // rotate(0) keeps tip pointing up. So rotate(carAngle - PI).
-  mmCtx.rotate(-carAngle + Math.PI);
+  mmCtx.rotate(-carAngle+Math.PI);
   mmCtx.fillStyle='#f5c842';
   mmCtx.beginPath();
   mmCtx.moveTo(0,-6.5);   // tip = forward (car faces -Z = up canvas when angle=PI)
