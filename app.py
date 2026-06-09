@@ -638,7 +638,7 @@ let lastNearEntry=null;
 
 const CAM_BACK=11,CAM_UP=5.5,CAM_LAG=0.09;
 let camPos=new THREE.Vector3(0,8,122);
-const BLK_X=24,BLK_Z=30,ROAD_W=10,CITY_H=155;
+const BLK_X=32,BLK_Z=38,ROAD_W=10,CITY_H=180;
 
 // NAV SCROLL
 function navTo(id){
@@ -732,7 +732,7 @@ function buildCity(){
     new THREE.MeshLambertMaterial({color:0x060a10}));
   ground.rotation.x=-Math.PI/2;ground.receiveShadow=true;scene.add(ground);
   scene.add(new THREE.GridHelper(CITY_H*2.4,110,0x0d1420,0x090f18));
-  makeRoads();makeDistrictZones();placeBuildings();makeDistrictSigns();placeLamps();
+  makeRoads();makeDistrictZones();makeDistrictRoadBanners();placeBuildings();makeDistrictSigns();placeLamps();
 }
 
 function makeRoads(){
@@ -828,6 +828,37 @@ function makeSign(x,z,label,color){
   scene.add(g);
 }
 
+function makeDistrictRoadBanners(){
+  // Paint a large district name on the road surface before each row of buildings
+  const startZ=-((DIST_ORDER.length-1)*BLK_Z)/2;
+  DIST_ORDER.forEach((dk,row)=>{
+    const dist=DISTRICTS[dk];
+    const cols=ROW_COLS[dk];
+    const startX=-((cols-1)*BLK_X)/2;
+    const cx=startX+(cols-1)*BLK_X/2;
+    const rz=startZ+row*BLK_Z-BLK_Z/2+BLK_Z/2; // center of the road before the row
+
+    // Canvas texture — district name large + colored
+    const can=document.createElement('canvas');can.width=1024;can.height=128;
+    const ctx=can.getContext('2d');ctx.clearRect(0,0,1024,128);
+    ctx.font='900 68px Segoe UI,Arial';ctx.fillStyle=dist.hex;
+    ctx.textAlign='center';ctx.textBaseline='middle';ctx.globalAlpha=0.55;
+    ctx.fillText(('— '+dist.name.toUpperCase()+' —'),512,64);
+    ctx.globalAlpha=1;
+    const tex=new THREE.CanvasTexture(can);
+
+    // Width spans the whole district
+    const bannerW=cols*BLK_X+10;
+    const banner=new THREE.Mesh(
+      new THREE.PlaneGeometry(bannerW,5),
+      new THREE.MeshBasicMaterial({map:tex,transparent:true,depthWrite:false})
+    );
+    banner.rotation.x=-Math.PI/2;
+    banner.position.set(cx,0.09,rz-BLK_Z/2+4);
+    scene.add(banner);
+  });
+}
+
 function placeBuildings(){
   PROJECTS.forEach((p,i)=>{
     const{x,z}=projPos(p);
@@ -889,10 +920,12 @@ function makeBuilding(p,bx,bz,idx){
 
   // Entrance
   const eZ=bD/2+3.6;
-  const lTex=makeRoadTex(p.name,dist.hex);
-  const lMesh=new THREE.Mesh(new THREE.PlaneGeometry(9.5,2),
+
+  // Project name on road — bigger, clearer
+  const lTex=makeRoadTex(p.name,p.cat,dist.hex);
+  const lMesh=new THREE.Mesh(new THREE.PlaneGeometry(13,3.2),
     new THREE.MeshBasicMaterial({map:lTex,transparent:true,depthWrite:false}));
-  lMesh.rotation.x=-Math.PI/2;lMesh.position.set(0,0.11,eZ+3.8);g.add(lMesh);
+  lMesh.rotation.x=-Math.PI/2;lMesh.position.set(0,0.11,eZ+5.5);g.add(lMesh);
 
   const eMat=new THREE.MeshBasicMaterial({color:hc,transparent:true,opacity:0.12,depthWrite:false});
   const ePlane=new THREE.Mesh(new THREE.PlaneGeometry(5.5,3.2),eMat);
@@ -960,14 +993,21 @@ function makeParticles(dk,color,bW,bH){
   return group;
 }
 
-function makeRoadTex(text,hex){
-  const can=document.createElement('canvas');can.width=512;can.height=112;
-  const ctx=can.getContext('2d');ctx.clearRect(0,0,512,112);
-  ctx.font='bold 32px Segoe UI,Arial';ctx.fillStyle=hex;
-  ctx.textAlign='center';ctx.textBaseline='middle';
-  let label=text;while(ctx.measureText(label).width>490&&label.length>4)label=label.slice(0,-1);
-  if(label!==text)label=label.trim()+'…';
-  ctx.fillText(label,256,56);
+function makeRoadTex(name,cat,hex){
+  const can=document.createElement('canvas');can.width=640;can.height=160;
+  const ctx=can.getContext('2d');ctx.clearRect(0,0,640,160);
+  // Category (colored, smaller, top)
+  ctx.font='bold 26px Segoe UI,Arial';ctx.fillStyle=hex;
+  ctx.textAlign='center';ctx.textBaseline='middle';ctx.globalAlpha=0.9;
+  ctx.fillText(cat.toUpperCase(),320,42);ctx.globalAlpha=1;
+  // Divider
+  ctx.fillStyle=hex;ctx.globalAlpha=0.3;ctx.fillRect(80,62,480,1.5);ctx.globalAlpha=1;
+  // Project name (white, large)
+  ctx.font='bold 40px Segoe UI,Arial';ctx.fillStyle='#eef2ff';
+  let label=name;
+  while(ctx.measureText(label).width>620&&label.length>4)label=label.slice(0,-1);
+  if(label!==name)label=label.trim()+'…';
+  ctx.fillText(label,320,108);
   return new THREE.CanvasTexture(can);
 }
 
@@ -1199,9 +1239,13 @@ function drawMinimap(){
     mmCtx.globalAlpha=1;
   });
   const cpx=ox+carPos.x*scale,cpz=oz+carPos.z*scale;
-  mmCtx.save();mmCtx.translate(cpx,cpz);mmCtx.rotate(-carAngle);
+  mmCtx.save();mmCtx.translate(cpx,cpz);
+  // carAngle: 0=facing +Z (down on minimap), PI=facing -Z (up on minimap)
+  // Canvas: positive Y is down, so rotate by carAngle directly (not negated)
+  mmCtx.rotate(carAngle);
   mmCtx.fillStyle='#ffffff';mmCtx.beginPath();
-  mmCtx.moveTo(0,-5.5);mmCtx.lineTo(3.2,4);mmCtx.lineTo(0,2);mmCtx.lineTo(-3.2,4);
+  // Arrow pointing up = forward direction
+  mmCtx.moveTo(0,-6);mmCtx.lineTo(3.5,5);mmCtx.lineTo(0,3);mmCtx.lineTo(-3.5,5);
   mmCtx.closePath();mmCtx.fill();mmCtx.restore();
   mmCtx.strokeStyle='rgba(74,144,217,.14)';mmCtx.lineWidth=1;mmCtx.strokeRect(0,0,mw,mh);
 }
