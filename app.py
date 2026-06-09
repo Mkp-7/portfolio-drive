@@ -365,7 +365,7 @@ html,body{width:100%;height:100vh;overflow:hidden;background:#04080f;font-family
     <div class="avail-pill"><span class="avail-dot"></span>Open to full-time opportunities</div>
     <div class="intro-name">Mukund <span class="accent">Patel</span></div>
     <div class="intro-role"><strong>Data Scientist</strong> &nbsp;·&nbsp; <strong>AI Engineer</strong> &nbsp;·&nbsp; <strong>Analytics Professional</strong></div>
-    <div class="lsummary">MS Data Science graduate from <strong>Montclair State University</strong> (GPA 4.0) with hands-on experience at the <strong>MTA New York</strong> building data pipelines, and BI dashboards. I build end-to-end analytics solutions — from SQL pipelines and ML models to deployed AI applications — across transportation, finance, healthcare, retail, and logistics.</div>
+    <div class="lsummary">MS Data Science graduate from <strong>Montclair State University</strong> (GPA 4.0) with hands-on experience at the <strong>MTA New York</strong> building data pipelines, and BI dashboards. I build end-to-end analytics solutions - from SQL pipelines and ML models to deployed AI applications - across transportation, finance, healthcare, retail, and logistics.</div>
     <div class="domain-row">
       <span class="domain-tag">AI Agents &amp; LLMs</span>
       <span class="domain-tag">Revenue Management</span>
@@ -511,7 +511,7 @@ html,body{width:100%;height:100vh;overflow:hidden;background:#04080f;font-family
 </div>
 
 <div id="hint-box">
-  <span style="color:#8aaccc">W A S D</span> / Arrows — Drive &nbsp;·&nbsp; <span style="color:#8aaccc">Enter</span> — Open project
+  <span style="color:#8aaccc">W A S D</span> / Arrows - Drive &nbsp;·&nbsp; <span style="color:#8aaccc">Enter</span> - Open project
 </div>
 
 <!-- D-PAD for mobile -->
@@ -848,7 +848,7 @@ function makeDistrictSigns(){
   // For each district row: one category holding spans the full width of that row
   // connecting from the left-side edge of leftmost building to right-side edge of rightmost building.
   // The holding is placed at the TOP of the buildings (rooftop level), above the street.
-  // Front and back faces show category label — swapped: +Z face = leaving, -Z face = entering.
+  // Front and back faces show category label - swapped: +Z face = leaving, -Z face = entering.
 
   const pM=new THREE.MeshLambertMaterial({color:0x1e2d3e});
 
@@ -862,7 +862,7 @@ function makeDistrictSigns(){
     const leftBX  = bColX(startCol);
     const rightBX = bColX(startCol+cols-1);
 
-    // Holding sits at rooftop height — use max bH across row (~12) + buffer
+    // Holding sits at rooftop height - use max bH across row (~12) + buffer
     const holdY = 14.5;
     const holdH = 1.0;   // board height
     const holdW = (rightBX - leftBX) + BW; // spans from outer edge to outer edge
@@ -886,7 +886,7 @@ function makeDistrictSigns(){
 
     const cx=(leftBX+rightBX)/2;
 
-    // Horizontal beam (structural — thin bar spanning the row)
+    // Horizontal beam (structural - thin bar spanning the row)
     const beam=new THREE.Mesh(
       new THREE.BoxGeometry(holdW, 0.2, 0.2),
       pM
@@ -894,7 +894,7 @@ function makeDistrictSigns(){
     beam.position.set(cx, holdY, rowZ);
     scene.add(beam);
 
-    // Front face board (+Z — car coming from +Z, this is the leaving side)
+    // Front face board (+Z - car coming from +Z, this is the leaving side)
     const frontTex = makeTex(dist);
     const fm=new THREE.Mesh(
       new THREE.PlaneGeometry(holdW, holdH),
@@ -904,7 +904,7 @@ function makeDistrictSigns(){
     fm.rotation.y=0;
     scene.add(fm);
 
-    // Back face board (-Z — car coming from -Z)
+    // Back face board (-Z - car coming from -Z)
     const bm=new THREE.Mesh(
       new THREE.PlaneGeometry(holdW, holdH),
       new THREE.MeshBasicMaterial({map:makeTex(dist), transparent:true, depthWrite:false})
@@ -913,7 +913,7 @@ function makeDistrictSigns(){
     bm.rotation.y=Math.PI;
     scene.add(bm);
 
-    // Vertical support pillars at building corners — attached to buildings on left and right
+    // Vertical support pillars at building corners - attached to buildings on left and right
     [[leftBX  - BW/2 + 0.5, rowZ],
      [rightBX + BW/2 - 0.5, rowZ]].forEach(([px,pz])=>{
       const pillar=new THREE.Mesh(
@@ -972,12 +972,12 @@ function buildCar(){
     wg.position.set(wx,wy,wz);
     wg.userData.isWheel=true;
 
-    // Inner spin group — this is what we rotate to spin the wheel
+    // Inner spin group - this is what we rotate to spin the wheel
     const spin=new THREE.Group();
     wg.add(spin);
     wg.userData.spin=spin;
 
-    // Tyre — cylinder lying on its side (axis along X = car width)
+    // Tyre - cylinder lying on its side (axis along X = car width)
     const tyre=new THREE.Mesh(new THREE.CylinderGeometry(0.42,0.42,0.26,20),yM);
     tyre.rotation.z=Math.PI/2; tyre.castShadow=true; spin.add(tyre);
 
@@ -1077,7 +1077,7 @@ function loop(){
     if(!blocked){carPos.x=nx;carPos.z=nz;}else{carSpeed*=-.25;}
 
     carGroup.position.x=carPos.x;carGroup.position.z=carPos.z;carGroup.rotation.y=carAngle;
-    // Spin wheels — rotate the inner spin group around Z axis (wheel's roll axis)
+    // Spin wheels - rotate the inner spin group around Z axis (wheel's roll axis)
     carWheels.forEach(wg=>{
       if(wg.userData.spin) wg.userData.spin.rotation.x+=carSpeed*2.5;
     });
@@ -1108,11 +1108,11 @@ function loop(){
     camera.lookAt(carPos.x+Math.sin(carAngle)*4,1.2,carPos.z+Math.cos(carAngle)*4);
   }
 
-  // Entrance detection + glow — perimeter zone around whole building
+  // Entrance detection + glow - perimeter zone around whole building
   nearEntry=null;let bestD=9999;
   buildings.forEach(b=>{
     const dx=carPos.x-b.cx,dz=carPos.z-b.cz;
-    // Distance to building perimeter (not centre) — use Chebyshev distance to rectangle
+    // Distance to building perimeter (not centre) - use Chebyshev distance to rectangle
     const px=Math.max(0,Math.abs(dx)-b.hw),pz=Math.max(0,Math.abs(dz)-b.hd);
     const d=Math.sqrt(px*px+pz*pz); // 0 when inside perimeter ring
     const inZone=d<5.5;
