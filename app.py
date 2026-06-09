@@ -635,7 +635,7 @@ let carGroup,carWheels=[];
 let buildings=[];
 let nearEntry=null,modalOpen=false;
 let keys={},dpadState={up:0,down:0,left:0,right:0};
-let carPos=new THREE.Vector3(0,0,85);
+let carPos=new THREE.Vector3(0,0,105);
 let carAngle=Math.PI,carSpeed=0;
 let frame=0;
 let mmCanvas,mmCtx;
@@ -645,20 +645,17 @@ let audioCtx=null,engineOsc=null,engineGain=null;
 let lastNearEntry=null;
 
 const CAM_BACK=11,CAM_UP=5.5,CAM_LAG=0.09;
-let camPos=new THREE.Vector3(0,8,97);
+let camPos=new THREE.Vector3(0,8,117);
 // Matrix layout: alternating building columns/rows and road columns/rows
-const BW=16;   // building slot width (X)
-const BD=16;   // building slot depth (Z)
-const RW=10;   // road width (X and Z)
-const CITY_H=90; // half-city for boundary checks
-
-// Building column centres (5 cols): -52,-26,0,26,52
-// Road column centres (6 roads):    -65,-39,-13,13,39,65
-// Same pattern for rows (Z axis)
-function bColX(col){ return -52 + col*26; }  // col 0-4
-function bRowZ(row){ return -52 + row*26; }  // row 0-4
-function rColX(col){ return -65 + col*26; }  // col 0-5 (road X centres)
-function rRowZ(row){ return -65 + row*26; }  // row 0-5 (road Z centres)
+// BW=building slot, RW=road width, STEP=BW+RW
+const BW=18, RW=16, STEP=BW+RW; // step=34
+const CITY_H=115;
+// Building col centres (5):  -68,-34,0,34,68
+// Road col centres (6):      -85,-51,-17,17,51,85
+function bColX(col){ return -68 + col*STEP; }
+function bRowZ(row){ return -68 + row*STEP; }
+function rColX(col){ return -85 + col*STEP; }
+function rRowZ(row){ return -85 + row*STEP; }
 
 // District row assignments (car starts at +Z, drives -Z; row 0 = nearest = most +Z)
 
@@ -845,135 +842,89 @@ function makeDistrictZones(){
 
 
 function makeDistrictSigns(){
-  // At every intersection of a HORIZONTAL road (rRowZ) and VERTICAL road (rColX),
-  // place a billboard gantry:
-  //   - 2 poles on LEFT side of vertical road (at rColX - RW/2 - 1)
-  //     and 2 poles on RIGHT side (at rColX + RW/2 + 1),
-  //     each pair straddles the horizontal road in Z.
-  //   - Holding board spans from left to right ABOVE the road centre.
-  //   - Board faces Z so approaching driver reads it.
-  //
-  // Each horizontal road r (0-5) separates bRow r-1 (above, higher Z)
-  // from bRow r (below, lower Z). Car drives from +Z toward -Z.
-  // Entering district = DIST_ORDER[r] (what car is about to drive into).
-  // Leaving district  = DIST_ORDER[r-1].
-  // User wants SWAP: face+Z (driver sees before crossing) = leaving, face-Z = entering.
+  // One horizontal holding bar per district row.
+  // No poles. Bar attached directly between the left outer edge of the
+  // leftmost building and the right outer edge of the rightmost building.
+  // Floats just above the tallest building in that row.
+  // Label shown on front (+Z) and back (-Z) faces.
 
-  for(let r=0;r<=5;r++){
-    const roadZ=rRowZ(r);
-    const entering = r<5  ? DISTRICTS[DIST_ORDER[r]]   : null;
-    const leaving  = r>0  ? DISTRICTS[DIST_ORDER[r-1]] : null;
-    if(!entering&&!leaving) continue;
+  const BHEIGHTS=[9,13,10,14,8,12,11,9,13,10,14,8,12,11,9,13,10,14];
+  const bBody=Math.round(BW*0.72); // building body width = 13
 
-    const facePlusZ  = leaving  || entering;  // swapped: +Z face = leaving
-    const faceMinusZ = entering || leaving;   // swapped: -Z face = entering
+  DIST_ORDER.forEach((dk,row)=>{
+    const dist=DISTRICTS[dk];
+    const cols=ROW_COLS[dk];
+    const startCol=Math.floor((5-cols)/2);
+    const rowZ=bRowZ(row);
 
-    // Determine which vertical road columns to put billboards at
-    // Use columns relevant to both adjacent districts
-    const colsEntering = entering ? ROW_COLS[DIST_ORDER[r]]   : 0;
-    const colsLeaving  = leaving  ? ROW_COLS[DIST_ORDER[r-1]] : 0;
-    const startEntering = entering ? Math.floor((5-colsEntering)/2) : 0;
-    const startLeaving  = leaving  ? Math.floor((5-colsLeaving)/2)  : 0;
-    const colMin = Math.min(startEntering, startLeaving);
-    const colMax = Math.max(
-      startEntering + colsEntering,
-      startLeaving  + colsLeaving
+    // Left/right building centres
+    const leftBX  = bColX(startCol);
+    const rightBX = bColX(startCol+cols-1);
+    const cx       = (leftBX+rightBX)/2;
+
+    // Bar width: from left building's outer left edge to right building's outer right edge
+    const barW = (rightBX-leftBX) + bBody;
+    const barH = 0.85;
+
+    // Max building height in this district row
+    const idxs=PROJECTS.map((p,i)=>p.district===dk?i:-1).filter(i=>i>=0);
+    const maxH=Math.max(...idxs.map(i=>BHEIGHTS[i%18]));
+    const barY=maxH+1.5;
+
+    // Structural beam
+    const beam=new THREE.Mesh(
+      new THREE.BoxGeometry(barW,0.18,0.18),
+      new THREE.MeshLambertMaterial({color:dist.color,emissive:dist.color,emissiveIntensity:0.55})
     );
-    // Place billboard at every vertical road crossing within span
-    for(let cc=colMin; cc<=colMax; cc++){
-      const roadX=rColX(cc);
-      makeBillboard(roadX, roadZ, facePlusZ, faceMinusZ);
+    beam.position.set(cx,barY,rowZ);
+    scene.add(beam);
+
+    // End connector knobs
+    [leftBX-bBody/2+0.1, rightBX+bBody/2-0.1].forEach(ex=>{
+      const knob=new THREE.Mesh(
+        new THREE.BoxGeometry(0.26,barH+0.1,0.26),
+        new THREE.MeshLambertMaterial({color:dist.color,emissive:dist.color,emissiveIntensity:0.65})
+      );
+      knob.position.set(ex,barY,rowZ);
+      scene.add(knob);
+    });
+
+    // Label texture
+    function makeTex(){
+      const cw=1024,ch=96;
+      const can=document.createElement('canvas');
+      can.width=cw;can.height=ch;
+      const ctx=can.getContext('2d');
+      ctx.fillStyle='#060e18';ctx.fillRect(0,0,cw,ch);
+      ctx.fillStyle=dist.hex;
+      ctx.fillRect(0,0,cw,8);ctx.fillRect(0,ch-8,cw,8);
+      ctx.font='bold 48px Segoe UI,Arial';
+      ctx.fillStyle=dist.hex;
+      ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillText(dist.name.toUpperCase(),cw/2,ch/2);
+      const tex=new THREE.CanvasTexture(can);
+      tex.anisotropy=renderer.capabilities.getMaxAnisotropy();
+      return tex;
     }
-  }
+
+    const mat=new THREE.MeshBasicMaterial({map:makeTex(),transparent:true,depthWrite:false});
+
+    // Front face (+Z)
+    const fm=new THREE.Mesh(new THREE.PlaneGeometry(barW,barH),mat);
+    fm.position.set(cx,barY,rowZ-0.1);fm.rotation.y=0;
+    scene.add(fm);
+
+    // Back face (-Z)
+    const bm=new THREE.Mesh(new THREE.PlaneGeometry(barW,barH),mat.clone());
+    bm.position.set(cx,barY,rowZ+0.1);bm.rotation.y=Math.PI;
+    scene.add(bm);
+
+    // Glow
+    const pl=new THREE.PointLight(dist.color,0.5,barW+6);
+    pl.position.set(cx,barY+0.7,rowZ);
+    scene.add(pl);
+  });
 }
-
-function makeBillboard(roadX, roadZ, facePlusZ, faceMinusZ){
-  // STRUCTURE:
-  // Horizontal road at z=roadZ runs in X direction, width RW in Z.
-  // Vertical road at x=roadX runs in Z direction, width RW in X.
-  //
-  // Poles are placed OUTSIDE both roads:
-  //   Left side of vertical road:  x = roadX - RW/2 - 1.5
-  //   Right side of vertical road: x = roadX + RW/2 + 1.5
-  //   -Z side of horizontal road:  z = roadZ - RW/2 - 1.5  (kerb)
-  //   +Z side of horizontal road:  z = roadZ + RW/2 + 1.5  (kerb)
-  //
-  // This gives 4 poles total at the 4 corners outside the intersection.
-  // Horizontal arms connect left-left to right-left (at -Z kerb)
-  //                      and left-right to right-right (at +Z kerb).
-  // The board hangs from these arms, above the road centre, faces Z.
-
-  const poleGap = RW/2 + 1.5;  // distance from road centre to pole in X and Z
-  const poleH   = 5.5;
-  const boardH  = 0.8;
-  const boardW  = poleGap*2 - 1; // spans between poles in X, slightly inset
-  const pM = new THREE.MeshLambertMaterial({color:0x1e2e3e});
-
-  // 4 pole positions
-  const polePositions=[
-    [roadX-poleGap, roadZ-poleGap],
-    [roadX+poleGap, roadZ-poleGap],
-    [roadX-poleGap, roadZ+poleGap],
-    [roadX+poleGap, roadZ+poleGap],
-  ];
-  polePositions.forEach(([px,pz])=>{
-    const pole=new THREE.Mesh(new THREE.CylinderGeometry(0.09,0.11,poleH,8),pM);
-    pole.position.set(px,poleH/2,pz);
-    scene.add(pole);
-  });
-
-  // Two horizontal arms (one on -Z side, one on +Z side) — span in X between left/right poles
-  [[roadZ-poleGap],[roadZ+poleGap]].forEach(([pz])=>{
-    const arm=new THREE.Mesh(new THREE.BoxGeometry(poleGap*2,0.1,0.1),pM);
-    arm.position.set(roadX,poleH,pz);
-    scene.add(arm);
-  });
-
-  // Cross brace — connects the two arms in Z for rigidity (visual)
-  [-poleGap,poleGap].forEach(dx=>{
-    const brace=new THREE.Mesh(new THREE.BoxGeometry(0.08,0.08,poleGap*2),pM);
-    brace.position.set(roadX+dx,poleH,roadZ);
-    scene.add(brace);
-  });
-
-  function makeTex(dist){
-    const cw=512,ch=84;
-    const can=document.createElement('canvas');
-    can.width=cw; can.height=ch;
-    const ctx=can.getContext('2d');
-    ctx.fillStyle='#07101c'; ctx.fillRect(0,0,cw,ch);
-    ctx.fillStyle=dist.hex;
-    ctx.fillRect(0,0,cw,7); ctx.fillRect(0,ch-7,cw,7);
-    ctx.font='bold 34px Segoe UI,Arial';
-    ctx.fillStyle=dist.hex;
-    ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.fillText(dist.name.toUpperCase(),cw/2,ch/2);
-    const tex=new THREE.CanvasTexture(can);
-    tex.anisotropy=renderer.capabilities.getMaxAnisotropy();
-    return tex;
-  }
-
-  const boardY=poleH-boardH*0.55;
-
-  // Face +Z: driver coming from +Z sees this BEFORE crossing → facePlusZ
-  const fm=new THREE.Mesh(new THREE.PlaneGeometry(boardW,boardH),
-    new THREE.MeshBasicMaterial({map:makeTex(facePlusZ),transparent:true,depthWrite:false}));
-  fm.position.set(roadX,boardY,roadZ-poleGap+0.06);
-  fm.rotation.y=0;
-  scene.add(fm);
-
-  // Face -Z: driver coming from -Z sees this BEFORE crossing → faceMinusZ
-  const bm=new THREE.Mesh(new THREE.PlaneGeometry(boardW,boardH),
-    new THREE.MeshBasicMaterial({map:makeTex(faceMinusZ),transparent:true,depthWrite:false}));
-  bm.position.set(roadX,boardY,roadZ+poleGap-0.06);
-  bm.rotation.y=Math.PI;
-  scene.add(bm);
-
-  const pl=new THREE.PointLight(facePlusZ.color||0x4a90d9,0.2,10);
-  pl.position.set(roadX,poleH+0.3,roadZ);
-  scene.add(pl);
-}
-
 
 
 function placeBuildings(){
@@ -986,7 +937,10 @@ function placeBuildings(){
 function makeBuilding(p,bx,bz,idx){
   const dist=DISTRICTS[p.district];
   const hc=dist.color;
-  const style=idx%4, bH=9, bW=11, bD=11; // uniform height — poster fills face cleanly
+  const BHEIGHTS=[9,13,10,14,8,12,11,9,13,10,14,8,12,11,9,13,10,14];
+  const bH=BHEIGHTS[idx%18];
+  const bW=Math.round(BW*0.72); // 13 — fits slot with clearance to road
+  const bD=bW;
   const g=new THREE.Group();g.position.set(bx,0,bz);
 
   // Pavement
@@ -1295,7 +1249,7 @@ function loop(){
     let blocked=false;
     const pt=new THREE.Vector2(nx,nz);
     for(const b of buildings){if(b.bbox.containsPoint(pt)){blocked=true;break;}}
-    if(Math.abs(nx)>95||Math.abs(nz)>95)blocked=true;
+    if(Math.abs(nx)>CITY_H||Math.abs(nz)>CITY_H)blocked=true;
     if(!blocked){carPos.x=nx;carPos.z=nz;}else{carSpeed*=-.25;}
 
     carGroup.position.x=carPos.x;carGroup.position.z=carPos.z;carGroup.rotation.y=carAngle;
@@ -1383,7 +1337,7 @@ function loop(){
 // ════════════════════════════════════
 function drawMinimap(){
   const mw=140,mh=140;mmCtx.fillStyle='#04080f';mmCtx.fillRect(0,0,mw,mh);
-  const scale=mw/200,ox=mw/2,oz=mh/2;
+  const scale=mw/(CITY_H*2.1),ox=mw/2,oz=mh/2;
   buildings.forEach(b=>{
     const px=ox+b.entranceWorld.x*scale,pz=oz+b.entranceWorld.z*scale;
     const isN=b===nearEntry,isV=b.visited;
