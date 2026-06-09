@@ -365,7 +365,7 @@ html,body{width:100%;height:100vh;overflow:hidden;background:#04080f;font-family
     <div class="avail-pill"><span class="avail-dot"></span>Open to full-time opportunities</div>
     <div class="intro-name">Mukund <span class="accent">Patel</span></div>
     <div class="intro-role"><strong>Data Scientist</strong> &nbsp;·&nbsp; <strong>AI Engineer</strong> &nbsp;·&nbsp; <strong>Analytics Professional</strong></div>
-    <div class="lsummary">MS Data Science graduate from <strong>Montclair State University</strong> (GPA 4.0) with hands-on experience at the <strong>MTA New York</strong> building data pipelines, and BI dashboards. I build end-to-end analytics solutions — from SQL pipelines and ML models to deployed AI applications — across transportation, finance, healthcare, retail, and logistics.</div>
+    <div class="lsummary">MS Data Science graduate from <strong>Montclair State University</strong> (GPA 4.0) with hands-on experience at the <strong>MTA New York</strong> building data pipelines, and BI dashboards. I build end-to-end analytics solutions - from SQL pipelines and ML models to deployed AI applications - across transportation, finance, healthcare, retail, and logistics.</div>
     <div class="domain-row">
       <span class="domain-tag">AI Agents &amp; LLMs</span>
       <span class="domain-tag">Revenue Management</span>
@@ -511,7 +511,7 @@ html,body{width:100%;height:100vh;overflow:hidden;background:#04080f;font-family
 </div>
 
 <div id="hint-box">
-  <span style="color:#8aaccc">W A S D</span> / Arrows — Drive &nbsp;·&nbsp; <span style="color:#8aaccc">Enter</span> — Open project
+  <span style="color:#8aaccc">W A S D</span> / Arrows - Drive &nbsp;·&nbsp; <span style="color:#8aaccc">Enter</span> - Open project
 </div>
 
 <!-- D-PAD for mobile -->
@@ -750,16 +750,16 @@ function projPos(p){
   const startZ=-((DIST_ORDER.length-1)*BLK_Z)/2;
   const distOffsetX=((5-cols)*BLK_X)/2;
   // Buildings sit at col*BLK_X (between vertical roads at c*BLK_X-BLK_X/2)
-  // and row*BLK_Z (horizontal roads are at row*BLK_Z ± BLK_Z/2 — i.e. between rows)
+  // and row*BLK_Z (horizontal roads are at row*BLK_Z ± BLK_Z/2 - i.e. between rows)
   // Vertical roads: startX + c*BLK_X - BLK_X/2  for c=0..5 → at -64, -32, 0, 32, 64, 96
   // Buildings at: startX + distOffsetX + col*BLK_X → at -64+16=−48, −16, 16... wait
   // Simpler: put building X midway between two vertical roads = startX + distOffsetX + col*BLK_X
   // Vertical roads at startX + c*BLK_X - BLK_X/2
   // Building col=0 → startX + distOffsetX + 0 = startX + distOffsetX
   // Nearest road: startX + 0*BLK_X - BLK_X/2 = startX - 16  AND  startX + 1*BLK_X - BLK_X/2 = startX + 16
-  // Building at startX+distOffsetX — centred between roads when distOffsetX=0: startX+0=startX, roads at startX-16 and startX+16 ✓
+  // Building at startX+distOffsetX - centred between roads when distOffsetX=0: startX+0=startX, roads at startX-16 and startX+16 ✓
   // Horizontal roads at startZ + r*BLK_Z for r=-1..ROWS (between rows)
-  // Buildings at startZ + row*BLK_Z — but roads also pass through startZ+row*BLK_Z when r==row!
+  // Buildings at startZ + row*BLK_Z - but roads also pass through startZ+row*BLK_Z when r==row!
   // Fix: offset building Z by +BLK_Z/2 so it sits BETWEEN horizontal roads
   // Horizontal roads: startZ + r*BLK_Z, r=-1,0,1,2,3,4,5
   // With offset: building z = startZ + row*BLK_Z + BLK_Z/2 → sits between road[row] and road[row+1] ✓
@@ -784,7 +784,7 @@ function makeRoads(){
   const sM=new THREE.MeshLambertMaterial({color:0x111c2c});
   const ROWS=DIST_ORDER.length;
   const startZ=-((ROWS-1)*BLK_Z)/2;
-  // Horizontal roads sit AT startZ + r*BLK_Z (between rows — buildings are at +BLK_Z/2 offset)
+  // Horizontal roads sit AT startZ + r*BLK_Z (between rows - buildings are at +BLK_Z/2 offset)
   for(let r=-1;r<=ROWS;r++) makeHR(startZ+r*BLK_Z,rM,lM,sM);
   // Vertical roads at startX + c*BLK_X - BLK_X/2 (buildings at col*BLK_X = midway between roads)
   const startX=-((5-1)*BLK_X)/2;
@@ -841,77 +841,87 @@ function makeDistrictZones(){
 function makeDistrictSigns(){
   const startZ=-((DIST_ORDER.length-1)*BLK_Z)/2;
   const baseX=-((5-1)*BLK_X)/2;
+  const ROWS=DIST_ORDER.length;
 
-  DIST_ORDER.forEach((dk,row)=>{
-    const dist=DISTRICTS[dk];
-    const cols=ROW_COLS[dk];
-    const distOffsetX=((5-cols)*BLK_X)/2;
+  // One billboard straddling each horizontal road, at every vertical road crossing
+  for(let r=0;r<=ROWS;r++){
+    const roadZ=startZ+r*BLK_Z;
+    // District car is about to enter (ahead = lower Z for car driving toward -Z)
+    const distAhead  = r < ROWS ? DISTRICTS[DIST_ORDER[r]]   : null;
+    // District car is leaving
+    const distBehind = r > 0    ? DISTRICTS[DIST_ORDER[r-1]] : null;
+    if(!distAhead && !distBehind) continue;
+    const frontDist = distAhead  || distBehind;
+    const backDist  = distBehind || distAhead;
 
-    // The two horizontal roads bounding this district row
-    const roadZ_front=startZ+row*BLK_Z+BLK_Z; // road AFTER district (positive Z = car approaches)
-    const roadZ_back =startZ+row*BLK_Z;         // road BEFORE district
+    // Column span covering both adjacent districts
+    const cA = distAhead  ? ROW_COLS[DIST_ORDER[r]]   : 0;
+    const cB = distBehind ? ROW_COLS[DIST_ORDER[r-1]] : 0;
+    const offA = distAhead  ? ((5-cA)*BLK_X)/2 : 9999;
+    const offB = distBehind ? ((5-cB)*BLK_X)/2 : 9999;
+    const leftCol  = Math.round(Math.min(offA,offB)/BLK_X);
+    const rightCol = leftCol + Math.max(cA,cB);
 
-    // Vertical road X positions within this district's column span
-    // Vertical roads at baseX + c*BLK_X - BLK_X/2 for c covering this district
-    const colStart=Math.round(distOffsetX/BLK_X);
-    for(let c=colStart;c<=colStart+cols;c++){
-      const rx=baseX+c*BLK_X-BLK_X/2;
-      // Place sign at each boundary road, at each vertical road crossing
-      [roadZ_front, roadZ_back].forEach(rz=>{
-        makePoleSign(rx, rz, dist.name, dist.color);
-      });
+    for(let c=leftCol;c<=rightCol;c++){
+      const vx=baseX+c*BLK_X-BLK_X/2;
+      makeBillboard(vx, roadZ, frontDist, backDist);
     }
-  });
+  }
 }
 
-function makePoleSign(x,z,label,color){
-  const g=new THREE.Group();
-  g.position.set(x,0,z);
+function makeBillboard(x, roadZ, frontDist, backDist){
+  const poleOff = ROAD_W/2 + 1.4;
+  const pH = 6.5;
+  const bH = 1.1;
+  const bW = BLK_X - 4;
+  const pM = new THREE.MeshLambertMaterial({color:0x2e3e50});
 
-  const pM=new THREE.MeshLambertMaterial({color:0x3a4f62});
-
-  // Single centre pole
-  const pole=new THREE.Mesh(new THREE.CylinderGeometry(0.08,0.1,5,8),pM);
-  pole.position.y=2.5; g.add(pole);
-
-  // Horizontal cross-arm (perpendicular to Z road so readable both directions)
-  const arm=new THREE.Mesh(new THREE.BoxGeometry(5,0.1,0.1),pM);
-  arm.position.y=5.1; g.add(arm);
-
-  // Sign board facing +Z (readable driving toward -Z)
-  function board(rotY){
+  function makeTex(dist){
+    const cw=1024, ch=192;
     const can=document.createElement('canvas');
-    can.width=512; can.height=96;
+    can.width=cw; can.height=ch;
     const ctx=can.getContext('2d');
-    ctx.fillStyle='#0a1220';
-    ctx.fillRect(0,0,512,96);
-    ctx.fillStyle=color;
-    ctx.fillRect(0,0,512,8);
-    ctx.fillRect(0,88,512,8);
-    ctx.font='bold 40px Segoe UI,Arial';
-    ctx.fillStyle='#e8f0ff';
-    ctx.textAlign='center';
-    ctx.textBaseline='middle';
-    ctx.fillText(label.toUpperCase(),256,52);
+    ctx.fillStyle='#08111e'; ctx.fillRect(0,0,cw,ch);
+    ctx.fillStyle=dist.hex;
+    ctx.fillRect(0,0,cw,14);
+    ctx.fillRect(0,ch-14,cw,14);
+    ctx.font='bold 68px Segoe UI,Arial';
+    ctx.fillStyle=dist.hex;
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(dist.name.toUpperCase(), cw/2, ch/2);
     const tex=new THREE.CanvasTexture(can);
-    const mesh=new THREE.Mesh(
-      new THREE.PlaneGeometry(4.8,0.9),
-      new THREE.MeshBasicMaterial({map:tex,transparent:true,side:THREE.DoubleSide})
-    );
-    mesh.position.set(0,5.1,0);
-    mesh.rotation.y=rotY;
-    return mesh;
+    tex.anisotropy=renderer.capabilities.getMaxAnisotropy();
+    return tex;
   }
 
-  // Two boards — one facing each driving direction
-  g.add(board(0));          // facing +Z
-  g.add(board(Math.PI));    // facing -Z
+  // Two poles - one each side of horizontal road in Z
+  [roadZ-poleOff, roadZ+poleOff].forEach(pz=>{
+    const pole=new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.12,pH,8),pM);
+    pole.position.set(x,pH/2,pz);
+    scene.add(pole);
+  });
 
-  // Colored glow light
-  const pl=new THREE.PointLight(color,0.4,12);
-  pl.position.set(0,5.5,0); g.add(pl);
+  // Connecting arm
+  const arm=new THREE.Mesh(new THREE.BoxGeometry(0.08,0.08,poleOff*2),pM);
+  arm.position.set(x,pH,roadZ); scene.add(arm);
 
-  scene.add(g);
+  const boardY=pH-bH*0.6;
+
+  // Front face - faces +Z (driver coming from +Z = entering sees frontDist name)
+  const fm=new THREE.Mesh(new THREE.PlaneGeometry(bW,bH),
+    new THREE.MeshBasicMaterial({map:makeTex(frontDist),transparent:true,depthWrite:false}));
+  fm.position.set(x,boardY,roadZ); fm.rotation.y=0;
+  scene.add(fm);
+
+  // Back face - faces -Z
+  const bm=new THREE.Mesh(new THREE.PlaneGeometry(bW,bH),
+    new THREE.MeshBasicMaterial({map:makeTex(backDist),transparent:true,depthWrite:false}));
+  bm.position.set(x,boardY,roadZ); bm.rotation.y=Math.PI;
+  scene.add(bm);
+
+  // Subtle glow
+  const pl=new THREE.PointLight(frontDist.color,0.28,10);
+  pl.position.set(x,pH+0.4,roadZ); scene.add(pl);
 }
 
 
@@ -955,7 +965,7 @@ function placeBuildings(){
 function makeBuilding(p,bx,bz,idx){
   const dist=DISTRICTS[p.district];
   const hc=dist.color;
-  const style=idx%4, bH=9, bW=11, bD=11; // uniform height — poster fills face cleanly
+  const style=idx%4, bH=9, bW=11, bD=11; // uniform height - poster fills face cleanly
   const g=new THREE.Group();g.position.set(bx,0,bz);
 
   // Pavement
@@ -963,12 +973,12 @@ function makeBuilding(p,bx,bz,idx){
     new THREE.MeshLambertMaterial({color:0x0e1826}));
   pave.position.y=0.1;pave.receiveShadow=true;g.add(pave);
 
-  // Solid body — clean dark concrete, no style variations
+  // Solid body - clean dark concrete, no style variations
   const body=new THREE.Mesh(new THREE.BoxGeometry(bW,bH,bD),
     new THREE.MeshLambertMaterial({color:0x111824}));
   body.position.y=bH/2+0.2;body.castShadow=true;body.receiveShadow=true;g.add(body);
 
-  // Colored top cap — category color, full width
+  // Colored top cap - category color, full width
   const cap=new THREE.Mesh(new THREE.BoxGeometry(bW+0.1,0.6,bD+0.1),
     new THREE.MeshLambertMaterial({color:hc,emissive:hc,emissiveIntensity:0.5}));
   cap.position.y=bH+0.5;g.add(cap);
@@ -988,7 +998,7 @@ function makeBuilding(p,bx,bz,idx){
   g.add(pg);allParticleGroups.push({group:pg,building:null});
 
   // ── PERIMETER ENTRANCE ZONE ──
-  // Full rectangle around building — glowing floor plane
+  // Full rectangle around building - glowing floor plane
   const zoneW=bW+10,zoneD=bD+10;
   const eMat=new THREE.MeshBasicMaterial({color:hc,transparent:true,opacity:0.08,depthWrite:false});
   const ePlane=new THREE.Mesh(new THREE.PlaneGeometry(zoneW,zoneD),eMat);
@@ -1013,12 +1023,6 @@ function makeBuilding(p,bx,bz,idx){
 
   // Entrance light at centre
   const eL=new THREE.PointLight(hc,0,18);eL.position.set(0,0.5,0);g.add(eL);
-
-  // Road label (front side)
-  const lTex=makeRoadTex(p.name,p.cat,dist.hex);
-  const lMesh=new THREE.Mesh(new THREE.PlaneGeometry(16,4),
-    new THREE.MeshBasicMaterial({map:lTex,transparent:true,depthWrite:false}));
-  lMesh.rotation.x=-Math.PI/2;lMesh.position.set(0,0.11,hd2+3);g.add(lMesh);
 
   const entranceWorld=new THREE.Vector3(bx,0,bz);
   const bbox=new THREE.Box2(
@@ -1068,7 +1072,7 @@ function makePoster(g,p,dist,bW,bH,bD){
     // Start drawing from 18% down so text sits in lower portion
     let y=ch*0.18;
 
-    // Project name — bold white, wrapped
+    // Project name - bold white, wrapped
     const nameSz=cw*0.082;
     const nameFont=`900 ${nameSz}px Segoe UI,Arial`;
     const nameLines=wrap(p.name,nameFont,maxW);
@@ -1082,7 +1086,7 @@ function makePoster(g,p,dist,bW,bH,bD){
     ctx.fillRect(pad,y,maxW,2); ctx.globalAlpha=1;
     y+=nameSz*0.55;
 
-    // Category — district colour, wrapped
+    // Category - district colour, wrapped
     const catSz=nameSz*0.62;
     const catFont=`700 ${catSz}px Segoe UI,Arial`;
     const catLines=wrap(p.cat,catFont,maxW);
@@ -1128,39 +1132,8 @@ function makeParticles(dk,color,bW,bH){
   return group;
 }
 
-function makeRoadTex(name,cat,hex){
-  const can=document.createElement('canvas');can.width=1280;can.height=320;
-  const ctx=can.getContext('2d');ctx.clearRect(0,0,1280,320);
-  // Category (colored, top)
-  ctx.font='bold 72px Segoe UI,Arial';ctx.fillStyle=hex;
-  ctx.textAlign='center';ctx.textBaseline='middle';ctx.globalAlpha=0.92;
-  ctx.fillText(cat.toUpperCase(),640,88);ctx.globalAlpha=1;
-  // Divider
-  ctx.fillStyle=hex;ctx.globalAlpha=0.35;ctx.fillRect(120,136,1040,3);ctx.globalAlpha=1;
-  // Project name (white, very large)
-  ctx.font='900 100px Segoe UI,Arial';ctx.fillStyle='#f0f4ff';
-  let label=name;
-  while(ctx.measureText(label).width>1240&&label.length>4)label=label.slice(0,-1);
-  if(label!==name)label=label.trim()+'…';
-  ctx.fillText(label,640,240);
-  return new THREE.CanvasTexture(can);
-}
-
-function addWins(g,bW,bH,bD){
-  const litM=new THREE.MeshLambertMaterial({color:0xfff0b0,emissive:0xfff0b0,emissiveIntensity:0.65});
-  const dkM=new THREE.MeshLambertMaterial({color:0x0a1020});
-  const cols=3,rows=Math.max(2,Math.floor((bH-1.5)/2.2));
-  const gapX=(bW-1.8)/(cols-1),gapY=(bH-1.5)/(rows+1);
-  for(let r=0;r<rows;r++) for(let c=0;c<cols;c++){
-    const wx=-bW/2+0.9+c*gapX,wy=0.2+gapY+r*gapY,lit=Math.random()>.32;
-    const wf=new THREE.Mesh(new THREE.BoxGeometry(0.62,0.82,0.07),lit?litM:dkM);
-    wf.position.set(wx,wy,bD/2+0.04);g.add(wf);
-    const wb=wf.clone();wb.position.z=-bD/2-0.04;g.add(wb);
-  }
-}
-
 function placeLamps(){
-  // Only place one lamp per road intersection — minimal, clean
+  // Only place one lamp per road intersection - minimal, clean
   const pM=new THREE.MeshLambertMaterial({color:0x506070});
   const bM=new THREE.MeshLambertMaterial({color:0xffeedd,emissive:0xffeedd,emissiveIntensity:1});
   const startZ=-((DIST_ORDER.length-1)*BLK_Z)/2;
@@ -1225,12 +1198,12 @@ function buildCar(){
     wg.position.set(wx,wy,wz);
     wg.userData.isWheel=true;
 
-    // Inner spin group — this is what we rotate to spin the wheel
+    // Inner spin group - this is what we rotate to spin the wheel
     const spin=new THREE.Group();
     wg.add(spin);
     wg.userData.spin=spin;
 
-    // Tyre — cylinder lying on its side (axis along X = car width)
+    // Tyre - cylinder lying on its side (axis along X = car width)
     const tyre=new THREE.Mesh(new THREE.CylinderGeometry(0.42,0.42,0.26,20),yM);
     tyre.rotation.z=Math.PI/2; tyre.castShadow=true; spin.add(tyre);
 
@@ -1330,7 +1303,7 @@ function loop(){
     if(!blocked){carPos.x=nx;carPos.z=nz;}else{carSpeed*=-.25;}
 
     carGroup.position.x=carPos.x;carGroup.position.z=carPos.z;carGroup.rotation.y=carAngle;
-    // Spin wheels — rotate the inner spin group around Z axis (wheel's roll axis)
+    // Spin wheels - rotate the inner spin group around Z axis (wheel's roll axis)
     carWheels.forEach(wg=>{
       if(wg.userData.spin) wg.userData.spin.rotation.x+=carSpeed*2.5;
     });
@@ -1361,11 +1334,11 @@ function loop(){
     camera.lookAt(carPos.x+Math.sin(carAngle)*4,1.2,carPos.z+Math.cos(carAngle)*4);
   }
 
-  // Entrance detection + glow — perimeter zone around whole building
+  // Entrance detection + glow - perimeter zone around whole building
   nearEntry=null;let bestD=9999;
   buildings.forEach(b=>{
     const dx=carPos.x-b.cx,dz=carPos.z-b.cz;
-    // Distance to building perimeter (not centre) — use Chebyshev distance to rectangle
+    // Distance to building perimeter (not centre) - use Chebyshev distance to rectangle
     const px=Math.max(0,Math.abs(dx)-b.hw),pz=Math.max(0,Math.abs(dz)-b.hd);
     const d=Math.sqrt(px*px+pz*pz); // 0 when inside perimeter ring
     const inZone=d<5.5;
