@@ -1402,7 +1402,7 @@ function drawMinimap(){
   // carAngle=0 → moving +Z → down canvas. carAngle=PI → moving -Z → up canvas.
   // carAngle=PI → car faces -Z → up on canvas (-Y). Arrow tip at (0,-6.5) = up.
   // rotate(0) keeps tip pointing up. So rotate(carAngle - PI).
-  mmCtx.rotate(carAngle + Math.PI);
+  mmCtx.rotate(-carAngle + Math.PI);
   mmCtx.fillStyle='#f5c842';
   mmCtx.beginPath();
   mmCtx.moveTo(0,-6.5);   // tip = forward (car faces -Z = up canvas when angle=PI)
