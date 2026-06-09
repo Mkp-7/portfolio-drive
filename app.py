@@ -345,7 +345,7 @@ html,body{width:100%;height:100vh;overflow:hidden;background:#04080f;font-family
     <div class="avail-pill"><span class="avail-dot"></span>Open to full-time opportunities</div>
     <div class="intro-name">Mukund <span class="accent">Patel</span></div>
     <div class="intro-role"><strong>Data Scientist</strong> &nbsp;·&nbsp; <strong>AI Engineer</strong> &nbsp;·&nbsp; <strong>Analytics Professional</strong></div>
-    <div class="lsummary">MS Data Science graduate from <strong>Montclair State University</strong> (GPA 4.0) with hands-on experience at the <strong>MTA New York</strong> building data pipelines, and BI dashboards. I build end-to-end analytics solutions - from SQL pipelines and ML models to deployed AI applications - across transportation, finance, healthcare, retail, and logistics.</div>
+    <div class="lsummary">MS Data Science graduate from <strong>Montclair State University</strong> (GPA 4.0) with hands-on experience at the <strong>MTA New York</strong> building data pipelines, and BI dashboards. I build end-to-end analytics solutions — from SQL pipelines and ML models to deployed AI applications — across transportation, finance, healthcare, retail, and logistics.</div>
     <div class="domain-row">
       <span class="domain-tag">AI Agents &amp; LLMs</span>
       <span class="domain-tag">Revenue Management</span>
@@ -489,7 +489,7 @@ html,body{width:100%;height:100vh;overflow:hidden;background:#04080f;font-family
 </div>
 
 <div id="hint-box">
-  <span style="color:#8aaccc">W A S D</span> / Arrows - Drive &nbsp;·&nbsp; <span style="color:#8aaccc">Enter</span> - Open project
+  <span style="color:#8aaccc">W A S D</span> / Arrows — Drive &nbsp;·&nbsp; <span style="color:#8aaccc">Enter</span> — Open project
 </div>
 
 <!-- D-PAD for mobile -->
@@ -917,7 +917,7 @@ function makeBuilding(p,bx,bz,idx){
   g.add(pg);allParticleGroups.push({group:pg,building:null});
 
   // ── PERIMETER ENTRANCE ZONE ──
-  // Full rectangle around building - glowing floor plane
+  // Full rectangle around building — glowing floor plane
   const zoneW=bW+10,zoneD=bD+10;
   const eMat=new THREE.MeshBasicMaterial({color:hc,transparent:true,opacity:0.08,depthWrite:false});
   const ePlane=new THREE.Mesh(new THREE.PlaneGeometry(zoneW,zoneD),eMat);
@@ -963,57 +963,101 @@ function makeBuilding(p,bx,bz,idx){
 }
 
 function makePoster(g,p,dist,bW,bH,bD){
-  function buildTex(wide){
-    const W=wide?2048:1536, H=1024;
-    const can=document.createElement('canvas');can.width=W;can.height=H;
+  // Build a canvas texture that exactly matches the given face dimensions
+  // Texel density: 128 px per world unit for crisp text at any distance
+  const PX=128;
+
+  function faceTex(faceW,faceH,isSide){
+    const cw=Math.round(faceW*PX), ch=Math.round(faceH*PX);
+    const can=document.createElement('canvas');
+    can.width=cw; can.height=ch;
     const ctx=can.getContext('2d');
     // Background
-    ctx.fillStyle='#080f1e';ctx.fillRect(0,0,W,H);
-    // Top colour bar
-    ctx.fillStyle=dist.hex;ctx.fillRect(0,0,W,22);
+    ctx.fillStyle='#080f1e';ctx.fillRect(0,0,cw,ch);
+    // Top bar
+    ctx.fillStyle=dist.hex;ctx.fillRect(0,0,cw,ch*0.028);
     // Bottom bar
-    ctx.fillStyle=dist.hex;ctx.globalAlpha=0.3;ctx.fillRect(0,H-22,W,22);ctx.globalAlpha=1;
-    // Icon
-    ctx.font=`${H*0.18}px serif`;ctx.textAlign='center';ctx.textBaseline='middle';
-    ctx.fillText(p.icon,W/2,H*0.21);
-    // Project name - very large, bold, white
+    ctx.fillStyle=dist.hex;ctx.globalAlpha=0.3;
+    ctx.fillRect(0,ch*0.972,cw,ch*0.028);ctx.globalAlpha=1;
+
+    ctx.textAlign='center';ctx.textBaseline='middle';
+
+    // Scale fonts relative to face dimensions
+    const baseF=Math.min(cw,ch);
+
+    // Icon (only front face to distinguish)
+    if(!isSide){
+      ctx.font=`${baseF*0.14}px serif`;
+      ctx.fillText(p.icon,cw/2,ch*0.2);
+    }
+
+    // Project name — always shown, fills width
+    const nameY=isSide?ch*0.38:ch*0.47;
     let nm=p.name;
-    ctx.font=`900 ${H*0.16}px Segoe UI,Arial`;
-    while(ctx.measureText(nm).width>W*0.93&&nm.length>3)nm=nm.slice(0,-1);
+    const nameFontSize=baseF*(isSide?0.13:0.12);
+    ctx.font=`900 ${nameFontSize}px Segoe UI,Arial`;
+    while(ctx.measureText(nm).width>cw*0.9&&nm.length>3)nm=nm.slice(0,-1);
     if(nm!==p.name)nm=nm.trim()+'…';
-    ctx.fillStyle='#f0f4ff';ctx.fillText(nm,W/2,H*0.44);
+    ctx.fillStyle='#f0f4ff';
+    ctx.fillText(nm,cw/2,nameY);
+
     // Divider
-    ctx.fillStyle=dist.hex;ctx.globalAlpha=0.5;ctx.fillRect(W*0.08,H*0.55,W*0.84,3);ctx.globalAlpha=1;
-    // Category - district colour, clear
-    ctx.font=`700 ${H*0.09}px Segoe UI,Arial`;ctx.fillStyle=dist.hex;
-    ctx.fillText(p.cat.toUpperCase(),W/2,H*0.65);
-    // Stat
-    ctx.font=`${H*0.075}px Segoe UI,Arial`;ctx.fillStyle='rgba(160,200,240,0.75)';
-    ctx.fillText(p.stat,W/2,H*0.78);
-    // District name faint bottom
-    ctx.font=`600 ${H*0.055}px Segoe UI,Arial`;ctx.fillStyle=dist.hex;ctx.globalAlpha=0.45;
-    ctx.fillText(dist.name.toUpperCase(),W/2,H*0.9);ctx.globalAlpha=1;
-    return new THREE.CanvasTexture(can);
+    ctx.fillStyle=dist.hex;ctx.globalAlpha=0.45;
+    ctx.fillRect(cw*0.08,nameY+nameFontSize*0.8,cw*0.84,Math.max(2,ch*0.004));
+    ctx.globalAlpha=1;
+
+    // Category
+    const catFontSize=nameFontSize*0.65;
+    ctx.font=`700 ${catFontSize}px Segoe UI,Arial`;
+    ctx.fillStyle=dist.hex;
+    ctx.fillText(p.cat.toUpperCase(),cw/2,nameY+nameFontSize*1.35);
+
+    // Stat (front only — less space on sides)
+    if(!isSide){
+      ctx.font=`${nameFontSize*0.55}px Segoe UI,Arial`;
+      ctx.fillStyle='rgba(160,200,240,0.7)';
+      ctx.fillText(p.stat,cw/2,nameY+nameFontSize*2.1);
+    }
+
+    const tex=new THREE.CanvasTexture(can);
+    tex.anisotropy=renderer.capabilities.getMaxAnisotropy(); // max sharpness at angles
+    return tex;
   }
 
-  const texFB=buildTex(true);   // front/back (wide)
-  const texLR=buildTex(false);  // left/right (narrower)
-  const pMat=(t)=>new THREE.MeshBasicMaterial({map:t,transparent:true,depthWrite:false});
+  // Front face (+Z): bW wide × bH tall
+  const frontTex=faceTex(bW,bH,false);
+  // Back face (-Z): same aspect
+  const backTex=faceTex(bW,bH,false);
+  // Left/Right faces: bD wide × bH tall
+  const sideTex=faceTex(bD,bH,true);
 
-  // Front
-  const fh=bH*0.75,fw=bW*0.92;
-  const front=new THREE.Mesh(new THREE.PlaneGeometry(fw,fh),pMat(texFB));
-  front.position.set(0,bH*0.52,bD/2+0.1);g.add(front);
-  // Back
-  const back=new THREE.Mesh(new THREE.PlaneGeometry(fw,fh),pMat(texFB));
-  back.position.set(0,bH*0.52,-bD/2-0.1);back.rotation.y=Math.PI;g.add(back);
-  // Left
-  const sw=bD*0.9;
-  const left=new THREE.Mesh(new THREE.PlaneGeometry(sw,fh),pMat(texLR));
-  left.position.set(-bW/2-0.1,bH*0.52,0);left.rotation.y=-Math.PI/2;g.add(left);
-  // Right
-  const right=new THREE.Mesh(new THREE.PlaneGeometry(sw,fh),pMat(texLR));
-  right.position.set(bW/2+0.1,bH*0.52,0);right.rotation.y=Math.PI/2;g.add(right);
+  const mkMat=(t)=>new THREE.MeshBasicMaterial({map:t,transparent:true,depthWrite:false});
+
+  // Place planes flush on building face — no offset gap that causes z-fight blur
+  const eps=0.05; // tiny offset to avoid z-fighting with building body
+
+  // FRONT (+Z)
+  const front=new THREE.Mesh(new THREE.PlaneGeometry(bW,bH),mkMat(frontTex));
+  front.position.set(0,bH/2+0.2,bD/2+eps);
+  g.add(front);
+
+  // BACK (-Z)
+  const back=new THREE.Mesh(new THREE.PlaneGeometry(bW,bH),mkMat(backTex));
+  back.position.set(0,bH/2+0.2,-bD/2-eps);
+  back.rotation.y=Math.PI;
+  g.add(back);
+
+  // LEFT (-X)
+  const left=new THREE.Mesh(new THREE.PlaneGeometry(bD,bH),mkMat(sideTex));
+  left.position.set(-bW/2-eps,bH/2+0.2,0);
+  left.rotation.y=-Math.PI/2;
+  g.add(left);
+
+  // RIGHT (+X)
+  const right=new THREE.Mesh(new THREE.PlaneGeometry(bD,bH),mkMat(sideTex));
+  right.position.set(bW/2+eps,bH/2+0.2,0);
+  right.rotation.y=Math.PI/2;
+  g.add(right);
 }
 
 function makeParticles(dk,color,bW,bH){
@@ -1238,11 +1282,11 @@ function loop(){
     camera.lookAt(carPos.x+Math.sin(carAngle)*4,1.2,carPos.z+Math.cos(carAngle)*4);
   }
 
-  // Entrance detection + glow - perimeter zone around whole building
+  // Entrance detection + glow — perimeter zone around whole building
   nearEntry=null;let bestD=9999;
   buildings.forEach(b=>{
     const dx=carPos.x-b.cx,dz=carPos.z-b.cz;
-    // Distance to building perimeter (not centre) - use Chebyshev distance to rectangle
+    // Distance to building perimeter (not centre) — use Chebyshev distance to rectangle
     const px=Math.max(0,Math.abs(dx)-b.hw),pz=Math.max(0,Math.abs(dz)-b.hd);
     const d=Math.sqrt(px*px+pz*pz); // 0 when inside perimeter ring
     const inZone=d<5.5;
