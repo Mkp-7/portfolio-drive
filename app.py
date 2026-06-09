@@ -657,7 +657,9 @@ function startGame(){
   document.getElementById('back-btn').style.display='block';
   ['hud','mm-wrap','hint-box'].forEach(id=>document.getElementById(id).style.display='block');
   document.getElementById('dpad').style.display='grid';
-  mmCanvas=document.getElementById('mm');mmCtx=mmCanvas.getContext('2d');
+  mmCanvas=document.getElementById('mm');
+  mmCanvas.width=140; mmCanvas.height=140;
+  mmCtx=mmCanvas.getContext('2d');
   init3D();buildCity();buildCar();bindInput();initAudio();
   clock=new THREE.Clock();loop();
   showToast('Drive into a glowing zone · Press Enter to open a project');
@@ -1356,18 +1358,20 @@ function drawMinimap(){
     if(isV){mmCtx.strokeStyle='#3ecf8e';mmCtx.lineWidth=1;mmCtx.beginPath();mmCtx.arc(px,pz,4.5,0,Math.PI*2);mmCtx.stroke();}
     mmCtx.globalAlpha=1;
   });
-  const cpx=ox+carPos.x*scale,cpz=oz+carPos.z*scale;
-  mmCtx.save();mmCtx.translate(cpx,cpz);
-  // carAngle=0 → moving +Z → down canvas. carAngle=PI → moving -Z → up canvas.
-  // carAngle=PI → car faces -Z → up on canvas (-Y). Arrow tip at (0,-6.5) = up.
-  // rotate(0) keeps tip pointing up. So rotate(carAngle - PI).
-  mmCtx.rotate(carAngle-Math.PI);
+  const cpx=ox+carPos.x*scale, cpz=oz+carPos.z*scale;
+  mmCtx.save(); mmCtx.translate(cpx,cpz);
+  // Arrow rotation: tip drawn at (0,-6.5) = up on canvas = -Z world direction.
+  // carAngle=PI means car faces -Z. rotate(carAngle-PI)=rotate(0) → tip points up = correct.
+  // carAngle=0 means car faces +Z. rotate(0-PI)=rotate(-PI) → tip points down = correct.
+  // If arrow looks backwards, change to: mmCtx.rotate(carAngle);
+  mmCtx.rotate(carAngle - Math.PI);
   mmCtx.fillStyle='#f5c842';
   mmCtx.beginPath();
-  mmCtx.moveTo(0,-6.5);   // tip = forward (car faces -Z = up canvas when angle=PI)
-  mmCtx.lineTo(4,5);mmCtx.lineTo(0,2.5);mmCtx.lineTo(-4,5);
-  mmCtx.closePath();mmCtx.fill();
-  mmCtx.fillStyle='#fff';mmCtx.beginPath();mmCtx.arc(0,0,1.8,0,Math.PI*2);mmCtx.fill();
+  mmCtx.moveTo(0,-6.5); // tip = forward
+  mmCtx.lineTo(4,5); mmCtx.lineTo(0,2.5); mmCtx.lineTo(-4,5);
+  mmCtx.closePath(); mmCtx.fill();
+  mmCtx.fillStyle='#fff';
+  mmCtx.beginPath(); mmCtx.arc(0,0,1.8,0,Math.PI*2); mmCtx.fill();
   mmCtx.restore();
   mmCtx.strokeStyle='rgba(74,144,217,.14)';mmCtx.lineWidth=1;mmCtx.strokeRect(0,0,mw,mh);
 }
