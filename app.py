@@ -77,27 +77,7 @@ html,body{width:100%;height:100vh;overflow:hidden;background:#04080f;font-family
 .lsec-inner{width:100%;max-width:820px;margin:0 auto}
 .lsec-eye{font-size:10px;letter-spacing:3px;color:#4a90d9;text-transform:uppercase;margin-bottom:8px}
 .lsec-title{font-size:clamp(24px,4vw,36px);font-weight:700;color:#eef2ff;letter-spacing:-1px;margin-bottom:8px}
-.lsec-div{width:32px;height:2px;background:#4a90d9;margin:0 0 26px;
-  transform:scaleX(0);transform-origin:left;transition:transform .6s .2s ease}
-
-/* Scroll-reveal base state */
-.reveal{opacity:0;transform:translateY(32px);transition:opacity .65s ease,transform .65s ease}
-.reveal.in{opacity:1;transform:translateY(0)}
-.reveal-left{opacity:0;transform:translateX(-32px);transition:opacity .65s ease,transform .65s ease}
-.reveal-left.in{opacity:1;transform:translateX(0)}
-.reveal-scale{opacity:0;transform:scale(.94);transition:opacity .55s ease,transform .55s ease}
-.reveal-scale.in{opacity:1;transform:scale(1)}
-/* stagger children */
-.stagger>*{opacity:0;transform:translateY(20px);transition:opacity .5s ease,transform .5s ease}
-.stagger.in>*{opacity:1;transform:translateY(0)}
-.stagger.in>*:nth-child(1){transition-delay:.05s}
-.stagger.in>*:nth-child(2){transition-delay:.15s}
-.stagger.in>*:nth-child(3){transition-delay:.25s}
-.stagger.in>*:nth-child(4){transition-delay:.35s}
-.stagger.in>*:nth-child(5){transition-delay:.45s}
-.stagger.in>*:nth-child(6){transition-delay:.55s}
-/* div bar animation trigger */
-.lsec-inner.in .lsec-div{transform:scaleX(1)}
+.lsec-div{width:32px;height:2px;background:#4a90d9;margin:0 0 26px}
 
 /* SUMMARY LINE */
 .lsummary,.hero-summary{font-size:13.5px;color:#4a6080;line-height:1.82;max-width:640px;
@@ -411,10 +391,10 @@ html,body{width:100%;height:100vh;overflow:hidden;background:#04080f;font-family
 <!-- ABOUT -->
 <section class="lsec" id="s-about">
   <div class="lsec-inner">
-    <div class="lsec-eye reveal">About</div>
-    <div class="lsec-title reveal">Who Am I</div>
+    <div class="lsec-eye">About</div>
+    <div class="lsec-title">Who Am I</div>
     <div class="lsec-div"></div>
-    <div class="l2col stagger">
+    <div class="l2col">
       <div class="lcard">
         <div class="lcard-head">Education</div>
         <div class="lfield"><div class="lfield-lbl">Master of Science &middot; Data Science</div><div class="lfield-val"><strong>Montclair State University</strong></div><div class="lfield-val">New Jersey, USA &nbsp;&middot;&nbsp; GPA 4.0 / 4.0</div><div class="lfield-val">Sep 2024 &ndash; May 2026</div></div>
@@ -439,10 +419,9 @@ html,body{width:100%;height:100vh;overflow:hidden;background:#04080f;font-family
 <!-- EXPERIENCE -->
 <section class="lsec" id="s-exp">
   <div class="lsec-inner">
-    <div class="lsec-eye reveal">Career</div>
-    <div class="lsec-title reveal">Professional Experience</div>
+    <div class="lsec-eye">Career</div>
+    <div class="lsec-title">Professional Experience</div>
     <div class="lsec-div"></div>
-    <div class="stagger">
     <div class="lexp" style="border-left-color:#4a90d9">
       <div class="lexp-hd"><div><div class="lexp-role">Data Analyst Intern</div><div class="lexp-org" style="color:#4a90d9">MTA &mdash; Metropolitan Transportation Authority &middot; New York, NY</div><div class="lexp-tags"><span class="letag" style="color:#4a90d9;background:rgba(74,144,217,.08);border-color:rgba(74,144,217,.2)">Computer Vision</span><span class="letag" style="color:#4a90d9;background:rgba(74,144,217,.08);border-color:rgba(74,144,217,.2)">ArcGIS</span><span class="letag" style="color:#4a90d9;background:rgba(74,144,217,.08);border-color:rgba(74,144,217,.2)">Tableau</span><span class="letag" style="color:#4a90d9;background:rgba(74,144,217,.08);border-color:rgba(74,144,217,.2)">Python ETL</span><span class="letag" style="color:#4a90d9;background:rgba(74,144,217,.08);border-color:rgba(74,144,217,.2)">SQL</span></div></div><div class="lexp-date">Oct 2025 &ndash; May 2026</div></div>
       <ul class="lexp-ul"><li>Automated data processing and validation for 8,500+ events using Python and Office Scripts, improving data quality.</li><li>Managed master data for 1,400+ bus routes via SQL and Excel; ArcGIS spatial analysis to identify route overlaps.</li><li>Built computer vision pipeline detecting bus lane violations from 900+ cameras at 92% accuracy; integrated with Tableau dashboards.</li><li>Developed ETL workflow processing driver trip logs to calculate pull-in/pull-out counts per depot at 30-minute intervals.</li></ul>
@@ -459,23 +438,22 @@ html,body{width:100%;height:100vh;overflow:hidden;background:#04080f;font-family
       <div class="lexp-hd"><div><div class="lexp-role">Research Volunteer</div><div class="lexp-org" style="color:#3ecf8e">Montclair State University &middot; New Jersey</div></div><div class="lexp-date">Nov 2024</div></div>
       <ul class="lexp-ul"><li>Processed NJ weather data (1915&ndash;2024) contributing to research showing ARIMA/SARIMA outperform deep learning for time-series forecasting.</li></ul>
     </div>
-  </div><!-- end stagger -->
   </div>
 </section>
 
 <!-- CONTACT -->
 <section class="lsec" id="s-contact">
   <div class="lsec-inner">
-    <div class="lsec-eye reveal">Get In Touch</div>
-    <div class="lsec-title reveal">Contact</div>
+    <div class="lsec-eye">Get In Touch</div>
+    <div class="lsec-title">Contact</div>
     <div class="lsec-div"></div>
-    <div class="lcont-grid stagger">
+    <div class="lcont-grid">
       <a class="lcont-card" href="mailto:mkpatel4102@gmail.com"><div class="lcont-icon">&#9993;&#65039;</div><div class="lcont-lbl">Email</div><div class="lcont-val">mkpatel4102@gmail.com</div></a>
       <a class="lcont-card" href="https://www.linkedin.com/in/mukund-patel7" target="_blank"><div class="lcont-icon">&#128188;</div><div class="lcont-lbl">LinkedIn</div><div class="lcont-val">linkedin.com/in/mukund-patel7</div></a>
       <a class="lcont-card" href="https://github.com/Mkp-7" target="_blank"><div class="lcont-icon">&#128187;</div><div class="lcont-lbl">GitHub</div><div class="lcont-val">github.com/Mkp-7</div></a>
       <div class="lcont-card" style="cursor:default"><div class="lcont-icon">&#128205;</div><div class="lcont-lbl">Location</div><div class="lcont-val">Clifton, New Jersey, USA</div></div>
     </div>
-    <div class="lexplore-banner reveal">
+    <div class="lexplore-banner">
       <div style="font-size:17px;font-weight:600;color:#eef2ff;margin-bottom:8px">Explore Projects Interactively</div>
       <div style="font-size:13px;color:#4a6080;margin-bottom:16px;line-height:1.7">Drive through a 3D city where each building is a project. Pull into any glowing entrance and press Enter to view details, live demo, and GitHub.</div>
       <button class="btn-primary" onclick="startGame()">&#9654; &nbsp;Enter Portfolio City</button>
@@ -624,7 +602,7 @@ const PROJECTS=[
   {name:"Book Recommendation Engine",   icon:"📚",district:"research",stat:"10K books · 1M+ ratings",   cat:"ML & Python",             stack:"Python · TF-IDF · SVD",             desc:"Recommendation engine trained on 10,000 books and 1M+ ratings. Employs TF-IDF with Cosine Similarity and SVD for personalized recommendations. Addresses cold start, scalability, and relevance challenges for accurate suggestions across diverse reader profiles.",                                                                                                  tags:["TF-IDF","SVD","Cosine Similarity","Collaborative Filtering","1M+ Ratings"],    gh:"https://github.com/Mkp-7/Book_Recommendation",                                    live:""},
 ];
 
-const DIST_ORDER=['research','health','ops','finance','retail'];
+const DIST_ORDER=['retail','finance','ops','health','research'];
 const ROW_COLS={retail:5,finance:3,ops:4,health:2,research:4};
 
 // ════════════════════════════════════
@@ -635,7 +613,7 @@ let carGroup,carWheels=[];
 let buildings=[];
 let nearEntry=null,modalOpen=false;
 let keys={},dpadState={up:0,down:0,left:0,right:0};
-let carPos=new THREE.Vector3(0,0,160);
+let carPos=new THREE.Vector3(0,0,110);
 let carAngle=Math.PI,carSpeed=0;
 let frame=0;
 let mmCanvas,mmCtx;
@@ -645,10 +623,10 @@ let audioCtx=null,engineOsc=null,engineGain=null;
 let lastNearEntry=null;
 
 const CAM_BACK=11,CAM_UP=5.5,CAM_LAG=0.09;
-let camPos=new THREE.Vector3(0,8,172);
-const BLK_X=32,BLK_Z=48,ROAD_W=10,CITY_H=220;
+let camPos=new THREE.Vector3(0,8,122);
+const BLK_X=32,BLK_Z=38,ROAD_W=10,CITY_H=180;
 
-// NAV SCROLL + SCROLL REVEAL
+// NAV SCROLL
 function navTo(id){
   const el=document.getElementById(id);
   const sc=document.getElementById('lscroll');
@@ -658,8 +636,6 @@ function navTo(id){
 document.addEventListener('DOMContentLoaded',()=>{
   const sc=document.getElementById('lscroll');
   if(!sc)return;
-
-  // Nav active state
   const secs=['s-hero','s-about','s-exp','s-contact'];
   const links=document.querySelectorAll('.lnav-link');
   sc.addEventListener('scroll',()=>{
@@ -673,21 +649,6 @@ document.addEventListener('DOMContentLoaded',()=>{
       }
     });
   });
-
-  // Scroll reveal via IntersectionObserver
-  const obs=new IntersectionObserver((entries)=>{
-    entries.forEach(e=>{
-      if(e.isIntersecting){
-        e.target.classList.add('in');
-        // Also trigger lsec-inner for div bar
-        const inner=e.target.closest('.lsec-inner');
-        if(inner)inner.classList.add('in');
-      }
-    });
-  },{root:sc,threshold:0.15});
-
-  // Observe all reveal elements and stagger containers
-  sc.querySelectorAll('.reveal,.reveal-left,.reveal-scale,.stagger').forEach(el=>obs.observe(el));
 });
 // ════════════════════════════════════
 function startGame(){
@@ -746,26 +707,14 @@ function projPos(p){
   const distProjs=PROJECTS.filter(x=>x.district===p.district);
   const col=distProjs.indexOf(p);
   const cols=ROW_COLS[p.district];
-  const startX=-((5-1)*BLK_X)/2;
+  // All districts anchored to same left edge so vertical roads line up perfectly
+  const startX=-((5-1)*BLK_X)/2; // always use max cols=5 as reference
   const startZ=-((DIST_ORDER.length-1)*BLK_Z)/2;
+  // Offset X to centre each district within its columns
   const distOffsetX=((5-cols)*BLK_X)/2;
-  // Buildings sit at col*BLK_X (between vertical roads at c*BLK_X-BLK_X/2)
-  // and row*BLK_Z (horizontal roads are at row*BLK_Z ± BLK_Z/2 - i.e. between rows)
-  // Vertical roads: startX + c*BLK_X - BLK_X/2  for c=0..5 → at -64, -32, 0, 32, 64, 96
-  // Buildings at: startX + distOffsetX + col*BLK_X → at -64+16=−48, −16, 16... wait
-  // Simpler: put building X midway between two vertical roads = startX + distOffsetX + col*BLK_X
-  // Vertical roads at startX + c*BLK_X - BLK_X/2
-  // Building col=0 → startX + distOffsetX + 0 = startX + distOffsetX
-  // Nearest road: startX + 0*BLK_X - BLK_X/2 = startX - 16  AND  startX + 1*BLK_X - BLK_X/2 = startX + 16
-  // Building at startX+distOffsetX - centred between roads when distOffsetX=0: startX+0=startX, roads at startX-16 and startX+16 ✓
-  // Horizontal roads at startZ + r*BLK_Z for r=-1..ROWS (between rows)
-  // Buildings at startZ + row*BLK_Z - but roads also pass through startZ+row*BLK_Z when r==row!
-  // Fix: offset building Z by +BLK_Z/2 so it sits BETWEEN horizontal roads
-  // Horizontal roads: startZ + r*BLK_Z, r=-1,0,1,2,3,4,5
-  // With offset: building z = startZ + row*BLK_Z + BLK_Z/2 → sits between road[row] and road[row+1] ✓
-  return {
+  return{
     x: startX + distOffsetX + col*BLK_X,
-    z: startZ + row*BLK_Z + BLK_Z/2
+    z: startZ + row*BLK_Z   // buildings stay at row Z; roads are between rows at ±BLK_Z/2
   };
 }
 
@@ -775,7 +724,7 @@ function buildCity(){
     new THREE.MeshLambertMaterial({color:0x060a10}));
   ground.rotation.x=-Math.PI/2;ground.receiveShadow=true;scene.add(ground);
   scene.add(new THREE.GridHelper(CITY_H*2.4,110,0x0d1420,0x090f18));
-  makeRoads();makeDistrictZones();makeDistrictRoadBanners();placeBuildings();makeDistrictSigns();placeLamps();
+  makeRoads();makeDistrictZones();placeBuildings();makeDistrictSigns();placeLamps();
 }
 
 function makeRoads(){
@@ -784,9 +733,7 @@ function makeRoads(){
   const sM=new THREE.MeshLambertMaterial({color:0x111c2c});
   const ROWS=DIST_ORDER.length;
   const startZ=-((ROWS-1)*BLK_Z)/2;
-  // Horizontal roads sit AT startZ + r*BLK_Z (between rows - buildings are at +BLK_Z/2 offset)
-  for(let r=-1;r<=ROWS;r++) makeHR(startZ+r*BLK_Z,rM,lM,sM);
-  // Vertical roads at startX + c*BLK_X - BLK_X/2 (buildings at col*BLK_X = midway between roads)
+  for(let r=-1;r<=ROWS;r++) makeHR(startZ+r*BLK_Z-BLK_Z/2+BLK_Z/2,rM,lM,sM);
   const startX=-((5-1)*BLK_X)/2;
   for(let c=0;c<=5;c++) makeVR(startX+c*BLK_X-BLK_X/2,rM,lM,sM);
 }
@@ -827,54 +774,68 @@ function makeDistrictZones(){
     const cols=ROW_COLS[dk];
     const distOffsetX=((5-cols)*BLK_X)/2;
     const cx=baseX+distOffsetX+(cols-1)*BLK_X/2;
-    // Buildings now at startZ + row*BLK_Z + BLK_Z/2, spanning BLK_Z-ROAD_W
     const zone=new THREE.Mesh(
       new THREE.PlaneGeometry(cols*BLK_X-ROAD_W,BLK_Z-ROAD_W),
       new THREE.MeshLambertMaterial({color:dist.color,transparent:true,opacity:0.04})
     );
     zone.rotation.x=-Math.PI/2;
-    zone.position.set(cx,0.055,startZ+row*BLK_Z+BLK_Z/2);
+    zone.position.set(cx,0.055,startZ+row*BLK_Z);
     scene.add(zone);
   });
 }
 
 function makeDistrictSigns(){
-  const startZ=-((DIST_ORDER.length-1)*BLK_Z)/2;
-  const baseX=-((5-1)*BLK_X)/2;
-  const ROWS=DIST_ORDER.length;
+  // Horizontal roads run along X. Car drives along -Z.
+  // At each horizontal road (roadZ), place one billboard PER DISTRICT ROW boundary.
+  // Billboard: poles on LEFT and RIGHT side of the street (offset in X from road centre),
+  // banner connecting them, spanning the road width in X, facing Z so car reads it.
+  //
+  // Each road separates district[r-1] (behind, higher Z) from district[r] (ahead, lower Z).
+  // Face toward +Z (driver coming from +Z sees it BEFORE crossing) → shows district AHEAD (row r)
+  // Face toward -Z (driver already past, looking back) → shows district BEHIND (row r-1)
+  // End roads: only one district, same on both faces.
 
-  // One billboard straddling each horizontal road, at every vertical road crossing
-  for(let r=0;r<=ROWS;r++){
-    const roadZ=startZ+r*BLK_Z;
-    // District car is about to enter (ahead = lower Z for car driving toward -Z)
-    const distAhead  = r < ROWS ? DISTRICTS[DIST_ORDER[r]]   : null;
-    // District car is leaving
-    const distBehind = r > 0    ? DISTRICTS[DIST_ORDER[r-1]] : null;
-    if(!distAhead && !distBehind) continue;
-    const frontDist = distAhead  || distBehind;
-    const backDist  = distBehind || distAhead;
+  const startZ = -((DIST_ORDER.length-1)*BLK_Z)/2;
+  const baseX  = -((5-1)*BLK_X)/2;
+  const ROWS   = DIST_ORDER.length;
 
-    // Column span covering both adjacent districts
-    const cA = distAhead  ? ROW_COLS[DIST_ORDER[r]]   : 0;
-    const cB = distBehind ? ROW_COLS[DIST_ORDER[r-1]] : 0;
-    const offA = distAhead  ? ((5-cA)*BLK_X)/2 : 9999;
-    const offB = distBehind ? ((5-cB)*BLK_X)/2 : 9999;
-    const leftCol  = Math.round(Math.min(offA,offB)/BLK_X);
-    const rightCol = leftCol + Math.max(cA,cB);
+  for(let r=0; r<=ROWS; r++){
+    const roadZ     = startZ + r*BLK_Z;
+    const distAhead  = r < ROWS ? DISTRICTS[DIST_ORDER[r]]   : null; // lower Z = what car enters
+    const distBehind = r > 0    ? DISTRICTS[DIST_ORDER[r-1]] : null; // higher Z = what car leaves
 
-    for(let c=leftCol;c<=rightCol;c++){
-      const vx=baseX+c*BLK_X-BLK_X/2;
-      makeBillboard(vx, roadZ, frontDist, backDist);
-    }
+    const frontDist = distAhead  || distBehind;  // face +Z: driver sees BEFORE crossing = entering
+    const backDist  = distBehind || distAhead;   // face -Z: driver sees AFTER crossing = leaving
+    if(!frontDist) continue;
+
+    // One billboard per district row boundary - centred on the district's column span
+    const refDist  = distAhead  || distBehind;
+    const refKey   = distAhead  ? DIST_ORDER[r] : DIST_ORDER[r-1];
+    const cols     = ROW_COLS[refKey];
+    const offX     = ((5-cols)*BLK_X)/2;
+    const leftX    = baseX + offX;
+    const rightX   = leftX + (cols-1)*BLK_X;
+    const centreX  = (leftX + rightX) / 2;
+
+    makeBillboard(centreX, roadZ, frontDist, backDist, rightX - leftX + BLK_X*0.6);
   }
 }
 
-function makeBillboard(x, roadZ, frontDist, backDist){
-  const poleOff = ROAD_W/2 + 1.4;
-  const pH = 6.5;
-  const bH = 1.1;
-  const bW = BLK_X - 4;
-  const pM = new THREE.MeshLambertMaterial({color:0x2e3e50});
+function makeBillboard(centreX, roadZ, frontDist, backDist, spanWidth){
+  // Poles sit on the left and right SIDE of the horizontal road (offset in X).
+  // Horizontal road runs in X direction, so pole offset is also in X.
+  // We place poles at centreX ± spanWidth/2, all at roadZ (centre of road).
+  // Poles are offset slightly in Z (±ROAD_W/2+1) to be ON THE CURB, not on the asphalt.
+
+  const halfSpan   = Math.min(spanWidth/2, BLK_X*2.2);
+  const leftPoleX  = centreX - halfSpan;
+  const rightPoleX = centreX + halfSpan;
+  const poleZ_neg  = roadZ - ROAD_W/2 - 1.0;  // curb on -Z side of road
+  const poleZ_pos  = roadZ + ROAD_W/2 + 1.0;  // curb on +Z side of road
+  const poleH      = 6.0;
+  const boardH     = 1.1;
+  const boardW     = halfSpan * 2 - 2;
+  const pM = new THREE.MeshLambertMaterial({color:0x2a3a4e});
 
   function makeTex(dist){
     const cw=1024, ch=192;
@@ -882,8 +843,7 @@ function makeBillboard(x, roadZ, frontDist, backDist){
     can.width=cw; can.height=ch;
     const ctx=can.getContext('2d');
     ctx.fillStyle='#08111e'; ctx.fillRect(0,0,cw,ch);
-    ctx.fillStyle=dist.hex;
-    ctx.fillRect(0,0,cw,14);
+    ctx.fillStyle=dist.hex; ctx.fillRect(0,0,cw,14);
     ctx.fillRect(0,ch-14,cw,14);
     ctx.font='bold 68px Segoe UI,Arial';
     ctx.fillStyle=dist.hex;
@@ -894,66 +854,50 @@ function makeBillboard(x, roadZ, frontDist, backDist){
     return tex;
   }
 
-  // Two poles - one each side of horizontal road in Z
-  [roadZ-poleOff, roadZ+poleOff].forEach(pz=>{
-    const pole=new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.12,pH,8),pM);
-    pole.position.set(x,pH/2,pz);
-    scene.add(pole);
+  // Left pole pair (at leftPoleX, both Z sides of road)
+  // Right pole pair (at rightPoleX, both Z sides of road)
+  [[leftPoleX],[rightPoleX]].forEach(([px])=>{
+    [poleZ_neg, poleZ_pos].forEach(pz=>{
+      const pole=new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.12,poleH,8),pM);
+      pole.position.set(px, poleH/2, pz);
+      scene.add(pole);
+    });
+    // Connecting arm between the two poles of this side (spans in Z across road)
+    const arm=new THREE.Mesh(new THREE.BoxGeometry(0.08,0.08,ROAD_W+2.2),pM);
+    arm.position.set(px, poleH, roadZ);
+    scene.add(arm);
   });
 
-  // Connecting arm
-  const arm=new THREE.Mesh(new THREE.BoxGeometry(0.08,0.08,poleOff*2),pM);
-  arm.position.set(x,pH,roadZ); scene.add(arm);
+  // Horizontal gantry beam connecting left and right at top (spans in X)
+  const gantry=new THREE.Mesh(new THREE.BoxGeometry(halfSpan*2,0.1,0.1),pM);
+  gantry.position.set(centreX, poleH, poleZ_neg);
+  scene.add(gantry);
+  const gantry2=gantry.clone();
+  gantry2.position.z=poleZ_pos;
+  scene.add(gantry2);
 
-  const boardY=pH-bH*0.6;
+  const boardY = poleH - boardH*0.55;
 
-  // Front face - faces +Z (driver coming from +Z = entering sees frontDist name)
-  const fm=new THREE.Mesh(new THREE.PlaneGeometry(bW,bH),
+  // Front board: faces +Z - car approaches from +Z, sees district they are ENTERING (frontDist)
+  const fm=new THREE.Mesh(new THREE.PlaneGeometry(boardW, boardH),
     new THREE.MeshBasicMaterial({map:makeTex(frontDist),transparent:true,depthWrite:false}));
-  fm.position.set(x,boardY,roadZ); fm.rotation.y=0;
+  fm.position.set(centreX, boardY, poleZ_neg + 0.06);
+  fm.rotation.y=0;
   scene.add(fm);
 
-  // Back face - faces -Z
-  const bm=new THREE.Mesh(new THREE.PlaneGeometry(bW,bH),
+  // Back board: faces -Z - car already crossed, this is what they left (backDist)
+  const bm=new THREE.Mesh(new THREE.PlaneGeometry(boardW, boardH),
     new THREE.MeshBasicMaterial({map:makeTex(backDist),transparent:true,depthWrite:false}));
-  bm.position.set(x,boardY,roadZ); bm.rotation.y=Math.PI;
+  bm.position.set(centreX, boardY, poleZ_pos - 0.06);
+  bm.rotation.y=Math.PI;
   scene.add(bm);
 
-  // Subtle glow
-  const pl=new THREE.PointLight(frontDist.color,0.28,10);
-  pl.position.set(x,pH+0.4,roadZ); scene.add(pl);
+  // Subtle glow from entering district
+  const pl=new THREE.PointLight(frontDist.color, 0.25, 14);
+  pl.position.set(centreX, poleH+0.5, roadZ);
+  scene.add(pl);
 }
 
-
-function makeDistrictRoadBanners(){
-  const startZ=-((DIST_ORDER.length-1)*BLK_Z)/2;
-  const baseX=-((5-1)*BLK_X)/2;
-  DIST_ORDER.forEach((dk,row)=>{
-    const dist=DISTRICTS[dk];
-    const cols=ROW_COLS[dk];
-    const distOffsetX=((5-cols)*BLK_X)/2;
-    const cx=baseX+distOffsetX+(cols-1)*BLK_X/2;
-    // Road BEFORE this district (car approaches from +Z, buildings now at row*BLK_Z + BLK_Z/2)
-    const roadZ=startZ+row*BLK_Z+BLK_Z;
-
-    const can=document.createElement('canvas');can.width=2048;can.height=256;
-    const ctx=can.getContext('2d');ctx.clearRect(0,0,2048,256);
-    ctx.fillStyle=dist.hex;ctx.globalAlpha=0.12;ctx.fillRect(0,0,2048,256);ctx.globalAlpha=1;
-    ctx.font='900 140px Segoe UI,Arial';ctx.fillStyle=dist.hex;
-    ctx.textAlign='center';ctx.textBaseline='middle';ctx.globalAlpha=0.85;
-    ctx.fillText(dist.name.toUpperCase(),1024,128);ctx.globalAlpha=1;
-    const tex=new THREE.CanvasTexture(can);
-
-    const bannerW=Math.max(cols*BLK_X+20,60);
-    const banner=new THREE.Mesh(
-      new THREE.PlaneGeometry(bannerW,7),
-      new THREE.MeshBasicMaterial({map:tex,transparent:true,depthWrite:false,side:THREE.DoubleSide})
-    );
-    banner.rotation.x=-Math.PI/2;
-    banner.position.set(cx,0.09,roadZ-3.5);
-    scene.add(banner);
-  });
-}
 
 function placeBuildings(){
   PROJECTS.forEach((p,i)=>{
@@ -965,7 +909,7 @@ function placeBuildings(){
 function makeBuilding(p,bx,bz,idx){
   const dist=DISTRICTS[p.district];
   const hc=dist.color;
-  const style=idx%4, bH=9, bW=11, bD=11; // uniform height - poster fills face cleanly
+  const style=idx%4,bH=18+(idx%7)*4,bW=14,bD=12;
   const g=new THREE.Group();g.position.set(bx,0,bz);
 
   // Pavement
@@ -973,25 +917,46 @@ function makeBuilding(p,bx,bz,idx){
     new THREE.MeshLambertMaterial({color:0x0e1826}));
   pave.position.y=0.1;pave.receiveShadow=true;g.add(pave);
 
-  // Solid body - clean dark concrete, no style variations
+  // Body
   const body=new THREE.Mesh(new THREE.BoxGeometry(bW,bH,bD),
-    new THREE.MeshLambertMaterial({color:0x111824}));
+    new THREE.MeshLambertMaterial({color:0x0c1422}));
   body.position.y=bH/2+0.2;body.castShadow=true;body.receiveShadow=true;g.add(body);
 
-  // Colored top cap - category color, full width
-  const cap=new THREE.Mesh(new THREE.BoxGeometry(bW+0.1,0.6,bD+0.1),
-    new THREE.MeshLambertMaterial({color:hc,emissive:hc,emissiveIntensity:0.5}));
-  cap.position.y=bH+0.5;g.add(cap);
+  if(style===0){
+    const gM=new THREE.MeshLambertMaterial({color:hc,emissive:hc,emissiveIntensity:0.06,transparent:true,opacity:0.78});
+    const s=new THREE.Mesh(new THREE.BoxGeometry(bW-1.5,bH,0.09),gM);
+    s.position.set(0,bH/2+0.2,bD/2+0.06);g.add(s);
+    const s2=s.clone();s2.position.z=-bD/2-0.06;g.add(s2);
+  }else if(style===1){
+    for(let b=1;b<Math.floor(bH/3.2);b++){
+      const band=new THREE.Mesh(new THREE.BoxGeometry(bW+0.1,0.2,bD+0.1),
+        new THREE.MeshLambertMaterial({color:hc,emissive:hc,emissiveIntensity:0.14}));
+      band.position.y=0.2+b*3.2;g.add(band);
+    }
+  }else if(style===2){
+    const cM=new THREE.MeshLambertMaterial({color:0x182236});
+    for(const[cx2,cz2]of[[-bW/2+0.5,-bD/2+0.5],[bW/2-0.5,-bD/2+0.5],[-bW/2+0.5,bD/2-0.5],[bW/2-0.5,bD/2-0.5]]){
+      const col=new THREE.Mesh(new THREE.BoxGeometry(0.9,bH,0.9),cM);
+      col.position.set(cx2,bH/2+0.2,cz2);g.add(col);
+    }
+  }else{
+    const top=new THREE.Mesh(new THREE.BoxGeometry(bW*0.62,bH*0.38,bD*0.62),
+      new THREE.MeshLambertMaterial({color:0x0c1422}));
+    top.position.y=bH+bH*0.38/2-0.4;top.castShadow=true;g.add(top);
+    const ledge=new THREE.Mesh(new THREE.BoxGeometry(bW+0.4,0.32,bD+0.4),
+      new THREE.MeshLambertMaterial({color:hc,emissive:hc,emissiveIntensity:0.22}));
+    ledge.position.y=bH+0.2;g.add(ledge);
+  }
 
-  // Thin colored ledge at base
-  const base=new THREE.Mesh(new THREE.BoxGeometry(bW+0.2,0.25,bD+0.2),
-    new THREE.MeshLambertMaterial({color:hc,emissive:hc,emissiveIntensity:0.2}));
-  base.position.y=0.32;g.add(base);
+  addWins(g,bW,bH,bD);
 
+  // ── 4-SIDE POSTERS ──
   makePoster(g,p,dist,bW,bH,bD);
 
-  // Category glow light above cap
-  const rL=new THREE.PointLight(hc,0.8,30);rL.position.set(0,bH+3,0);g.add(rL);
+  const roofBar=new THREE.Mesh(new THREE.BoxGeometry(bW,0.4,bD),
+    new THREE.MeshLambertMaterial({color:hc,emissive:hc,emissiveIntensity:0.55}));
+  roofBar.position.y=bH+0.42;g.add(roofBar);
+  const rL=new THREE.PointLight(hc,0.8,30);rL.position.set(0,bH+2,0);g.add(rL);
 
   // Particles
   const pg=makeParticles(p.district,hc,bW,bH);
@@ -1038,79 +1003,101 @@ function makeBuilding(p,bx,bz,idx){
 }
 
 function makePoster(g,p,dist,bW,bH,bD){
-  const PX=96;
-  const cw=Math.round(bW*PX), ch=Math.round(bH*PX);
+  // Build a canvas texture that exactly matches the given face dimensions
+  // Texel density: 128 px per world unit for crisp text at any distance
+  const PX=128;
 
-  function buildCanvas(){
+  function faceTex(faceW,faceH,isSide){
+    const cw=Math.round(faceW*PX), ch=Math.round(faceH*PX);
     const can=document.createElement('canvas');
     can.width=cw; can.height=ch;
     const ctx=can.getContext('2d');
+    // Background
+    ctx.fillStyle='#080f1e';ctx.fillRect(0,0,cw,ch);
+    // Top bar
+    ctx.fillStyle=dist.hex;ctx.fillRect(0,0,cw,ch*0.028);
+    // Bottom bar
+    ctx.fillStyle=dist.hex;ctx.globalAlpha=0.3;
+    ctx.fillRect(0,ch*0.972,cw,ch*0.028);ctx.globalAlpha=1;
 
-    // Solid background matching body
-    ctx.fillStyle='#111824'; ctx.fillRect(0,0,cw,ch);
-    // Coloured top strip (matches cap)
-    ctx.fillStyle=dist.hex; ctx.fillRect(0,0,cw,ch*0.055);
+    ctx.textAlign='center';ctx.textBaseline='middle';
 
-    ctx.textAlign='center'; ctx.textBaseline='top';
-    const pad=cw*0.08;
-    const maxW=cw-pad*2;
+    // Scale fonts relative to face dimensions
+    const baseF=Math.min(cw,ch);
 
-    // Text wrapping helper
-    function wrap(text,font,mW){
-      ctx.font=font;
-      const words=text.split(' ');
-      const lines=[];let line='';
-      words.forEach(w=>{
-        const t=line?line+' '+w:w;
-        if(ctx.measureText(t).width>mW&&line){lines.push(line);line=w;}
-        else line=t;
-      });
-      if(line)lines.push(line);
-      return lines;
+    // Icon (only front face to distinguish)
+    if(!isSide){
+      ctx.font=`${baseF*0.14}px serif`;
+      ctx.fillText(p.icon,cw/2,ch*0.2);
     }
 
-    // Start drawing from 18% down so text sits in lower portion
-    let y=ch*0.18;
+    // Project name - always shown, fills width
+    const nameY=isSide?ch*0.38:ch*0.47;
+    let nm=p.name;
+    const nameFontSize=baseF*(isSide?0.13:0.12);
+    ctx.font=`900 ${nameFontSize}px Segoe UI,Arial`;
+    while(ctx.measureText(nm).width>cw*0.9&&nm.length>3)nm=nm.slice(0,-1);
+    if(nm!==p.name)nm=nm.trim()+'…';
+    ctx.fillStyle='#f0f4ff';
+    ctx.fillText(nm,cw/2,nameY);
 
-    // Project name - bold white, wrapped
-    const nameSz=cw*0.082;
-    const nameFont=`900 ${nameSz}px Segoe UI,Arial`;
-    const nameLines=wrap(p.name,nameFont,maxW);
-    ctx.font=nameFont; ctx.fillStyle='#f0f4ff';
-    const nameLineH=nameSz*1.28;
-    nameLines.forEach((line,i)=>{ ctx.fillText(line,cw/2,y+i*nameLineH); });
-    y+=nameLines.length*nameLineH+nameSz*0.5;
+    // Divider
+    ctx.fillStyle=dist.hex;ctx.globalAlpha=0.45;
+    ctx.fillRect(cw*0.08,nameY+nameFontSize*0.8,cw*0.84,Math.max(2,ch*0.004));
+    ctx.globalAlpha=1;
 
-    // Thin divider
-    ctx.fillStyle=dist.hex; ctx.globalAlpha=0.4;
-    ctx.fillRect(pad,y,maxW,2); ctx.globalAlpha=1;
-    y+=nameSz*0.55;
+    // Category
+    const catFontSize=nameFontSize*0.65;
+    ctx.font=`700 ${catFontSize}px Segoe UI,Arial`;
+    ctx.fillStyle=dist.hex;
+    ctx.fillText(p.cat.toUpperCase(),cw/2,nameY+nameFontSize*1.35);
 
-    // Category - district colour, wrapped
-    const catSz=nameSz*0.62;
-    const catFont=`700 ${catSz}px Segoe UI,Arial`;
-    const catLines=wrap(p.cat,catFont,maxW);
-    ctx.font=catFont; ctx.fillStyle=dist.hex;
-    const catLineH=catSz*1.3;
-    catLines.forEach((line,i)=>{ ctx.fillText(line,cw/2,y+i*catLineH); });
+    // Stat (front only - less space on sides)
+    if(!isSide){
+      ctx.font=`${nameFontSize*0.55}px Segoe UI,Arial`;
+      ctx.fillStyle='rgba(160,200,240,0.7)';
+      ctx.fillText(p.stat,cw/2,nameY+nameFontSize*2.1);
+    }
 
     const tex=new THREE.CanvasTexture(can);
-    tex.anisotropy=renderer.capabilities.getMaxAnisotropy();
+    tex.anisotropy=renderer.capabilities.getMaxAnisotropy(); // max sharpness at angles
     return tex;
   }
 
-  const eps=0.05;
-  const mat=new THREE.MeshBasicMaterial({map:buildCanvas(),transparent:true,depthWrite:false});
-  const mat2=new THREE.MeshBasicMaterial({map:buildCanvas(),transparent:true,depthWrite:false});
+  // Front face (+Z): bW wide × bH tall
+  const frontTex=faceTex(bW,bH,false);
+  // Back face (-Z): same aspect
+  const backTex=faceTex(bW,bH,false);
+  // Left/Right faces: bD wide × bH tall
+  const sideTex=faceTex(bD,bH,true);
+
+  const mkMat=(t)=>new THREE.MeshBasicMaterial({map:t,transparent:true,depthWrite:false});
+
+  // Place planes flush on building face - no offset gap that causes z-fight blur
+  const eps=0.05; // tiny offset to avoid z-fighting with building body
 
   // FRONT (+Z)
-  const front=new THREE.Mesh(new THREE.PlaneGeometry(bW,bH),mat);
-  front.position.set(0,bH/2+0.2,bD/2+eps); g.add(front);
+  const front=new THREE.Mesh(new THREE.PlaneGeometry(bW,bH),mkMat(frontTex));
+  front.position.set(0,bH/2+0.2,bD/2+eps);
+  g.add(front);
 
   // BACK (-Z)
-  const back=new THREE.Mesh(new THREE.PlaneGeometry(bW,bH),mat2);
+  const back=new THREE.Mesh(new THREE.PlaneGeometry(bW,bH),mkMat(backTex));
   back.position.set(0,bH/2+0.2,-bD/2-eps);
-  back.rotation.y=Math.PI; g.add(back);
+  back.rotation.y=Math.PI;
+  g.add(back);
+
+  // LEFT (-X)
+  const left=new THREE.Mesh(new THREE.PlaneGeometry(bD,bH),mkMat(sideTex));
+  left.position.set(-bW/2-eps,bH/2+0.2,0);
+  left.rotation.y=-Math.PI/2;
+  g.add(left);
+
+  // RIGHT (+X)
+  const right=new THREE.Mesh(new THREE.PlaneGeometry(bD,bH),mkMat(sideTex));
+  right.position.set(bW/2+eps,bH/2+0.2,0);
+  right.rotation.y=Math.PI/2;
+  g.add(right);
 }
 
 function makeParticles(dk,color,bW,bH){
@@ -1132,29 +1119,24 @@ function makeParticles(dk,color,bW,bH){
   return group;
 }
 
+
+
 function placeLamps(){
-  // Only place one lamp per road intersection - minimal, clean
-  const pM=new THREE.MeshLambertMaterial({color:0x506070});
+  const pM=new THREE.MeshLambertMaterial({color:0x606878});
   const bM=new THREE.MeshLambertMaterial({color:0xffeedd,emissive:0xffeedd,emissiveIntensity:1});
   const startZ=-((DIST_ORDER.length-1)*BLK_Z)/2;
-  const startX=-((5-1)*BLK_X)/2;
-  // Intersections: horizontal roads at startZ+r*BLK_Z, vertical roads at startX+c*BLK_X-BLK_X/2
-  for(let c=0;c<=5;c++){
-    for(let r=0;r<=DIST_ORDER.length;r++){
-      const lx=startX+c*BLK_X-BLK_X/2;
-      const lz=startZ+r*BLK_Z;
-      if((c+r)%2!==0) continue;
-      const lg=new THREE.Group();lg.position.set(lx,0,lz);
-      const pole=new THREE.Mesh(new THREE.CylinderGeometry(0.06,0.08,5,8),pM);
-      pole.position.y=2.5; lg.add(pole);
-      const arm=new THREE.Mesh(new THREE.BoxGeometry(0.06,0.06,1.0),pM);
-      arm.position.set(0,5.05,0.5); lg.add(arm);
-      const head=new THREE.Mesh(new THREE.BoxGeometry(0.3,0.14,0.5),bM);
-      head.position.set(0,4.95,0.95); lg.add(head);
-      const pl=new THREE.PointLight(0xfff0e0,0.22,18);
-      pl.position.set(0,4.9,0.95); lg.add(pl);
-      scene.add(lg);
-    }
+  for(let c=-1;c<=5;c++) for(let r=-1;r<=DIST_ORDER.length;r++){
+    const lx=-((5-1)*BLK_X)/2+c*BLK_X-BLK_X/2;
+    const lz=startZ+r*BLK_Z-BLK_Z/2;
+    const lg=new THREE.Group();lg.position.set(lx,0,lz);
+    const pole=new THREE.Mesh(new THREE.CylinderGeometry(0.07,0.09,5,8),pM);
+    pole.position.y=2.5;lg.add(pole);
+    const arm=new THREE.Mesh(new THREE.BoxGeometry(0.07,0.07,1.1),pM);
+    arm.position.set(0,5.1,0.55);lg.add(arm);
+    const head=new THREE.Mesh(new THREE.BoxGeometry(0.34,0.15,0.55),bM);
+    head.position.set(0,4.98,1.0);lg.add(head);
+    const pl=new THREE.PointLight(0xfff0e0,0.28,16);pl.position.set(0,4.9,1.0);lg.add(pl);
+    scene.add(lg);
   }
 }
 
@@ -1195,34 +1177,14 @@ function buildCar(){
 
   [[-1.14,0.42,1.52],[1.14,0.42,1.52],[-1.14,0.42,-1.52],[1.14,0.42,-1.52]].forEach(([wx,wy,wz])=>{
     const wg=new THREE.Group();
-    wg.position.set(wx,wy,wz);
-    wg.userData.isWheel=true;
-
-    // Inner spin group - this is what we rotate to spin the wheel
-    const spin=new THREE.Group();
-    wg.add(spin);
-    wg.userData.spin=spin;
-
-    // Tyre - cylinder lying on its side (axis along X = car width)
-    const tyre=new THREE.Mesh(new THREE.CylinderGeometry(0.42,0.42,0.26,20),yM);
-    tyre.rotation.z=Math.PI/2; tyre.castShadow=true; spin.add(tyre);
-
-    // Rim
-    const rim=new THREE.Mesh(new THREE.CylinderGeometry(0.27,0.27,0.27,10),rM);
-    rim.rotation.z=Math.PI/2; spin.add(rim);
-
-    // 5 spokes
+    const tyre=new THREE.Mesh(new THREE.CylinderGeometry(0.42,0.42,0.26,20),yM);tyre.rotation.z=Math.PI/2;tyre.castShadow=true;wg.add(tyre);
+    const rim=new THREE.Mesh(new THREE.CylinderGeometry(0.27,0.27,0.27,10),rM);rim.rotation.z=Math.PI/2;wg.add(rim);
     for(let s=0;s<5;s++){
       const spk=new THREE.Mesh(new THREE.BoxGeometry(0.05,0.52,0.05),rM);
-      spk.rotation.z=Math.PI/2;
-      spk.rotation.x=(s/5)*Math.PI*2;
-      spk.position.y=Math.sin((s/5)*Math.PI*2)*0.14;
-      spk.position.z=Math.cos((s/5)*Math.PI*2)*0.14;
-      spin.add(spk);
+      spk.rotation.z=Math.PI/2;spk.rotation.x=(s/5)*Math.PI*2;
+      spk.position.y=Math.sin((s/5)*Math.PI*2)*0.14;spk.position.z=Math.cos((s/5)*Math.PI*2)*0.14;wg.add(spk);
     }
-
-    carGroup.add(wg);
-    carWheels.push(wg);
+    wg.position.set(wx,wy,wz);wg.userData.isWheel=true;carGroup.add(wg);carWheels.push(wg);
   });
   carGroup.position.copy(carPos);scene.add(carGroup);
 }
@@ -1303,10 +1265,7 @@ function loop(){
     if(!blocked){carPos.x=nx;carPos.z=nz;}else{carSpeed*=-.25;}
 
     carGroup.position.x=carPos.x;carGroup.position.z=carPos.z;carGroup.rotation.y=carAngle;
-    // Spin wheels - rotate the inner spin group around Z axis (wheel's roll axis)
-    carWheels.forEach(wg=>{
-      if(wg.userData.spin) wg.userData.spin.rotation.x+=carSpeed*2.5;
-    });
+    carWheels.forEach(wg=>{wg.children[0].rotation.x+=carSpeed*2.2;});
 
     if(engineOsc&&audioCtx){
       engineOsc.frequency.value=55+Math.abs(carSpeed)/mspd*80;
