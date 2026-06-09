@@ -345,7 +345,7 @@ html,body{width:100%;height:100vh;overflow:hidden;background:#04080f;font-family
     <div class="avail-pill"><span class="avail-dot"></span>Open to full-time opportunities</div>
     <div class="intro-name">Mukund <span class="accent">Patel</span></div>
     <div class="intro-role"><strong>Data Scientist</strong> &nbsp;·&nbsp; <strong>AI Engineer</strong> &nbsp;·&nbsp; <strong>Analytics Professional</strong></div>
-    <div class="lsummary">MS Data Science candidate at <strong>Montclair State University</strong> (GPA 4.0) &mdash; built computer vision pipelines, spatial analytics, and BI dashboards at the <strong>MTA New York</strong> supporting 1,400+ bus routes across the city. I design and ship end-to-end data products: from SQL pipelines and ML models to deployed AI agents using Claude, Groq, and Gemini APIs.</div>
+    <div class="hero-summary">MS Data Science candidate at <strong>Montclair State University</strong> (GPA 4.0) with hands-on experience at the <strong>MTA New York</strong> building data pipelines, computer vision systems, and BI dashboards. I build end-to-end analytics solutions - from SQL pipelines and ML models to deployed AI applications - across transportation, finance, healthcare, retail, and logistics.</div>
     <div class="domain-row">
       <span class="domain-tag">AI Agents &amp; LLMs</span>
       <span class="domain-tag">Revenue Management</span>
@@ -489,7 +489,7 @@ html,body{width:100%;height:100vh;overflow:hidden;background:#04080f;font-family
 </div>
 
 <div id="hint-box">
-  <span style="color:#8aaccc">W A S D</span> / Arrows — Drive &nbsp;·&nbsp; <span style="color:#8aaccc">Enter</span> — Open project
+  <span style="color:#8aaccc">W A S D</span> / Arrows - Drive &nbsp;·&nbsp; <span style="color:#8aaccc">Enter</span> - Open project
 </div>
 
 <!-- D-PAD for mobile -->
@@ -917,7 +917,7 @@ function makeBuilding(p,bx,bz,idx){
   g.add(pg);allParticleGroups.push({group:pg,building:null});
 
   // ── PERIMETER ENTRANCE ZONE ──
-  // Full rectangle around building — glowing floor plane
+  // Full rectangle around building - glowing floor plane
   const zoneW=bW+10,zoneD=bD+10;
   const eMat=new THREE.MeshBasicMaterial({color:hc,transparent:true,opacity:0.08,depthWrite:false});
   const ePlane=new THREE.Mesh(new THREE.PlaneGeometry(zoneW,zoneD),eMat);
@@ -976,7 +976,7 @@ function makePoster(g,p,dist,bW,bH,bD){
     // Icon
     ctx.font=`${H*0.18}px serif`;ctx.textAlign='center';ctx.textBaseline='middle';
     ctx.fillText(p.icon,W/2,H*0.21);
-    // Project name — very large, bold, white
+    // Project name - very large, bold, white
     let nm=p.name;
     ctx.font=`900 ${H*0.16}px Segoe UI,Arial`;
     while(ctx.measureText(nm).width>W*0.93&&nm.length>3)nm=nm.slice(0,-1);
@@ -984,7 +984,7 @@ function makePoster(g,p,dist,bW,bH,bD){
     ctx.fillStyle='#f0f4ff';ctx.fillText(nm,W/2,H*0.44);
     // Divider
     ctx.fillStyle=dist.hex;ctx.globalAlpha=0.5;ctx.fillRect(W*0.08,H*0.55,W*0.84,3);ctx.globalAlpha=1;
-    // Category — district colour, clear
+    // Category - district colour, clear
     ctx.font=`700 ${H*0.09}px Segoe UI,Arial`;ctx.fillStyle=dist.hex;
     ctx.fillText(p.cat.toUpperCase(),W/2,H*0.65);
     // Stat
@@ -1238,11 +1238,11 @@ function loop(){
     camera.lookAt(carPos.x+Math.sin(carAngle)*4,1.2,carPos.z+Math.cos(carAngle)*4);
   }
 
-  // Entrance detection + glow — perimeter zone around whole building
+  // Entrance detection + glow - perimeter zone around whole building
   nearEntry=null;let bestD=9999;
   buildings.forEach(b=>{
     const dx=carPos.x-b.cx,dz=carPos.z-b.cz;
-    // Distance to building perimeter (not centre) — use Chebyshev distance to rectangle
+    // Distance to building perimeter (not centre) - use Chebyshev distance to rectangle
     const px=Math.max(0,Math.abs(dx)-b.hw),pz=Math.max(0,Math.abs(dz)-b.hd);
     const d=Math.sqrt(px*px+pz*pz); // 0 when inside perimeter ring
     const inZone=d<5.5;
