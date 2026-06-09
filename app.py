@@ -26,7 +26,7 @@ HTML = (
 html{scroll-behavior:smooth}
 body{width:100%;background:#04080f;font-family:'Segoe UI',system-ui,sans-serif;color:#c8d8f0;overflow-x:hidden}
 #landing{height:100vh;overflow-y:auto;overflow-x:hidden;scroll-snap-type:y mandatory}
-#game-wrap{height:100vh;display:none;position:relative}
+#game-wrap{position:fixed;inset:0;display:none;background:#04080f}
 .section{min-height:100vh;scroll-snap-align:start;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:70px 24px 40px}
 .grid-bg{position:fixed;inset:0;z-index:0;pointer-events:none;
   background-image:linear-gradient(rgba(74,144,217,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(74,144,217,.05) 1px,transparent 1px);
@@ -162,7 +162,7 @@ body{width:100%;background:#04080f;font-family:'Segoe UI',system-ui,sans-serif;c
 .explore-banner p{font-size:12.5px;color:#4a6080;margin-bottom:16px;line-height:1.72}
 
 /* GAME HUD */
-#c{display:block;width:100%;height:100vh}
+#c{display:block;position:absolute;top:0;left:0;width:100%;height:100%}
 #hud{position:fixed;top:14px;left:14px;display:none;z-index:50;min-width:188px}
 .hud-box{background:rgba(4,8,15,.92);border:1px solid rgba(74,144,217,.14);border-radius:12px;padding:12px 15px;backdrop-filter:blur(16px);margin-bottom:6px}
 .hud-lbl{font-size:9px;letter-spacing:2px;color:#1e2e42;text-transform:uppercase;margin-bottom:1px}
@@ -582,12 +582,6 @@ function startGame(){
   ['hud','mm-wrap','hint-box'].forEach(id=>document.getElementById(id).style.display='block');
   document.getElementById('dpad').style.display='grid';
   if(!gameReady){gameReady=true;initGame();}
-  else{
-    // Already initialised — just force a resize
-    renderer.setSize(window.innerWidth,window.innerHeight);
-    camera.aspect=window.innerWidth/window.innerHeight;
-    camera.updateProjectionMatrix();
-  }
 }
 function backToLanding(){
   document.getElementById('game-wrap').style.display='none';
@@ -643,36 +637,43 @@ const BX=24,BZ=30,RW=10,CH=155;
 
 function initGame(){
   mmCv=document.getElementById('mm');mmCx=mmCv.getContext('2d');
-  // Force canvas to full size before Three.js init (was hidden, so had 0 dimensions)
-  const cv=document.getElementById('c');
-  cv.width=window.innerWidth;cv.height=window.innerHeight;
-  init3D();buildCity();buildCar();bindInput();initAudio();
+  bindInput();initAudio();
   clock=new THREE.Clock();
-  // Short delay so the game-wrap is fully visible before first render
-  setTimeout(()=>{
-    renderer.setSize(window.innerWidth,window.innerHeight);
-    camera.aspect=window.innerWidth/window.innerHeight;
-    camera.updateProjectionMatrix();
-    gameLoop();
+  // Wait 2 frames so game-wrap is fully painted and has real pixel dimensions
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    init3D();buildCity();buildCar();gameLoop();
     showToast('Drive into a glowing zone \u00b7 Press Enter to open a project');
-  },80);
+  }));
 }
 
 function init3D(){
-  scene=new THREE.Scene();scene.background=new THREE.Color(0x04080f);
+  const wrap=document.getElementById('game-wrap');
+  const W=wrap.clientWidth||window.innerWidth;
+  const H=wrap.clientHeight||window.innerHeight;
+  scene=new THREE.Scene();
+  scene.background=new THREE.Color(0x04080f);
   scene.fog=new THREE.FogExp2(0x04080f,0.007);
-  camera=new THREE.PerspectiveCamera(55,innerWidth/innerHeight,0.1,400);
+  camera=new THREE.PerspectiveCamera(55,W/H,0.1,400);
   camera.position.copy(camPos);
-  renderer=new THREE.WebGLRenderer({canvas:document.getElementById('c'),antialias:true,powerPreference:'high-performance'});
-  renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  const cv=document.getElementById('c');
+  cv.width=W; cv.height=H;
+  renderer=new THREE.WebGLRenderer({canvas:cv,antialias:true,powerPreference:'high-performance'});
+  renderer.setSize(W,H,false);
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
   renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
   renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.1;
-  window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
+  window.addEventListener('resize',()=>{
+    const nW=wrap.clientWidth||window.innerWidth;
+    const nH=wrap.clientHeight||window.innerHeight;
+    camera.aspect=nW/nH;camera.updateProjectionMatrix();
+    renderer.setSize(nW,nH,false);
+  });
   scene.add(new THREE.AmbientLight(0x8899bb,0.5));
   const sun=new THREE.DirectionalLight(0xeef2ff,1.8);sun.position.set(60,100,40);sun.castShadow=true;
-  sun.shadow.mapSize.set(4096,4096);sun.shadow.camera.near=1;sun.shadow.camera.far=400;
+  sun.shadow.mapSize.set(2048,2048);sun.shadow.camera.near=1;sun.shadow.camera.far=400;
   sun.shadow.camera.left=sun.shadow.camera.bottom=-200;sun.shadow.camera.right=sun.shadow.camera.top=200;
-  sun.shadow.bias=-0.0004;scene.add(sun);scene.add(new THREE.DirectionalLight(0x2233aa,0.3));
+  sun.shadow.bias=-0.0004;scene.add(sun);
+  scene.add(new THREE.DirectionalLight(0x2233aa,0.3));
 }
 
 function pPos(p){
