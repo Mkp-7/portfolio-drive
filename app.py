@@ -859,7 +859,7 @@ function makeDistrictSigns(){
     const idxs=PROJECTS.map((p,i)=>p.district===dk?i:-1).filter(i=>i>=0);
     const maxH=Math.max(...idxs.map(i=>BH_LIST[i%18]));
     // Bar sits attached to tops of buildings - at building cap height
-    const barY=maxH+0.4;  // cap is at bH+0.5, so this sits right on top
+    const barY=maxH+0.2;  // cap is at bH+0.5, so this sits right on top
     const barH=0.82;
 
     for(let i=0;i<cols-1;i++){
