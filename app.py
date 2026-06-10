@@ -623,12 +623,18 @@ html,body{width:100%;height:100vh;overflow:hidden;background:#04080f;font-family
 <div id="mcontrols" style="display:none"></div>
 <!-- Steering wheel - bottom-left -->
 <div id="steering-wrap">
+  <div id="mc-enter" style="display:none;width:128px;height:36px;margin-bottom:6px;
+    background:rgba(245,200,66,.12);border:2px solid #f5c842;border-radius:10px;
+    color:#f5c842;font-size:11px;font-weight:700;letter-spacing:1.5px;
+    align-items:center;justify-content:center;cursor:pointer;
+    user-select:none;-webkit-user-select:none;touch-action:none;
+    animation:blink .85s ease-in-out infinite;">⏎ OPEN</div>
   <div style="display:flex;flex-direction:row;gap:8px;">
     <div class="mc-btn" id="mc-left" style="width:60px;height:60px;font-size:26px;border:2px solid rgba(74,144,217,.4);color:#4a90d9;">◀</div>
     <div class="mc-btn" id="mc-right" style="width:60px;height:60px;font-size:26px;border:2px solid rgba(74,144,217,.4);color:#4a90d9;">▶</div>
   </div>
   <div id="mc-wheel-lbl">STEER</div>
-</div></div>
+</div>
 <!-- Pedals: brake left, accel right - bottom-right -->
 <div id="pedals">
   <div class="mc-btn" id="mc-brake">▼<br><span style="font-size:8px;letter-spacing:1px;opacity:.75">BRK</span></div>
@@ -1463,7 +1469,9 @@ function loop(){
   if(nearEntry){
     pEl.innerHTML='<span style="color:'+nearEntry.distHex+'">'+nearEntry.project.name+'</span>';
     eEl.style.display='block';
-  }else{pEl.textContent='Navigate to a project entrance';eEl.style.display='none';}
+    const me=document.getElementById('mc-enter');if(me)me.style.display='flex';
+  }}else{pEl.textContent='Navigate to a project entrance';eEl.style.display='none';
+    const me=document.getElementById('mc-enter');if(me)me.style.display='none';}
   document.getElementById('hud-visited').textContent=visitedSet.size+' / 18 explored';
 
   drawMinimap();renderer.render(scene,camera);
@@ -1575,6 +1583,13 @@ function bindInput(){
   mcBind('mc-brake','down')
   mcBind('mc-left','left');
   mcBind('mc-right','right');
+  const me=document.getElementById('mc-enter');
+  if(me){
+    me.addEventListener('pointerdown',e=>{
+      e.preventDefault();
+      if(nearEntry&&!modalOpen) openModal(nearEntry);
+    });
+  }
 
   // ── 360 steering wheel ──
   // Wheel rotation drives steering: rotating CW = steer right, CCW = steer left.
