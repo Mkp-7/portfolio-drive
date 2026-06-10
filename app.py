@@ -855,10 +855,11 @@ function makeDistrictSigns(){
     const startCol=Math.floor((5-cols)/2);
     const rowZ=bRowZ(row);
 
-    // Tallest building in this district row → bar height
+    // Tallest building height in this district row
     const idxs=PROJECTS.map((p,i)=>p.district===dk?i:-1).filter(i=>i>=0);
     const maxH=Math.max(...idxs.map(i=>BH_LIST[i%18]));
-    const barY=maxH+1.5;
+    // Bar sits attached to tops of buildings — at building cap height
+    const barY=maxH+0.55;  // cap is at bH+0.5, so this sits right on top
     const barH=0.82;
 
     for(let i=0;i<cols-1;i++){
@@ -869,18 +870,19 @@ function makeDistrictSigns(){
       const hW     = hRight-hLeft;
       const hCX    = (hLeft+hRight)/2;
 
-      // Structural beam (glowing, district colour)
+      // Structural beam runs along the BOTTOM edge of the label — not through its centre
+      const beamY = barY - barH/2 - 0.09;  // just below the label face
       const beam=new THREE.Mesh(
-        new THREE.BoxGeometry(hW,0.16,0.16),
+        new THREE.BoxGeometry(hW,0.12,0.12),
         new THREE.MeshLambertMaterial({color:dist.color,emissive:dist.color,emissiveIntensity:0.6})
       );
-      beam.position.set(hCX,barY,rowZ);
+      beam.position.set(hCX,beamY,rowZ);
       scene.add(beam);
 
       // Connector brackets where bar meets building walls
       [hLeft+0.07, hRight-0.07].forEach(ex=>{
         const brk=new THREE.Mesh(
-          new THREE.BoxGeometry(0.2,barH+0.1,0.2),
+          new THREE.BoxGeometry(0.2,barH+0.3,0.2),
           new THREE.MeshLambertMaterial({color:dist.color,emissive:dist.color,emissiveIntensity:0.7})
         );
         brk.position.set(ex,barY,rowZ);
