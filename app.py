@@ -277,18 +277,7 @@ html,body{width:100%;height:100vh;overflow:hidden;background:#04080f;font-family
 /* ════════════════════════════════════
    GAME
 ════════════════════════════════════ */
-html,
-body{
-  height:100dvh;
-  overflow:hidden;
-  touch-action:none;
-}
-
-#c{
-  display:block;
-  width:100%;
-  height:100dvh;
-}
+#c{display:block;width:100%;height:100vh}
 
 /* HUD */
 #hud{position:fixed;top:16px;left:16px;display:none;z-index:50;min-width:192px}
@@ -313,153 +302,122 @@ body{
 
 /* ════ DEVICE-ADAPTIVE CONTROLS ════ */
 #dpad{display:none!important}
+/* mcontrols wrapper hidden — individual elements positioned separately */
+#mcontrols{display:none!important}
 
-/* Mobile controls - bottom-right, hidden by default, shown only on touch devices */
-/* MOBILE CONTROLS */
-
-#mcontrols{
-  position:fixed;
-  inset:0;
-  pointer-events:none;
-  z-index:120;
-  display:none;
-}
-
-/* Steering bottom-left */
+/* ── Steering wheel — bottom-left ── */
 #steering-wrap{
-  position:fixed;
-  left:12px;
-  bottom:max(12px, env(safe-area-inset-bottom));
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:0;
-  pointer-events:auto;
+  position:fixed;left:12px;bottom:12px;z-index:60;
+  display:none; /* shown by JS on touch devices */
+  flex-direction:column;align-items:center;gap:3px;
 }
-
-/* Pedals bottom-right */
-#pedals{
-  position:fixed;
-  right:12px;
-  bottom:max(12px, env(safe-area-inset-bottom));
-  display:flex;
-  flex-direction:row;
-  gap:8px;
-  align-items:flex-end;
-  pointer-events:auto;
-}
-
-/* Brake left, accelerator right */
-#mc-brake{order:1;}
-#mc-accel{order:2;}
-
-/* Pedal buttons */
-.mc-btn{
-  background:rgba(4,8,15,.9);
-  border-radius:10px;display:flex;align-items:center;justify-content:center;
-  font-size:16px;color:#4a6a8a;cursor:pointer;
-  user-select:none;-webkit-user-select:none;touch-action:none;transition:background .1s,border-color .1s;
-}
-#mc-accel{width:56px;height:56px;font-size:22px;border:2px solid rgba(62,207,142,.4);color:#3ecf8e}
-#mc-accel.on{background:rgba(62,207,142,.2);border-color:#3ecf8e;color:#fff}
-#mc-brake{width:56px;height:56px;font-size:22px;border:2px solid rgba(232,85,85,.4);color:#e85555}
-#mc-brake.on{background:rgba(232,85,85,.2);border-color:#e85555;color:#fff}
-
-/* 360-rotatable steering wheel */
 #mc-wheel{
-  width:90px;height:90px;border-radius:50%;
+  width:100px;height:100px;border-radius:50%;
   background:rgba(4,8,15,.92);
   border:3px solid rgba(74,144,217,.45);
   position:relative;
   cursor:grab;user-select:none;-webkit-user-select:none;touch-action:none;
-  /* wheel rotates via JS transform */
 }
-/* Outer rim highlight */
 #mc-wheel::before{
-  content:'';position:absolute;inset:5px;border-radius:50%;
-  border:1px solid rgba(74,144,217,.2);pointer-events:none;
+  content:'';position:absolute;inset:6px;border-radius:50%;
+  border:1px solid rgba(74,144,217,.18);pointer-events:none;
 }
-/* Spoke */
 #mc-wheel-spoke{
   position:absolute;top:50%;left:50%;
-  width:60px;height:3px;background:rgba(74,144,217,.6);border-radius:2px;
-  transform:translate(-50%,-50%);transform-origin:center center;
+  width:68px;height:3px;background:rgba(74,144,217,.65);border-radius:2px;
+  transform:translate(-50%,-50%);
   pointer-events:none;
 }
-/* Hub dot */
 #mc-wheel-hub{
   position:absolute;top:50%;left:50%;
-  width:12px;height:12px;border-radius:50%;
+  width:14px;height:14px;border-radius:50%;
   background:#4a90d9;transform:translate(-50%,-50%);
-  pointer-events:none;box-shadow:0 0 6px #4a90d9;
+  pointer-events:none;box-shadow:0 0 8px #4a90d9;
 }
-/* Grip marker on wheel rim - shows rotation */
 #mc-wheel-marker{
-  position:absolute;top:4px;left:50%;
-  width:6px;height:10px;border-radius:3px;
+  position:absolute;top:5px;left:50%;
+  width:7px;height:12px;border-radius:3px;
   background:#4a90d9;transform:translateX(-50%);
   pointer-events:none;
 }
 #mc-wheel-lbl{
-  font-size:9px;letter-spacing:1.5px;color:#253545;text-transform:uppercase;
-  margin-top:4px;text-align:center;
+  font-size:9px;letter-spacing:1.5px;color:#2a3d52;text-transform:uppercase;
 }
 
-/* Hint box - desktop only */
+/* ── Pedals — bottom-right ── */
+#pedals{
+  position:fixed;right:12px;bottom:12px;z-index:60;
+  display:none; /* shown by JS on touch devices */
+  flex-direction:row;gap:8px;align-items:flex-end;
+}
+.mc-btn{
+  background:rgba(4,8,15,.9);
+  border-radius:12px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:2px;
+  font-size:22px;color:#4a6a8a;cursor:pointer;
+  user-select:none;-webkit-user-select:none;touch-action:none;
+  transition:background .1s,border-color .1s;
+}
+#mc-brake{width:60px;height:60px;border:2px solid rgba(232,85,85,.4);color:#e85555}
+#mc-brake.on{background:rgba(232,85,85,.22);border-color:#e85555;color:#fff}
+#mc-accel{width:60px;height:60px;border:2px solid rgba(62,207,142,.4);color:#3ecf8e}
+#mc-accel.on{background:rgba(62,207,142,.22);border-color:#3ecf8e;color:#fff}
+
+/* Hint box — desktop only */
 #hint-box{position:fixed;bottom:16px;left:16px;display:none;background:rgba(4,8,15,.88);border:1px solid rgba(255,255,255,.06);border-radius:8px;padding:7px 13px;font-size:10px;color:#2e4058;z-index:50;line-height:2}
 
 /* ════ RESPONSIVE LANDING PAGE ════ */
 @media(max-width:640px){
   /* Nav */
   #lnav{padding:0 14px;height:48px}
-  .lnav-links{display:none} /* hide nav links on mobile, save space */
+  .lnav-links{display:none}
   .lnav-logo{font-size:13px}
-  /* Hero */
-  .intro-name{font-size:clamp(34px,10vw,52px);letter-spacing:-1px}
-  .intro-role{font-size:13px;margin-bottom:20px}
-  .lsummary,.hero-summary{font-size:12.5px;padding:0 4px}
-  .domain-row{gap:5px;margin-bottom:22px}
-  .domain-tag{font-size:10px;padding:4px 9px}
+  .lnav-cta{font-size:10px;padding:6px 12px}
+  /* Hero text — tighter for mobile */
+  .intro-name{font-size:clamp(30px,9vw,48px);letter-spacing:-1px}
+  .intro-role{font-size:12px;margin-bottom:16px}
+  .lsummary,.hero-summary{font-size:12px;padding:0 4px;margin-bottom:16px}
+  .domain-row{gap:4px;margin-bottom:16px}
+  .domain-tag{font-size:9.5px;padding:3px 8px}
   .stats-row{flex-wrap:wrap}
   .stat-item{min-width:50%;border-bottom:1px solid rgba(255,255,255,.06)}
-  .cta-row{flex-wrap:wrap;gap:8px;justify-content:center}
-  .btn-primary,.btn-outline,.btn-enter{font-size:12px;padding:11px 16px}
-  .dist-row{gap:5px}
-  .dist-chip{font-size:10px;padding:5px 10px}
+  .stat-num{font-size:18px}
+  .stat-lbl{font-size:9px}
+  .cta-row{flex-wrap:wrap;gap:7px;justify-content:center;margin-bottom:18px}
+  .btn-primary,.btn-outline,.btn-enter{font-size:11px;padding:10px 14px;gap:5px}
+  .dist-row{gap:4px;margin-top:12px}
+  .dist-chip{font-size:9.5px;padding:5px 9px;gap:5px}
+  .scroll-hint{margin-top:14px;font-size:9px}
   /* Sections */
-  .lsec{padding:40px 14px 28px}
-  .lsec-title{font-size:clamp(20px,5vw,28px)}
+  .lsec{padding:36px 12px 24px}
+  .lsec-title{font-size:clamp(19px,5vw,26px)}
+  .lsec-eye{font-size:9px}
   .l2col{grid-template-columns:1fr}
-  .lcard{padding:14px}
+  .lcard{padding:12px}
+  .lfield-val{font-size:12px}
   /* Experience */
-  .lexp{padding:14px 14px}
-  .lexp-role{font-size:13px}
-  .lexp-ul li{font-size:11px}
+  .lexp{padding:12px 12px}
+  .lexp-role{font-size:12.5px}
+  .lexp-ul li{font-size:11px;line-height:1.6}
   /* Contact grid */
   .lcont-grid{grid-template-columns:1fr 1fr}
-  /* Minimap smaller on mobile */
-  #mm{width:100px;height:100px}
-  /* HUD smaller */
-  #hud{min-width:160px}
-  .hud-box{padding:9px 11px}
-  /* Enter hint hidden on mobile (touch tap instead) */
+  .lcont-card{padding:14px 10px}
+  .lcont-icon{font-size:20px;margin-bottom:6px}
+  .lcont-val{font-size:11px}
+  /* Game UI — mobile adjustments */
+  #mm-wrap{top:10px;right:10px;bottom:auto} /* minimap top-right on mobile */
+  .mm-lbl{display:none} /* hide label to save space */
+  #mm{width:90px;height:90px}
+  #hud{min-width:150px;max-width:55vw}
+  .hud-box{padding:8px 10px}
+  .hud-val{font-size:11px}
+  .hud-lbl{font-size:8px}
   .hud-enter{display:none!important}
-  #mm-wrap{
-     top:10px;
-     right:10px;
-     left:auto;
-     bottom:auto;
-   }
-   
-   #mm{
-     width:90px;
-     height:90px;
-   }
 }
-
 @media(min-width:641px){
-  /* Desktop: hide mobile controls always */
-  #mcontrols{display:none!important}
+  /* Desktop: force-hide all mobile controls */
+  #steering-wrap{display:none!important}
+  #pedals{display:none!important}
 }
 
 /* MODAL */
@@ -511,7 +469,7 @@ body{
     <div class="avail-pill"><span class="avail-dot"></span>Open to full-time opportunities</div>
     <div class="intro-name">Mukund <span class="accent">Patel</span></div>
     <div class="intro-role"><strong>Data Scientist</strong> &nbsp;·&nbsp; <strong>AI Engineer</strong> &nbsp;·&nbsp; <strong>Analytics Professional</strong></div>
-    <div class="lsummary">MS Data Science graduate from <strong>Montclair State University</strong> (GPA 4.0) with hands-on experience at the <strong>MTA New York</strong> building data pipelines, and BI dashboards. I build end-to-end analytics solutions - from SQL pipelines and ML models to deployed AI applications - across transportation, finance, healthcare, retail, and logistics.</div>
+    <div class="lsummary">MS Data Science graduate from <strong>Montclair State University</strong> (GPA 4.0) with hands-on experience at the <strong>MTA New York</strong> building data pipelines, and BI dashboards. I build end-to-end analytics solutions — from SQL pipelines and ML models to deployed AI applications — across transportation, finance, healthcare, retail, and logistics.</div>
     <div class="domain-row">
       <span class="domain-tag">AI Agents &amp; LLMs</span>
       <span class="domain-tag">Revenue Management</span>
@@ -657,26 +615,25 @@ body{
 </div>
 
 <div id="hint-box">
-  <span style="color:#8aaccc">W A S D</span> / Arrows - Drive &nbsp;·&nbsp; <span style="color:#8aaccc">Enter</span> - Open project
+  <span style="color:#8aaccc">W A S D</span> / Arrows — Drive &nbsp;·&nbsp; <span style="color:#8aaccc">Enter</span> — Open project
 </div>
 
-<!-- MOBILE CONTROLS (touch devices only, bottom-right) -->
+<!-- MOBILE CONTROLS (touch devices only) -->
 <div id="dpad" style="display:none"></div>
-<div id="mcontrols">
-  <!-- 360 steering wheel on left -->
-  <div id="steering-wrap">
-    <div id="mc-wheel">
-      <div id="mc-wheel-spoke"></div>
-      <div id="mc-wheel-marker"></div>
-      <div id="mc-wheel-hub"></div>
-    </div>
-    <div id="mc-wheel-lbl">Steer</div>
+<div id="mcontrols" style="display:none"></div>
+<!-- Steering wheel — bottom-left -->
+<div id="steering-wrap">
+  <div id="mc-wheel">
+    <div id="mc-wheel-spoke"></div>
+    <div id="mc-wheel-marker"></div>
+    <div id="mc-wheel-hub"></div>
   </div>
-  <!-- Pedals: accel + brake side by side -->
-  <div id="pedals">
-    <div class="mc-btn" id="mc-accel">▲<br><span style="font-size:8px;letter-spacing:1px;opacity:.7">GAS</span></div>
-    <div class="mc-btn" id="mc-brake">▼<br><span style="font-size:8px;letter-spacing:1px;opacity:.7">BRK</span></div>
-  </div>
+  <div id="mc-wheel-lbl">STEER</div>
+</div>
+<!-- Pedals: brake left, accel right — bottom-right -->
+<div id="pedals">
+  <div class="mc-btn" id="mc-brake">▼<br><span style="font-size:8px;letter-spacing:1px;opacity:.75">BRK</span></div>
+  <div class="mc-btn" id="mc-accel">▲<br><span style="font-size:8px;letter-spacing:1px;opacity:.75">GAS</span></div>
 </div>
 
 <!-- MODAL -->
@@ -861,18 +818,24 @@ document.addEventListener('DOMContentLoaded',()=>{
 // ════════════════════════════════════
 function startGame(){
   document.getElementById('intro').style.display='none';
-  document.getElementById('c').style.display='block';
+  const cv2=document.getElementById('c');
+  cv2.style.display='block';
+  cv2.style.width='100%';
+  cv2.style.height=window.innerHeight+'px';
+  window.addEventListener('resize',()=>{ cv2.style.height=window.innerHeight+'px'; });
+  window.addEventListener('orientationchange',()=>setTimeout(()=>{ cv2.style.height=window.innerHeight+'px'; },200));
   document.getElementById('back-btn').style.display='block';
   ['hud','mm-wrap'].forEach(id=>document.getElementById(id).style.display='block');
   document.getElementById('dpad').style.display='none';
   // Show mobile controls only on touch-capable devices
   const isTouchDevice=('ontouchstart' in window)||navigator.maxTouchPoints>0;
   if(isTouchDevice){
-    document.getElementById('mcontrols').style.display='flex';
-    // Hide desktop hint on mobile
+    document.getElementById('steering-wrap').style.display='flex';
+    document.getElementById('pedals').style.display='flex';
     document.getElementById('hint-box').style.display='none';
   } else {
-    document.getElementById('mcontrols').style.display='none';
+    document.getElementById('steering-wrap').style.display='none';
+    document.getElementById('pedals').style.display='none';
     document.getElementById('hint-box').style.display='block';
   }
   mmCanvas=document.getElementById('mm');
@@ -889,6 +852,8 @@ function backToPortfolio(){
   ['hud','mm-wrap','hint-box'].forEach(id=>document.getElementById(id).style.display='none');
   document.getElementById('dpad').style.display='none';
   document.getElementById('mcontrols').style.display='none';
+  document.getElementById('steering-wrap').style.display='none';
+  document.getElementById('pedals').style.display='none';
   document.getElementById('hint-box').style.display='none';
 }
 
@@ -908,11 +873,15 @@ function init3D(){
   renderer.shadowMap.type=THREE.PCFSoftShadowMap;
   renderer.toneMapping=THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure=1.1;
-  window.addEventListener('resize',()=>{
-    camera.aspect=innerWidth/innerHeight;
+  function onResize(){
+    const W=window.innerWidth, H=window.innerHeight;
+    camera.aspect=W/H;
     camera.updateProjectionMatrix();
-    renderer.setSize(innerWidth,innerHeight);
-  });
+    renderer.setSize(W,H,false);
+  }
+  window.addEventListener('resize',onResize);
+  window.addEventListener('orientationchange',()=>setTimeout(onResize,200));
+  screen.orientation && screen.orientation.addEventListener('change',()=>setTimeout(onResize,200));
   scene.add(new THREE.AmbientLight(0x8899bb,0.5));
   const sun=new THREE.DirectionalLight(0xeef2ff,1.8);
   sun.position.set(60,100,40);sun.castShadow=true;
@@ -1024,7 +993,7 @@ function makeDistrictSigns(){
     const startCol=Math.floor((5-cols)/2);
     const rowZ=bRowZ(row);
 
-    // Bar passes through buildings - slightly below the shortest building in this row
+    // Bar passes through buildings — slightly below the shortest building in this row
     const idxs=PROJECTS.map((p,i)=>p.district===dk?i:-1).filter(i=>i>=0);
     const minH=Math.min(...idxs.map(i=>BH_LIST[i%18]));
     const barY=minH*0.7+1.9; // passes through buildings at user-specified height
@@ -1038,7 +1007,7 @@ function makeDistrictSigns(){
       const hW     = hRight-hLeft;
       const hCX    = (hLeft+hRight)/2;
 
-      // Structural beam runs along the BOTTOM edge of the label - not through its centre
+      // Structural beam runs along the BOTTOM edge of the label — not through its centre
       const beamY = barY - barH/2 - 0.09;  // just below the label face
       const beam=new THREE.Mesh(
         new THREE.BoxGeometry(hW,0.12,0.12),
@@ -1117,12 +1086,12 @@ function makeBuilding(p,bx,bz,idx){
     new THREE.MeshLambertMaterial({color:0x0e1826}));
   pave.position.y=0.1;pave.receiveShadow=true;g.add(pave);
 
-  // Solid body - clean dark concrete, no style variations
+  // Solid body — clean dark concrete, no style variations
   const body=new THREE.Mesh(new THREE.BoxGeometry(bW,bH,bD),
     new THREE.MeshLambertMaterial({color:0x111824}));
   body.position.y=bH/2+0.2;body.castShadow=true;body.receiveShadow=true;g.add(body);
 
-  // Colored top cap - category color, full width
+  // Colored top cap — category color, full width
   const cap=new THREE.Mesh(new THREE.BoxGeometry(bW+0.1,0.6,bD+0.1),
     new THREE.MeshLambertMaterial({color:hc,emissive:hc,emissiveIntensity:0.5}));
   cap.position.y=bH+0.5;g.add(cap);
@@ -1142,7 +1111,7 @@ function makeBuilding(p,bx,bz,idx){
   g.add(pg);allParticleGroups.push({group:pg,building:null});
 
   // ── PERIMETER ENTRANCE ZONE ──
-  // Full rectangle around building - glowing floor plane
+  // Full rectangle around building — glowing floor plane
   const zoneW=bW+10,zoneD=bD+10;
   const eMat=new THREE.MeshBasicMaterial({color:hc,transparent:true,opacity:0.08,depthWrite:false});
   const ePlane=new THREE.Mesh(new THREE.PlaneGeometry(zoneW,zoneD),eMat);
@@ -1216,7 +1185,7 @@ function makePoster(g,p,dist,bW,bH,bD){
     // Start drawing from 18% down so text sits in lower portion
     let y=ch*0.18;
 
-    // Project name - bold white, wrapped
+    // Project name — bold white, wrapped
     const nameSz=cw*0.082;
     const nameFont=`900 ${nameSz}px Segoe UI,Arial`;
     const nameLines=wrap(p.name,nameFont,maxW);
@@ -1230,7 +1199,7 @@ function makePoster(g,p,dist,bW,bH,bD){
     ctx.fillRect(pad,y,maxW,2); ctx.globalAlpha=1;
     y+=nameSz*0.55;
 
-    // Category - district colour, wrapped
+    // Category — district colour, wrapped
     const catSz=nameSz*0.62;
     const catFont=`700 ${catSz}px Segoe UI,Arial`;
     const catLines=wrap(p.cat,catFont,maxW);
@@ -1317,12 +1286,12 @@ function buildCar(){
     wg.position.set(wx,wy,wz);
     wg.userData.isWheel=true;
 
-    // Inner spin group - this is what we rotate to spin the wheel
+    // Inner spin group — this is what we rotate to spin the wheel
     const spin=new THREE.Group();
     wg.add(spin);
     wg.userData.spin=spin;
 
-    // Tyre - cylinder lying on its side (axis along X = car width)
+    // Tyre — cylinder lying on its side (axis along X = car width)
     const tyre=new THREE.Mesh(new THREE.CylinderGeometry(0.42,0.42,0.26,20),yM);
     tyre.rotation.z=Math.PI/2; tyre.castShadow=true; spin.add(tyre);
 
@@ -1422,7 +1391,7 @@ function loop(){
     if(!blocked){carPos.x=nx;carPos.z=nz;}else{carSpeed*=-.25;}
 
     carGroup.position.x=carPos.x;carGroup.position.z=carPos.z;carGroup.rotation.y=carAngle;
-    // Spin wheels - rotate the inner spin group around Z axis (wheel's roll axis)
+    // Spin wheels — rotate the inner spin group around Z axis (wheel's roll axis)
     carWheels.forEach(wg=>{
       if(wg.userData.spin) wg.userData.spin.rotation.x+=carSpeed*2.5;
     });
@@ -1453,11 +1422,11 @@ function loop(){
     camera.lookAt(carPos.x+Math.sin(carAngle)*4,1.2,carPos.z+Math.cos(carAngle)*4);
   }
 
-  // Entrance detection + glow - perimeter zone around whole building
+  // Entrance detection + glow — perimeter zone around whole building
   nearEntry=null;let bestD=9999;
   buildings.forEach(b=>{
     const dx=carPos.x-b.cx,dz=carPos.z-b.cz;
-    // Distance to building perimeter (not centre) - use Chebyshev distance to rectangle
+    // Distance to building perimeter (not centre) — use Chebyshev distance to rectangle
     const px=Math.max(0,Math.abs(dx)-b.hw),pz=Math.max(0,Math.abs(dz)-b.hd);
     const d=Math.sqrt(px*px+pz*pz); // 0 when inside perimeter ring
     const inZone=d<5.5;
@@ -1668,37 +1637,6 @@ function bindInput(){
     wh.addEventListener('pointercancel',e=>{e.preventDefault();wheelEnd();});
   }
 }
-function updateMobileControls(){
-
-  const mobile =
-    ('ontouchstart' in window) ||
-    navigator.maxTouchPoints > 0 ||
-    window.innerWidth <= 640;
-
-  const mc = document.getElementById('mcontrols');
-
-  if(mc){
-    mc.style.display = mobile ? 'block' : 'none';
-  }
-
-  const mm = document.getElementById('mm-wrap');
-
-  if(mm){
-    mm.style.display = mobile ? 'block' : '';
-  }
-}
-
-window.addEventListener('resize', () => {
-  updateMobileControls();
-});
-
-window.addEventListener('orientationchange', () => {
-  setTimeout(() => {
-    updateMobileControls();
-  }, 250);
-});
-
-updateMobileControls();
 
 // ════════════════════════════════════
 //  TOAST
@@ -1715,4 +1653,4 @@ function showToast(msg){
 </body>
 </html>"""
 
-components.html(HTML, height=1000, scrolling=False)
+components.html(HTML, height=760, scrolling=False)
