@@ -893,7 +893,7 @@ function makeDistrictSigns(){
     // Bar passes through buildings — slightly below the shortest building in this row
     const idxs=PROJECTS.map((p,i)=>p.district===dk?i:-1).filter(i=>i>=0);
     const minH=Math.min(...idxs.map(i=>BH_LIST[i%18]));
-    const barY=minH*0.7+0.5; // 62% up the shortest building — visually passing through
+    const barY=minH*0.7+0.9; // 62% up the shortest building — visually passing through
     const barH=0.82;
 
     for(let i=0;i<cols-1;i++){
