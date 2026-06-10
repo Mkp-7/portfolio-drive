@@ -298,47 +298,118 @@ html,body{width:100%;height:100vh;overflow:hidden;background:#04080f;font-family
 .mm-lbl{font-size:9px;letter-spacing:2px;color:#253545;text-transform:uppercase;text-align:center;margin-bottom:4px}
 #mm{border-radius:10px;border:1px solid rgba(74,144,217,.14)}
 
-/* HINT */
+/* HINT (desktop only - see media query above) */
+
+/* ════ DEVICE-ADAPTIVE CONTROLS ════ */
+#dpad{display:none!important}
+
+/* Mobile controls — bottom-right, hidden by default, shown only on touch devices */
+#mcontrols{
+  position:fixed;right:12px;bottom:12px;z-index:50;
+  display:none; /* shown via JS on touch device */
+  flex-direction:row;align-items:flex-end;gap:10px;
+}
+/* Pedals: side by side */
+#pedals{display:flex;flex-direction:row;gap:6px;align-items:flex-end}
+/* Steering wheel area */
+#steering-wrap{display:flex;flex-direction:column;align-items:center;gap:0}
+
+/* Pedal buttons */
+.mc-btn{
+  background:rgba(4,8,15,.9);
+  border-radius:10px;display:flex;align-items:center;justify-content:center;
+  font-size:16px;color:#4a6a8a;cursor:pointer;
+  user-select:none;-webkit-user-select:none;touch-action:none;transition:background .1s,border-color .1s;
+}
+#mc-accel{width:56px;height:56px;font-size:22px;border:2px solid rgba(62,207,142,.4);color:#3ecf8e}
+#mc-accel.on{background:rgba(62,207,142,.2);border-color:#3ecf8e;color:#fff}
+#mc-brake{width:56px;height:56px;font-size:22px;border:2px solid rgba(232,85,85,.4);color:#e85555}
+#mc-brake.on{background:rgba(232,85,85,.2);border-color:#e85555;color:#fff}
+
+/* 360-rotatable steering wheel */
+#mc-wheel{
+  width:90px;height:90px;border-radius:50%;
+  background:rgba(4,8,15,.92);
+  border:3px solid rgba(74,144,217,.45);
+  position:relative;
+  cursor:grab;user-select:none;-webkit-user-select:none;touch-action:none;
+  /* wheel rotates via JS transform */
+}
+/* Outer rim highlight */
+#mc-wheel::before{
+  content:'';position:absolute;inset:5px;border-radius:50%;
+  border:1px solid rgba(74,144,217,.2);pointer-events:none;
+}
+/* Spoke */
+#mc-wheel-spoke{
+  position:absolute;top:50%;left:50%;
+  width:60px;height:3px;background:rgba(74,144,217,.6);border-radius:2px;
+  transform:translate(-50%,-50%);transform-origin:center center;
+  pointer-events:none;
+}
+/* Hub dot */
+#mc-wheel-hub{
+  position:absolute;top:50%;left:50%;
+  width:12px;height:12px;border-radius:50%;
+  background:#4a90d9;transform:translate(-50%,-50%);
+  pointer-events:none;box-shadow:0 0 6px #4a90d9;
+}
+/* Grip marker on wheel rim — shows rotation */
+#mc-wheel-marker{
+  position:absolute;top:4px;left:50%;
+  width:6px;height:10px;border-radius:3px;
+  background:#4a90d9;transform:translateX(-50%);
+  pointer-events:none;
+}
+#mc-wheel-lbl{
+  font-size:9px;letter-spacing:1.5px;color:#253545;text-transform:uppercase;
+  margin-top:4px;text-align:center;
+}
+
+/* Hint box — desktop only */
 #hint-box{position:fixed;bottom:16px;left:16px;display:none;background:rgba(4,8,15,.88);border:1px solid rgba(255,255,255,.06);border-radius:8px;padding:7px 13px;font-size:10px;color:#2e4058;z-index:50;line-height:2}
 
-/* DPAD */
-/* MOBILE CONTROLS — bottom-left cluster */
-#mcontrols{
-  position:fixed;left:12px;bottom:12px;z-index:50;display:none;
-  display:none;flex-direction:row;align-items:flex-end;gap:8px;
+/* ════ RESPONSIVE LANDING PAGE ════ */
+@media(max-width:640px){
+  /* Nav */
+  #lnav{padding:0 14px;height:48px}
+  .lnav-links{display:none} /* hide nav links on mobile, save space */
+  .lnav-logo{font-size:13px}
+  /* Hero */
+  .intro-name{font-size:clamp(34px,10vw,52px);letter-spacing:-1px}
+  .intro-role{font-size:13px;margin-bottom:20px}
+  .lsummary,.hero-summary{font-size:12.5px;padding:0 4px}
+  .domain-row{gap:5px;margin-bottom:22px}
+  .domain-tag{font-size:10px;padding:4px 9px}
+  .stats-row{flex-wrap:wrap}
+  .stat-item{min-width:50%;border-bottom:1px solid rgba(255,255,255,.06)}
+  .cta-row{flex-wrap:wrap;gap:8px;justify-content:center}
+  .btn-primary,.btn-outline,.btn-enter{font-size:12px;padding:11px 16px}
+  .dist-row{gap:5px}
+  .dist-chip{font-size:10px;padding:5px 10px}
+  /* Sections */
+  .lsec{padding:40px 14px 28px}
+  .lsec-title{font-size:clamp(20px,5vw,28px)}
+  .l2col{grid-template-columns:1fr}
+  .lcard{padding:14px}
+  /* Experience */
+  .lexp{padding:14px 14px}
+  .lexp-role{font-size:13px}
+  .lexp-ul li{font-size:11px}
+  /* Contact grid */
+  .lcont-grid{grid-template-columns:1fr 1fr}
+  /* Minimap smaller on mobile */
+  #mm{width:100px;height:100px}
+  /* HUD smaller */
+  #hud{min-width:160px}
+  .hud-box{padding:9px 11px}
+  /* Enter hint hidden on mobile (touch tap instead) */
+  .hud-enter{display:none!important}
 }
-/* Pedal column: accel on top, brake below */
-#pedals{display:flex;flex-direction:column;gap:6px;align-items:center}
-/* Steering row: left arrow — wheel — right arrow */
-#steering-row{display:flex;flex-direction:row;align-items:center;gap:6px}
-.mc-btn{
-  background:rgba(4,8,15,.88);border:1px solid rgba(74,144,217,.2);
-  border-radius:10px;display:flex;align-items:center;justify-content:center;
-  font-size:18px;color:#4a6a8a;cursor:pointer;
-  user-select:none;-webkit-user-select:none;touch-action:none;transition:all .1s;
+@media(min-width:641px){
+  /* Desktop: hide mobile controls always */
+  #mcontrols{display:none!important}
 }
-.mc-btn:active,.mc-btn.on{background:rgba(74,144,217,.22);border-color:#4a90d9;color:#7eb8f7}
-#mc-accel{width:48px;height:56px;font-size:20px;border-color:rgba(62,207,142,.35);color:#3ecf8e}
-#mc-accel.on{background:rgba(62,207,142,.18);border-color:#3ecf8e}
-#mc-brake{width:48px;height:44px;font-size:16px;border-color:rgba(232,85,85,.35);color:#e85555}
-#mc-brake.on{background:rgba(232,85,85,.18);border-color:#e85555}
-#mc-left{width:48px;height:52px}
-#mc-right{width:48px;height:52px}
-/* Steering wheel — circle with a horizontal bar inside */
-#mc-wheel{
-  width:64px;height:64px;border-radius:50%;
-  background:rgba(4,8,15,.92);border:2px solid rgba(74,144,217,.35);
-  position:relative;display:flex;align-items:center;justify-content:center;
-  cursor:pointer;user-select:none;-webkit-user-select:none;touch-action:none;
-  transition:all .1s;
-}
-#mc-wheel::before{content:'';position:absolute;width:42px;height:2px;background:rgba(74,144,217,.5);border-radius:1px}
-#mc-wheel::after{content:'';position:absolute;width:2px;height:24px;background:rgba(74,144,217,.5);border-radius:1px}
-#mc-wheel-dot{width:10px;height:10px;border-radius:50%;background:#4a90d9;position:relative;z-index:1}
-#mc-wheel.left-on{border-color:#7eb8f7;transform:rotate(-22deg)}
-#mc-wheel.right-on{border-color:#7eb8f7;transform:rotate(22deg)}
-/* legacy dpad hidden */
-#dpad{display:none!important}
 
 /* MODAL */
 #ov{position:fixed;inset:0;background:rgba(0,0,0,.82);display:none;align-items:center;justify-content:center;z-index:100;backdrop-filter:blur(14px)}
@@ -538,19 +609,22 @@ html,body{width:100%;height:100vh;overflow:hidden;background:#04080f;font-family
   <span style="color:#8aaccc">W A S D</span> / Arrows — Drive &nbsp;·&nbsp; <span style="color:#8aaccc">Enter</span> — Open project
 </div>
 
-<!-- MOBILE CONTROLS -->
+<!-- MOBILE CONTROLS (touch devices only, bottom-right) -->
 <div id="dpad" style="display:none"></div>
 <div id="mcontrols">
-  <!-- Pedals: accel top, brake bottom -->
-  <div id="pedals">
-    <div class="mc-btn" id="mc-accel">▲</div>
-    <div class="mc-btn" id="mc-brake">▼</div>
+  <!-- 360 steering wheel on left -->
+  <div id="steering-wrap">
+    <div id="mc-wheel">
+      <div id="mc-wheel-spoke"></div>
+      <div id="mc-wheel-marker"></div>
+      <div id="mc-wheel-hub"></div>
+    </div>
+    <div id="mc-wheel-lbl">Steer</div>
   </div>
-  <!-- Steering: left — wheel — right -->
-  <div id="steering-row">
-    <div class="mc-btn" id="mc-left">◀</div>
-    <div id="mc-wheel"><div id="mc-wheel-dot"></div></div>
-    <div class="mc-btn" id="mc-right">▶</div>
+  <!-- Pedals: accel + brake side by side -->
+  <div id="pedals">
+    <div class="mc-btn" id="mc-accel">▲<br><span style="font-size:8px;letter-spacing:1px;opacity:.7">GAS</span></div>
+    <div class="mc-btn" id="mc-brake">▼<br><span style="font-size:8px;letter-spacing:1px;opacity:.7">BRK</span></div>
   </div>
 </div>
 
@@ -738,10 +812,18 @@ function startGame(){
   document.getElementById('intro').style.display='none';
   document.getElementById('c').style.display='block';
   document.getElementById('back-btn').style.display='block';
-  ['hud','mm-wrap','hint-box'].forEach(id=>document.getElementById(id).style.display='block');
+  ['hud','mm-wrap'].forEach(id=>document.getElementById(id).style.display='block');
   document.getElementById('dpad').style.display='none';
-  document.getElementById('mcontrols').style.display='none';
-  document.getElementById('mcontrols').style.display='flex';
+  // Show mobile controls only on touch-capable devices
+  const isTouchDevice=('ontouchstart' in window)||navigator.maxTouchPoints>0;
+  if(isTouchDevice){
+    document.getElementById('mcontrols').style.display='flex';
+    // Hide desktop hint on mobile
+    document.getElementById('hint-box').style.display='none';
+  } else {
+    document.getElementById('mcontrols').style.display='none';
+    document.getElementById('hint-box').style.display='block';
+  }
   mmCanvas=document.getElementById('mm');
   mmCanvas.width=140; mmCanvas.height=140;
   mmCtx=mmCanvas.getContext('2d');
@@ -756,6 +838,7 @@ function backToPortfolio(){
   ['hud','mm-wrap','hint-box'].forEach(id=>document.getElementById(id).style.display='none');
   document.getElementById('dpad').style.display='none';
   document.getElementById('mcontrols').style.display='none';
+  document.getElementById('hint-box').style.display='none';
 }
 
 // ════════════════════════════════════
@@ -893,7 +976,7 @@ function makeDistrictSigns(){
     // Bar passes through buildings — slightly below the shortest building in this row
     const idxs=PROJECTS.map((p,i)=>p.district===dk?i:-1).filter(i=>i>=0);
     const minH=Math.min(...idxs.map(i=>BH_LIST[i%18]));
-    const barY=minH*0.7+1.9; // 62% up the shortest building — visually passing through
+    const barY=minH*0.7+1.9; // passes through buildings at user-specified height
     const barH=0.82;
 
     for(let i=0;i<cols-1;i++){
@@ -1459,51 +1542,79 @@ function bindInput(){
     lastMX=e.touches[0].clientX;lastMY=e.touches[0].clientY;
   },{passive:true});
 
-  // New mobile controls wiring
-  function mcBind(id, dir, extraOn, extraOff){
+  // ── Mobile pedal buttons ──
+  function mcBind(id, dir){
     const el=document.getElementById(id);
     if(!el) return;
-    const on=()=>{
-      dpadState[dir]=1; el.classList.add('on');
-      if(extraOn) extraOn();
-      if(audioCtx&&audioCtx.state==='suspended') audioCtx.resume();
-    };
-    const off=()=>{ dpadState[dir]=0; el.classList.remove('on'); if(extraOff) extraOff(); };
+    const on=()=>{ dpadState[dir]=1; el.classList.add('on'); if(audioCtx&&audioCtx.state==='suspended') audioCtx.resume(); };
+    const off=()=>{ dpadState[dir]=0; el.classList.remove('on'); };
     el.addEventListener('pointerdown',e=>{e.preventDefault();on();});
     el.addEventListener('pointerup',off);
     el.addEventListener('pointerleave',off);
-    el.addEventListener('touchstart',e=>{e.preventDefault();on();},{passive:false});
-    el.addEventListener('touchend',off);
   }
   mcBind('mc-accel','up');
   mcBind('mc-brake','down');
-  mcBind('mc-left','left',
-    ()=>document.getElementById('mc-wheel').classList.add('left-on'),
-    ()=>document.getElementById('mc-wheel').classList.remove('left-on')
-  );
-  mcBind('mc-right','right',
-    ()=>document.getElementById('mc-wheel').classList.add('right-on'),
-    ()=>document.getElementById('mc-wheel').classList.remove('right-on')
-  );
-  // Wheel itself: touch left half = steer left, right half = steer right
+
+  // ── 360 steering wheel ──
+  // Wheel rotation drives steering: rotating CW = steer right, CCW = steer left.
+  // Threshold: ±15 degrees from start angle activates steer.
   const wh=document.getElementById('mc-wheel');
+  const spoke=document.getElementById('mc-wheel-spoke');
   if(wh){
-    wh.addEventListener('pointerdown',e=>{
-      e.preventDefault();
+    let wheelActive=false, startAngle=0, currentAngle=0, wheelCX=0, wheelCY=0;
+    const STEER_THRESH=15; // degrees to activate steering
+
+    function getAngle(cx,cy,ex,ey){
+      return Math.atan2(ey-cy,ex-cx)*180/Math.PI;
+    }
+    function applyWheelAngle(ang){
+      currentAngle=ang;
+      // Clamp visual rotation to ±90 deg
+      const vis=Math.max(-90,Math.min(90,ang));
+      wh.style.transform='rotate('+vis+'deg)';
+      // Steer based on threshold
+      if(ang>STEER_THRESH){ dpadState.right=1; dpadState.left=0; }
+      else if(ang<-STEER_THRESH){ dpadState.left=1; dpadState.right=0; }
+      else { dpadState.left=0; dpadState.right=0; }
+    }
+    function wheelStart(ex,ey){
       const r=wh.getBoundingClientRect();
-      const mid=r.left+r.width/2;
-      if(e.clientX<mid){ dpadState.left=1; wh.classList.add('left-on'); }
-      else             { dpadState.right=1; wh.classList.add('right-on'); }
+      wheelCX=r.left+r.width/2; wheelCY=r.top+r.height/2;
+      startAngle=getAngle(wheelCX,wheelCY,ex,ey)-currentAngle;
+      wheelActive=true;
+      wh.style.cursor='grabbing';
       if(audioCtx&&audioCtx.state==='suspended') audioCtx.resume();
-    });
-    wh.addEventListener('pointerup',()=>{
-      dpadState.left=0; dpadState.right=0;
-      wh.classList.remove('left-on','right-on');
-    });
-    wh.addEventListener('pointerleave',()=>{
-      dpadState.left=0; dpadState.right=0;
-      wh.classList.remove('left-on','right-on');
-    });
+    }
+    function wheelMove(ex,ey){
+      if(!wheelActive) return;
+      const ang=getAngle(wheelCX,wheelCY,ex,ey)-startAngle;
+      applyWheelAngle(ang);
+    }
+    function wheelEnd(){
+      if(!wheelActive) return;
+      wheelActive=false;
+      wh.style.cursor='grab';
+      // Spring back to centre
+      const spring=setInterval(()=>{
+        currentAngle*=0.75;
+        const vis=Math.max(-90,Math.min(90,currentAngle));
+        wh.style.transform='rotate('+vis+'deg)';
+        if(Math.abs(currentAngle)<0.5){
+          currentAngle=0; wh.style.transform='';
+          dpadState.left=0; dpadState.right=0;
+          clearInterval(spring);
+        } else {
+          if(currentAngle>STEER_THRESH){ dpadState.right=1; dpadState.left=0; }
+          else if(currentAngle<-STEER_THRESH){ dpadState.left=1; dpadState.right=0; }
+          else { dpadState.left=0; dpadState.right=0; }
+        }
+      },16);
+    }
+    // Pointer events
+    wh.addEventListener('pointerdown',e=>{e.preventDefault();wh.setPointerCapture(e.pointerId);wheelStart(e.clientX,e.clientY);});
+    wh.addEventListener('pointermove',e=>{e.preventDefault();wheelMove(e.clientX,e.clientY);});
+    wh.addEventListener('pointerup',e=>{e.preventDefault();wheelEnd();});
+    wh.addEventListener('pointercancel',e=>{e.preventDefault();wheelEnd();});
   }
 }
 
