@@ -623,13 +623,12 @@ html,body{width:100%;height:100vh;overflow:hidden;background:#04080f;font-family
 <div id="mcontrols" style="display:none"></div>
 <!-- Steering wheel - bottom-left -->
 <div id="steering-wrap">
-  <div id="mc-wheel">
-    <div id="mc-wheel-spoke"></div>
-    <div id="mc-wheel-marker"></div>
-    <div id="mc-wheel-hub"></div>
+  <div style="display:flex;flex-direction:row;gap:8px;">
+    <div class="mc-btn" id="mc-left" style="width:60px;height:60px;font-size:26px;border:2px solid rgba(74,144,217,.4);color:#4a90d9;">◀</div>
+    <div class="mc-btn" id="mc-right" style="width:60px;height:60px;font-size:26px;border:2px solid rgba(74,144,217,.4);color:#4a90d9;">▶</div>
   </div>
   <div id="mc-wheel-lbl">STEER</div>
-</div>
+</div></div>
 <!-- Pedals: brake left, accel right - bottom-right -->
 <div id="pedals">
   <div class="mc-btn" id="mc-brake">▼<br><span style="font-size:8px;letter-spacing:1px;opacity:.75">BRK</span></div>
@@ -1573,7 +1572,9 @@ function bindInput(){
     el.addEventListener('pointerleave',off);
   }
   mcBind('mc-accel','up');
-  mcBind('mc-brake','down');
+  mcBind('mc-brake','down')
+  mcBind('mc-left','left');
+  mcBind('mc-right','right');
 
   // ── 360 steering wheel ──
   // Wheel rotation drives steering: rotating CW = steer right, CCW = steer left.
