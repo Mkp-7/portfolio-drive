@@ -302,19 +302,43 @@ html,body{width:100%;height:100vh;overflow:hidden;background:#04080f;font-family
 #hint-box{position:fixed;bottom:16px;left:16px;display:none;background:rgba(4,8,15,.88);border:1px solid rgba(255,255,255,.06);border-radius:8px;padding:7px 13px;font-size:10px;color:#2e4058;z-index:50;line-height:2}
 
 /* DPAD */
-#dpad{
-  position:fixed;right:16px;bottom:136px;z-index:50;display:none;
-  grid-template-areas:'. u .' 'l . r' '. d .';
-  grid-template-columns:repeat(3,42px);grid-template-rows:repeat(3,42px);gap:3px;
+/* MOBILE CONTROLS — bottom-left cluster */
+#mcontrols{
+  position:fixed;left:12px;bottom:12px;z-index:50;display:none;
+  display:none;flex-direction:row;align-items:flex-end;gap:8px;
 }
-.dp-btn{
+/* Pedal column: accel on top, brake below */
+#pedals{display:flex;flex-direction:column;gap:6px;align-items:center}
+/* Steering row: left arrow — wheel — right arrow */
+#steering-row{display:flex;flex-direction:row;align-items:center;gap:6px}
+.mc-btn{
   background:rgba(4,8,15,.88);border:1px solid rgba(74,144,217,.2);
-  border-radius:8px;display:flex;align-items:center;justify-content:center;
-  font-size:16px;color:#4a6a8a;cursor:pointer;
+  border-radius:10px;display:flex;align-items:center;justify-content:center;
+  font-size:18px;color:#4a6a8a;cursor:pointer;
   user-select:none;-webkit-user-select:none;touch-action:none;transition:all .1s;
 }
-.dp-btn:active,.dp-btn.on{background:rgba(74,144,217,.25);border-color:#4a90d9;color:#7eb8f7}
-#dp-u{grid-area:u}#dp-d{grid-area:d}#dp-l{grid-area:l}#dp-r{grid-area:r}
+.mc-btn:active,.mc-btn.on{background:rgba(74,144,217,.22);border-color:#4a90d9;color:#7eb8f7}
+#mc-accel{width:48px;height:56px;font-size:20px;border-color:rgba(62,207,142,.35);color:#3ecf8e}
+#mc-accel.on{background:rgba(62,207,142,.18);border-color:#3ecf8e}
+#mc-brake{width:48px;height:44px;font-size:16px;border-color:rgba(232,85,85,.35);color:#e85555}
+#mc-brake.on{background:rgba(232,85,85,.18);border-color:#e85555}
+#mc-left{width:48px;height:52px}
+#mc-right{width:48px;height:52px}
+/* Steering wheel — circle with a horizontal bar inside */
+#mc-wheel{
+  width:64px;height:64px;border-radius:50%;
+  background:rgba(4,8,15,.92);border:2px solid rgba(74,144,217,.35);
+  position:relative;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;user-select:none;-webkit-user-select:none;touch-action:none;
+  transition:all .1s;
+}
+#mc-wheel::before{content:'';position:absolute;width:42px;height:2px;background:rgba(74,144,217,.5);border-radius:1px}
+#mc-wheel::after{content:'';position:absolute;width:2px;height:24px;background:rgba(74,144,217,.5);border-radius:1px}
+#mc-wheel-dot{width:10px;height:10px;border-radius:50%;background:#4a90d9;position:relative;z-index:1}
+#mc-wheel.left-on{border-color:#7eb8f7;transform:rotate(-22deg)}
+#mc-wheel.right-on{border-color:#7eb8f7;transform:rotate(22deg)}
+/* legacy dpad hidden */
+#dpad{display:none!important}
 
 /* MODAL */
 #ov{position:fixed;inset:0;background:rgba(0,0,0,.82);display:none;align-items:center;justify-content:center;z-index:100;backdrop-filter:blur(14px)}
@@ -365,7 +389,7 @@ html,body{width:100%;height:100vh;overflow:hidden;background:#04080f;font-family
     <div class="avail-pill"><span class="avail-dot"></span>Open to full-time opportunities</div>
     <div class="intro-name">Mukund <span class="accent">Patel</span></div>
     <div class="intro-role"><strong>Data Scientist</strong> &nbsp;·&nbsp; <strong>AI Engineer</strong> &nbsp;·&nbsp; <strong>Analytics Professional</strong></div>
-    <div class="lsummary">MS Data Science graduate from <strong>Montclair State University</strong> (GPA 4.0) with hands-on experience at the <strong>MTA New York</strong> building data pipelines, and BI dashboards. I build end-to-end analytics solutions - from SQL pipelines and ML models to deployed AI applications - across transportation, finance, healthcare, retail, and logistics.</div>
+    <div class="lsummary">MS Data Science graduate from <strong>Montclair State University</strong> (GPA 4.0) with hands-on experience at the <strong>MTA New York</strong> building data pipelines, and BI dashboards. I build end-to-end analytics solutions — from SQL pipelines and ML models to deployed AI applications — across transportation, finance, healthcare, retail, and logistics.</div>
     <div class="domain-row">
       <span class="domain-tag">AI Agents &amp; LLMs</span>
       <span class="domain-tag">Revenue Management</span>
@@ -511,15 +535,23 @@ html,body{width:100%;height:100vh;overflow:hidden;background:#04080f;font-family
 </div>
 
 <div id="hint-box">
-  <span style="color:#8aaccc">W A S D</span> / Arrows - Drive &nbsp;·&nbsp; <span style="color:#8aaccc">Enter</span> - Open project
+  <span style="color:#8aaccc">W A S D</span> / Arrows — Drive &nbsp;·&nbsp; <span style="color:#8aaccc">Enter</span> — Open project
 </div>
 
-<!-- D-PAD for mobile -->
-<div id="dpad">
-  <div class="dp-btn" id="dp-u">↑</div>
-  <div class="dp-btn" id="dp-l">←</div>
-  <div class="dp-btn" id="dp-r">→</div>
-  <div class="dp-btn" id="dp-d">↓</div>
+<!-- MOBILE CONTROLS -->
+<div id="dpad" style="display:none"></div>
+<div id="mcontrols">
+  <!-- Pedals: accel top, brake bottom -->
+  <div id="pedals">
+    <div class="mc-btn" id="mc-accel">▲</div>
+    <div class="mc-btn" id="mc-brake">▼</div>
+  </div>
+  <!-- Steering: left — wheel — right -->
+  <div id="steering-row">
+    <div class="mc-btn" id="mc-left">◀</div>
+    <div id="mc-wheel"><div id="mc-wheel-dot"></div></div>
+    <div class="mc-btn" id="mc-right">▶</div>
+  </div>
 </div>
 
 <!-- MODAL -->
@@ -707,7 +739,9 @@ function startGame(){
   document.getElementById('c').style.display='block';
   document.getElementById('back-btn').style.display='block';
   ['hud','mm-wrap','hint-box'].forEach(id=>document.getElementById(id).style.display='block');
-  document.getElementById('dpad').style.display='grid';
+  document.getElementById('dpad').style.display='none';
+  document.getElementById('mcontrols').style.display='none';
+  document.getElementById('mcontrols').style.display='flex';
   mmCanvas=document.getElementById('mm');
   mmCanvas.width=140; mmCanvas.height=140;
   mmCtx=mmCanvas.getContext('2d');
@@ -721,6 +755,7 @@ function backToPortfolio(){
   document.getElementById('back-btn').style.display='none';
   ['hud','mm-wrap','hint-box'].forEach(id=>document.getElementById(id).style.display='none');
   document.getElementById('dpad').style.display='none';
+  document.getElementById('mcontrols').style.display='none';
 }
 
 // ════════════════════════════════════
@@ -855,11 +890,10 @@ function makeDistrictSigns(){
     const startCol=Math.floor((5-cols)/2);
     const rowZ=bRowZ(row);
 
-    // Tallest building height in this district row
+    // Bar passes through buildings — slightly below the shortest building in this row
     const idxs=PROJECTS.map((p,i)=>p.district===dk?i:-1).filter(i=>i>=0);
-    const maxH=Math.max(...idxs.map(i=>BH_LIST[i%18]));
-    // Bar sits attached to tops of buildings - at building cap height
-    const barY=maxH+0.2;  // cap is at bH+0.5, so this sits right on top
+    const minH=Math.min(...idxs.map(i=>BH_LIST[i%18]));
+    const barY=minH*0.62+0.2; // 62% up the shortest building — visually passing through
     const barH=0.82;
 
     for(let i=0;i<cols-1;i++){
@@ -870,7 +904,7 @@ function makeDistrictSigns(){
       const hW     = hRight-hLeft;
       const hCX    = (hLeft+hRight)/2;
 
-      // Structural beam runs along the BOTTOM edge of the label - not through its centre
+      // Structural beam runs along the BOTTOM edge of the label — not through its centre
       const beamY = barY - barH/2 - 0.09;  // just below the label face
       const beam=new THREE.Mesh(
         new THREE.BoxGeometry(hW,0.12,0.12),
@@ -949,12 +983,12 @@ function makeBuilding(p,bx,bz,idx){
     new THREE.MeshLambertMaterial({color:0x0e1826}));
   pave.position.y=0.1;pave.receiveShadow=true;g.add(pave);
 
-  // Solid body - clean dark concrete, no style variations
+  // Solid body — clean dark concrete, no style variations
   const body=new THREE.Mesh(new THREE.BoxGeometry(bW,bH,bD),
     new THREE.MeshLambertMaterial({color:0x111824}));
   body.position.y=bH/2+0.2;body.castShadow=true;body.receiveShadow=true;g.add(body);
 
-  // Colored top cap - category color, full width
+  // Colored top cap — category color, full width
   const cap=new THREE.Mesh(new THREE.BoxGeometry(bW+0.1,0.6,bD+0.1),
     new THREE.MeshLambertMaterial({color:hc,emissive:hc,emissiveIntensity:0.5}));
   cap.position.y=bH+0.5;g.add(cap);
@@ -974,7 +1008,7 @@ function makeBuilding(p,bx,bz,idx){
   g.add(pg);allParticleGroups.push({group:pg,building:null});
 
   // ── PERIMETER ENTRANCE ZONE ──
-  // Full rectangle around building - glowing floor plane
+  // Full rectangle around building — glowing floor plane
   const zoneW=bW+10,zoneD=bD+10;
   const eMat=new THREE.MeshBasicMaterial({color:hc,transparent:true,opacity:0.08,depthWrite:false});
   const ePlane=new THREE.Mesh(new THREE.PlaneGeometry(zoneW,zoneD),eMat);
@@ -1048,7 +1082,7 @@ function makePoster(g,p,dist,bW,bH,bD){
     // Start drawing from 18% down so text sits in lower portion
     let y=ch*0.18;
 
-    // Project name - bold white, wrapped
+    // Project name — bold white, wrapped
     const nameSz=cw*0.082;
     const nameFont=`900 ${nameSz}px Segoe UI,Arial`;
     const nameLines=wrap(p.name,nameFont,maxW);
@@ -1062,7 +1096,7 @@ function makePoster(g,p,dist,bW,bH,bD){
     ctx.fillRect(pad,y,maxW,2); ctx.globalAlpha=1;
     y+=nameSz*0.55;
 
-    // Category - district colour, wrapped
+    // Category — district colour, wrapped
     const catSz=nameSz*0.62;
     const catFont=`700 ${catSz}px Segoe UI,Arial`;
     const catLines=wrap(p.cat,catFont,maxW);
@@ -1149,12 +1183,12 @@ function buildCar(){
     wg.position.set(wx,wy,wz);
     wg.userData.isWheel=true;
 
-    // Inner spin group - this is what we rotate to spin the wheel
+    // Inner spin group — this is what we rotate to spin the wheel
     const spin=new THREE.Group();
     wg.add(spin);
     wg.userData.spin=spin;
 
-    // Tyre - cylinder lying on its side (axis along X = car width)
+    // Tyre — cylinder lying on its side (axis along X = car width)
     const tyre=new THREE.Mesh(new THREE.CylinderGeometry(0.42,0.42,0.26,20),yM);
     tyre.rotation.z=Math.PI/2; tyre.castShadow=true; spin.add(tyre);
 
@@ -1254,7 +1288,7 @@ function loop(){
     if(!blocked){carPos.x=nx;carPos.z=nz;}else{carSpeed*=-.25;}
 
     carGroup.position.x=carPos.x;carGroup.position.z=carPos.z;carGroup.rotation.y=carAngle;
-    // Spin wheels - rotate the inner spin group around Z axis (wheel's roll axis)
+    // Spin wheels — rotate the inner spin group around Z axis (wheel's roll axis)
     carWheels.forEach(wg=>{
       if(wg.userData.spin) wg.userData.spin.rotation.x+=carSpeed*2.5;
     });
@@ -1285,11 +1319,11 @@ function loop(){
     camera.lookAt(carPos.x+Math.sin(carAngle)*4,1.2,carPos.z+Math.cos(carAngle)*4);
   }
 
-  // Entrance detection + glow - perimeter zone around whole building
+  // Entrance detection + glow — perimeter zone around whole building
   nearEntry=null;let bestD=9999;
   buildings.forEach(b=>{
     const dx=carPos.x-b.cx,dz=carPos.z-b.cz;
-    // Distance to building perimeter (not centre) - use Chebyshev distance to rectangle
+    // Distance to building perimeter (not centre) — use Chebyshev distance to rectangle
     const px=Math.max(0,Math.abs(dx)-b.hw),pz=Math.max(0,Math.abs(dz)-b.hd);
     const d=Math.sqrt(px*px+pz*pz); // 0 when inside perimeter ring
     const inZone=d<5.5;
@@ -1425,13 +1459,52 @@ function bindInput(){
     lastMX=e.touches[0].clientX;lastMY=e.touches[0].clientY;
   },{passive:true});
 
-  [['dp-u','up'],['dp-d','down'],['dp-l','left'],['dp-r','right']].forEach(([id,dir])=>{
+  // New mobile controls wiring
+  function mcBind(id, dir, extraOn, extraOff){
     const el=document.getElementById(id);
-    const on=()=>{dpadState[dir]=1;el.classList.add('on');if(audioCtx&&audioCtx.state==='suspended')audioCtx.resume();};
-    const off=()=>{dpadState[dir]=0;el.classList.remove('on');};
+    if(!el) return;
+    const on=()=>{
+      dpadState[dir]=1; el.classList.add('on');
+      if(extraOn) extraOn();
+      if(audioCtx&&audioCtx.state==='suspended') audioCtx.resume();
+    };
+    const off=()=>{ dpadState[dir]=0; el.classList.remove('on'); if(extraOff) extraOff(); };
     el.addEventListener('pointerdown',e=>{e.preventDefault();on();});
-    el.addEventListener('pointerup',off);el.addEventListener('pointerleave',off);
-  });
+    el.addEventListener('pointerup',off);
+    el.addEventListener('pointerleave',off);
+    el.addEventListener('touchstart',e=>{e.preventDefault();on();},{passive:false});
+    el.addEventListener('touchend',off);
+  }
+  mcBind('mc-accel','up');
+  mcBind('mc-brake','down');
+  mcBind('mc-left','left',
+    ()=>document.getElementById('mc-wheel').classList.add('left-on'),
+    ()=>document.getElementById('mc-wheel').classList.remove('left-on')
+  );
+  mcBind('mc-right','right',
+    ()=>document.getElementById('mc-wheel').classList.add('right-on'),
+    ()=>document.getElementById('mc-wheel').classList.remove('right-on')
+  );
+  // Wheel itself: touch left half = steer left, right half = steer right
+  const wh=document.getElementById('mc-wheel');
+  if(wh){
+    wh.addEventListener('pointerdown',e=>{
+      e.preventDefault();
+      const r=wh.getBoundingClientRect();
+      const mid=r.left+r.width/2;
+      if(e.clientX<mid){ dpadState.left=1; wh.classList.add('left-on'); }
+      else             { dpadState.right=1; wh.classList.add('right-on'); }
+      if(audioCtx&&audioCtx.state==='suspended') audioCtx.resume();
+    });
+    wh.addEventListener('pointerup',()=>{
+      dpadState.left=0; dpadState.right=0;
+      wh.classList.remove('left-on','right-on');
+    });
+    wh.addEventListener('pointerleave',()=>{
+      dpadState.left=0; dpadState.right=0;
+      wh.classList.remove('left-on','right-on');
+    });
+  }
 }
 
 // ════════════════════════════════════
