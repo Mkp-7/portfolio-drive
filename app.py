@@ -647,15 +647,14 @@ let lastNearEntry=null;
 const CAM_BACK=11,CAM_UP=5.5,CAM_LAG=0.09;
 let camPos=new THREE.Vector3(0,8,117);
 // Matrix layout: alternating building columns/rows and road columns/rows
-// BW=building slot, RW=road width, STEP=BW+RW
-const BW=18, RW=16, STEP=BW+RW; // step=34
+const BW=18, RW=16, STEP=BW+RW; // slot=18, road=16, step=34
 const CITY_H=115;
-// Building col centres (5):  -68,-34,0,34,68
-// Road col centres (6):      -85,-51,-17,17,51,85
-function bColX(col){ return -68 + col*STEP; }
-function bRowZ(row){ return -68 + row*STEP; }
-function rColX(col){ return -85 + col*STEP; }
-function rRowZ(row){ return -85 + row*STEP; }
+// Building col centres (5): -68,-34,0,34,68
+// Road col centres (6):     -85,-51,-17,17,51,85
+function bColX(col){ return -68+col*STEP; }
+function bRowZ(row){ return -68+row*STEP; }
+function rColX(col){ return -85+col*STEP; }
+function rRowZ(row){ return -85+row*STEP; }
 
 // District row assignments (car starts at +Z, drives -Z; row 0 = nearest = most +Z)
 
@@ -711,12 +710,9 @@ function startGame(){
   mmCanvas=document.getElementById('mm');
   mmCanvas.width=140; mmCanvas.height=140;
   mmCtx=mmCanvas.getContext('2d');
-  // Small delay so canvas is painted and has real clientWidth/clientHeight
-  setTimeout(()=>{
-    init3D();buildCity();buildCar();bindInput();initAudio();
-    clock=new THREE.Clock();loop();
-    showToast('Drive into a glowing zone · Press Enter to open a project');
-  },100);
+  init3D();buildCity();buildCar();bindInput();initAudio();
+  clock=new THREE.Clock();loop();
+  showToast('Drive into a glowing zone · Press Enter to open a project');
 }
 function backToPortfolio(){
   document.getElementById('intro').style.display='flex';
@@ -733,24 +729,19 @@ function init3D(){
   scene=new THREE.Scene();
   scene.background=new THREE.Color(0x04080f);
   scene.fog=new THREE.FogExp2(0x04080f,0.007);
-  const cv=document.getElementById('c');
-  const W=cv.clientWidth||window.innerWidth||800;
-  const H=cv.clientHeight||window.innerHeight||600;
-  camera=new THREE.PerspectiveCamera(55,W/H,0.1,400);
+  camera=new THREE.PerspectiveCamera(55,innerWidth/innerHeight,0.1,400);
   camera.position.copy(camPos);
-  renderer=new THREE.WebGLRenderer({canvas:cv,antialias:true,powerPreference:'high-performance'});
-  renderer.setSize(W,H,false);
+  renderer=new THREE.WebGLRenderer({canvas:document.getElementById('c'),antialias:true,powerPreference:'high-performance'});
+  renderer.setSize(innerWidth,innerHeight);
   renderer.setPixelRatio(Math.min(devicePixelRatio,2));
   renderer.shadowMap.enabled=true;
   renderer.shadowMap.type=THREE.PCFSoftShadowMap;
   renderer.toneMapping=THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure=1.1;
   window.addEventListener('resize',()=>{
-    const nW=cv.clientWidth||window.innerWidth;
-    const nH=cv.clientHeight||window.innerHeight;
-    camera.aspect=nW/nH;
+    camera.aspect=innerWidth/innerHeight;
     camera.updateProjectionMatrix();
-    renderer.setSize(nW,nH,false);
+    renderer.setSize(innerWidth,innerHeight);
   });
   scene.add(new THREE.AmbientLight(0x8899bb,0.5));
   const sun=new THREE.DirectionalLight(0xeef2ff,1.8);
@@ -850,98 +841,75 @@ function makeDistrictZones(){
 
 
 function makeDistrictSigns(){
-  // For each district row: place (cols-1) holdings, one between each adjacent building pair.
-  // E.g. 4 buildings → 3 holdings, all labelled with same district name.
-  // Each holding: connects right edge of building[i] to left edge of building[i+1].
-  // Bar spans the gap between buildings (road width area between slots).
-  // Floats just above the buildings.
-
-  const BHEIGHTS=[9,13,10,14,8,12,11,9,13,10,14,8,12,11,9,13,10,14];
-  const bBody=Math.round(BW*0.72); // building body width
+  // N buildings in a row → N-1 holdings between adjacent pairs.
+  // Each holding: spans from right edge of building[i] to left edge of building[i+1].
+  // No poles. Label = district name, on front (+Z) and back (-Z).
+  // Height: just above tallest building in this row.
+  const BH_LIST=[9,13,10,14,8,12,11,9,13,10,14,8,12,11,9,13,10,14];
+  const bBody=12; // building body width
 
   DIST_ORDER.forEach((dk,row)=>{
     const dist=DISTRICTS[dk];
     const cols=ROW_COLS[dk];
     const startCol=Math.floor((5-cols)/2);
     const rowZ=bRowZ(row);
-
-    // Max building height in this row
     const idxs=PROJECTS.map((p,i)=>p.district===dk?i:-1).filter(i=>i>=0);
-    const maxH=Math.max(...idxs.map(i=>BHEIGHTS[i%18]));
+    const maxH=Math.max(...idxs.map(i=>BH_LIST[i%18]));
     const barY=maxH+1.5;
-    const barH=0.85;
+    const barH=0.8;
 
-    // One holding between each adjacent building pair
-    for(let i=0; i<cols-1; i++){
-      const leftBX  = bColX(startCol+i);    // centre of left building
-      const rightBX = bColX(startCol+i+1);  // centre of right building
+    for(let i=0;i<cols-1;i++){
+      const lx=bColX(startCol+i);   // left building centre
+      const rx=bColX(startCol+i+1); // right building centre
+      const hLeft  = lx+bBody/2;    // right edge of left building
+      const hRight = rx-bBody/2;    // left edge of right building
+      const hW     = hRight-hLeft;
+      const hCX    = (hLeft+hRight)/2;
 
-      // Holding spans from right edge of left bldg to left edge of right bldg
-      const holdLeft  = leftBX  + bBody/2;  // right edge of left building
-      const holdRight = rightBX - bBody/2;  // left edge of right building
-      const holdW     = holdRight - holdLeft;
-      const holdCX    = (holdLeft+holdRight)/2;
-
-      // Structural beam
+      // Beam
       const beam=new THREE.Mesh(
-        new THREE.BoxGeometry(holdW,0.18,0.18),
+        new THREE.BoxGeometry(hW,0.16,0.16),
         new THREE.MeshLambertMaterial({color:dist.color,emissive:dist.color,emissiveIntensity:0.6})
       );
-      beam.position.set(holdCX,barY,rowZ);
-      scene.add(beam);
+      beam.position.set(hCX,barY,rowZ);scene.add(beam);
 
-      // Connector brackets at each end (touching building wall)
-      [holdLeft+0.08, holdRight-0.08].forEach(ex=>{
-        const brk=new THREE.Mesh(
-          new THREE.BoxGeometry(0.22,barH+0.12,0.22),
+      // Brackets at each end
+      [hLeft+0.07,hRight-0.07].forEach(ex=>{
+        scene.add(Object.assign(new THREE.Mesh(
+          new THREE.BoxGeometry(0.2,barH+0.1,0.2),
           new THREE.MeshLambertMaterial({color:dist.color,emissive:dist.color,emissiveIntensity:0.7})
-        );
-        brk.position.set(ex,barY,rowZ);
-        scene.add(brk);
+        ),{position:new THREE.Vector3(ex,barY,rowZ)}));
       });
 
-      // Label texture
-      function makeTex(){
-        const cw=512,ch=80;
+      // Texture
+      function mkTex(){
+        const cw=512,ch=76;
         const can=document.createElement('canvas');
         can.width=cw;can.height=ch;
         const ctx=can.getContext('2d');
         ctx.fillStyle='#06101c';ctx.fillRect(0,0,cw,ch);
         ctx.fillStyle=dist.hex;
         ctx.fillRect(0,0,cw,6);ctx.fillRect(0,ch-6,cw,6);
-        ctx.font='bold 32px Segoe UI,Arial';
-        ctx.fillStyle=dist.hex;
-        ctx.textAlign='center';ctx.textBaseline='middle';
-        // Truncate if too wide
-        let label=dist.name.toUpperCase();
-        while(ctx.measureText(label).width>cw-20&&label.length>3) label=label.slice(0,-1);
-        ctx.fillText(label,cw/2,ch/2);
+        ctx.font='bold 30px Segoe UI,Arial';
+        ctx.fillStyle=dist.hex;ctx.textAlign='center';ctx.textBaseline='middle';
+        let lbl=dist.name.toUpperCase();
+        while(ctx.measureText(lbl).width>cw-16&&lbl.length>3)lbl=lbl.slice(0,-1);
+        ctx.fillText(lbl,cw/2,ch/2);
         const tex=new THREE.CanvasTexture(can);
         tex.anisotropy=renderer.capabilities.getMaxAnisotropy();
         return tex;
       }
-
-      const mat=new THREE.MeshBasicMaterial({map:makeTex(),transparent:true,depthWrite:false});
-
-      // Front face (+Z) — scaled to holding width
-      const fm=new THREE.Mesh(new THREE.PlaneGeometry(holdW,barH),mat);
-      fm.position.set(holdCX,barY,rowZ-0.1);
-      fm.rotation.y=0;
-      scene.add(fm);
-
-      // Back face (-Z)
-      const bm=new THREE.Mesh(new THREE.PlaneGeometry(holdW,barH),mat.clone());
-      bm.position.set(holdCX,barY,rowZ+0.1);
-      bm.rotation.y=Math.PI;
-      scene.add(bm);
-
-      // Glow
-      const pl=new THREE.PointLight(dist.color,0.45,holdW+5);
-      pl.position.set(holdCX,barY+0.6,rowZ);
-      scene.add(pl);
+      const mat=new THREE.MeshBasicMaterial({map:mkTex(),transparent:true,depthWrite:false});
+      const fm=new THREE.Mesh(new THREE.PlaneGeometry(hW,barH),mat);
+      fm.position.set(hCX,barY,rowZ-0.09);fm.rotation.y=0;scene.add(fm);
+      const bm=new THREE.Mesh(new THREE.PlaneGeometry(hW,barH),mat.clone());
+      bm.position.set(hCX,barY,rowZ+0.09);bm.rotation.y=Math.PI;scene.add(bm);
+      const pl=new THREE.PointLight(dist.color,0.4,hW+5);
+      pl.position.set(hCX,barY+0.6,rowZ);scene.add(pl);
     }
   });
 }
+
 
 
 function placeBuildings(){
@@ -954,10 +922,9 @@ function placeBuildings(){
 function makeBuilding(p,bx,bz,idx){
   const dist=DISTRICTS[p.district];
   const hc=dist.color;
-  const BHEIGHTS=[9,13,10,14,8,12,11,9,13,10,14,8,12,11,9,13,10,14];
-  const bH=BHEIGHTS[idx%18];
-  const bW=Math.round(BW*0.72); // 13 — fits slot with clearance to road
-  const bD=bW;
+  const BH_LIST=[9,13,10,14,8,12,11,9,13,10,14,8,12,11,9,13,10,14];
+  const bH=BH_LIST[idx%18];
+  const bW=12, bD=12; // fits in BW=18 slot with 3-unit gap to road
   const g=new THREE.Group();g.position.set(bx,0,bz);
 
   // Pavement
