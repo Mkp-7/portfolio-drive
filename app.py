@@ -1470,7 +1470,7 @@ function loop(){
     pEl.innerHTML='<span style="color:'+nearEntry.distHex+'">'+nearEntry.project.name+'</span>';
     eEl.style.display='block';
     const me=document.getElementById('mc-enter');if(me)me.style.display='flex';
-  }}else{pEl.textContent='Navigate to a project entrance';eEl.style.display='none';
+  }else{pEl.textContent='Navigate to a project entrance';eEl.style.display='none';
     const me=document.getElementById('mc-enter');if(me)me.style.display='none';}
   document.getElementById('hud-visited').textContent=visitedSet.size+' / 18 explored';
 
