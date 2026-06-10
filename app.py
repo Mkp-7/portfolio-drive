@@ -647,7 +647,8 @@ let lastNearEntry=null;
 const CAM_BACK=11,CAM_UP=5.5,CAM_LAG=0.09;
 let camPos=new THREE.Vector3(0,8,117);
 // Matrix layout: alternating building columns/rows and road columns/rows
-const BW=18, RW=16, STEP=BW+RW; // slot=18, road=16, step=34
+// BW=building slot, RW=road width, STEP=BW+RW
+const BW=18, RW=16, STEP=BW+RW; // step=34
 const CITY_H=115;
 // Building col centres (5): -68,-34,0,34,68
 // Road col centres (6):     -85,-51,-17,17,51,85
@@ -830,7 +831,7 @@ function makeDistrictZones(){
     const cx     = (leftX+rightX)/2;
     const w      = rightX - leftX;
     const zone=new THREE.Mesh(
-      new THREE.PlaneGeometry(w, BD),
+      new THREE.PlaneGeometry(w, BW),
       new THREE.MeshLambertMaterial({color:dist.color,transparent:true,opacity:0.04})
     );
     zone.rotation.x=-Math.PI/2;
@@ -841,10 +842,10 @@ function makeDistrictZones(){
 
 
 function makeDistrictSigns(){
-  // N buildings in a row → N-1 holdings between adjacent pairs.
-  // Each holding: spans from right edge of building[i] to left edge of building[i+1].
-  // No poles. Label = district name, on front (+Z) and back (-Z).
-  // Height: just above tallest building in this row.
+  // N buildings per district row → N-1 holding bars connecting adjacent pairs.
+  // Each bar spans from right edge of building[i] to left edge of building[i+1].
+  // No poles. Floats just above tallest building in that row.
+  // Front (+Z) and back (-Z) faces show district label in district colour.
   const BH_LIST=[9,13,10,14,8,12,11,9,13,10,14,8,12,11,9,13,10,14];
   const bBody=12; // building body width
 
@@ -853,64 +854,78 @@ function makeDistrictSigns(){
     const cols=ROW_COLS[dk];
     const startCol=Math.floor((5-cols)/2);
     const rowZ=bRowZ(row);
+
+    // Tallest building in this district row → bar height
     const idxs=PROJECTS.map((p,i)=>p.district===dk?i:-1).filter(i=>i>=0);
     const maxH=Math.max(...idxs.map(i=>BH_LIST[i%18]));
     const barY=maxH+1.5;
-    const barH=0.8;
+    const barH=0.82;
 
     for(let i=0;i<cols-1;i++){
-      const lx=bColX(startCol+i);   // left building centre
-      const rx=bColX(startCol+i+1); // right building centre
-      const hLeft  = lx+bBody/2;    // right edge of left building
-      const hRight = rx-bBody/2;    // left edge of right building
+      const lx=bColX(startCol+i);    // left building centre
+      const rx=bColX(startCol+i+1);  // right building centre
+      const hLeft  = lx+bBody/2;     // right edge of left building
+      const hRight = rx-bBody/2;     // left edge of right building
       const hW     = hRight-hLeft;
       const hCX    = (hLeft+hRight)/2;
 
-      // Beam
+      // Structural beam (glowing, district colour)
       const beam=new THREE.Mesh(
         new THREE.BoxGeometry(hW,0.16,0.16),
         new THREE.MeshLambertMaterial({color:dist.color,emissive:dist.color,emissiveIntensity:0.6})
       );
-      beam.position.set(hCX,barY,rowZ);scene.add(beam);
+      beam.position.set(hCX,barY,rowZ);
+      scene.add(beam);
 
-      // Brackets at each end
-      [hLeft+0.07,hRight-0.07].forEach(ex=>{
-        scene.add(Object.assign(new THREE.Mesh(
+      // Connector brackets where bar meets building walls
+      [hLeft+0.07, hRight-0.07].forEach(ex=>{
+        const brk=new THREE.Mesh(
           new THREE.BoxGeometry(0.2,barH+0.1,0.2),
           new THREE.MeshLambertMaterial({color:dist.color,emissive:dist.color,emissiveIntensity:0.7})
-        ),{position:new THREE.Vector3(ex,barY,rowZ)}));
+        );
+        brk.position.set(ex,barY,rowZ);
+        scene.add(brk);
       });
 
-      // Texture
+      // Label texture (canvas)
       function mkTex(){
-        const cw=512,ch=76;
+        const cw=512, ch=76;
         const can=document.createElement('canvas');
-        can.width=cw;can.height=ch;
+        can.width=cw; can.height=ch;
         const ctx=can.getContext('2d');
-        ctx.fillStyle='#06101c';ctx.fillRect(0,0,cw,ch);
+        ctx.fillStyle='#06101c'; ctx.fillRect(0,0,cw,ch);
         ctx.fillStyle=dist.hex;
-        ctx.fillRect(0,0,cw,6);ctx.fillRect(0,ch-6,cw,6);
+        ctx.fillRect(0,0,cw,6); ctx.fillRect(0,ch-6,cw,6);
         ctx.font='bold 30px Segoe UI,Arial';
-        ctx.fillStyle=dist.hex;ctx.textAlign='center';ctx.textBaseline='middle';
+        ctx.fillStyle=dist.hex;
+        ctx.textAlign='center'; ctx.textBaseline='middle';
         let lbl=dist.name.toUpperCase();
-        while(ctx.measureText(lbl).width>cw-16&&lbl.length>3)lbl=lbl.slice(0,-1);
+        while(ctx.measureText(lbl).width>cw-16&&lbl.length>3) lbl=lbl.slice(0,-1);
         ctx.fillText(lbl,cw/2,ch/2);
         const tex=new THREE.CanvasTexture(can);
         tex.anisotropy=renderer.capabilities.getMaxAnisotropy();
         return tex;
       }
+
       const mat=new THREE.MeshBasicMaterial({map:mkTex(),transparent:true,depthWrite:false});
+
+      // Front face (+Z)
       const fm=new THREE.Mesh(new THREE.PlaneGeometry(hW,barH),mat);
-      fm.position.set(hCX,barY,rowZ-0.09);fm.rotation.y=0;scene.add(fm);
+      fm.position.set(hCX,barY,rowZ-0.09); fm.rotation.y=0;
+      scene.add(fm);
+
+      // Back face (-Z)
       const bm=new THREE.Mesh(new THREE.PlaneGeometry(hW,barH),mat.clone());
-      bm.position.set(hCX,barY,rowZ+0.09);bm.rotation.y=Math.PI;scene.add(bm);
-      const pl=new THREE.PointLight(dist.color,0.4,hW+5);
-      pl.position.set(hCX,barY+0.6,rowZ);scene.add(pl);
+      bm.position.set(hCX,barY,rowZ+0.09); bm.rotation.y=Math.PI;
+      scene.add(bm);
+
+      // Subtle glow
+      const pl=new THREE.PointLight(dist.color,0.45,hW+6);
+      pl.position.set(hCX,barY+0.6,rowZ);
+      scene.add(pl);
     }
   });
 }
-
-
 
 function placeBuildings(){
   PROJECTS.forEach((p,i)=>{
@@ -924,7 +939,7 @@ function makeBuilding(p,bx,bz,idx){
   const hc=dist.color;
   const BH_LIST=[9,13,10,14,8,12,11,9,13,10,14,8,12,11,9,13,10,14];
   const bH=BH_LIST[idx%18];
-  const bW=12, bD=12; // fits in BW=18 slot with 3-unit gap to road
+  const bW=12, bD=12; // fits BW=18 slot with 3-unit gap to road
   const g=new THREE.Group();g.position.set(bx,0,bz);
 
   // Pavement
