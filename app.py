@@ -1581,34 +1581,28 @@ function bindInput(){
   const wh=document.getElementById('mc-wheel');
   const spoke=document.getElementById('mc-wheel-spoke');
   if(wh){
-    let wheelActive=false, startAngle=0, currentAngle=0, wheelCX=0, wheelCY=0;
-    const STEER_THRESH=15; // degrees to activate steering
-
-// ── 360 steering wheel ──
-  const wh=document.getElementById('mc-wheel');
-  if(wh){
-    // Left half = steer left, right half = steer right
-    wh.addEventListener('pointerdown',e=>{
-      e.preventDefault();
-      const r=wh.getBoundingClientRect();
-      if(e.clientX < r.left+r.width/2){
-        dpadState.left=1; dpadState.right=0;
-        wh.style.transform='rotate(-30deg)';
-      } else {
-        dpadState.right=1; dpadState.left=0;
-        wh.style.transform='rotate(30deg)';
-      }
-      if(audioCtx&&audioCtx.state==='suspended') audioCtx.resume();
-    });
-    wh.addEventListener('pointerup',()=>{
-      dpadState.left=0; dpadState.right=0;
-      wh.style.transform='';
-    });
-    wh.addEventListener('pointerleave',()=>{
-      dpadState.left=0; dpadState.right=0;
-      wh.style.transform='';
-    });
-  }
+       wh.addEventListener('pointerdown',e=>{
+         e.preventDefault();
+         const r=wh.getBoundingClientRect();
+         if(e.clientX < r.left+r.width/2){
+           dpadState.left=1; dpadState.right=0;
+           wh.style.transform='rotate(-30deg)';
+         } else {
+           dpadState.right=1; dpadState.left=0;
+           wh.style.transform='rotate(30deg)';
+         }
+         if(audioCtx&&audioCtx.state==='suspended') audioCtx.resume();
+       });
+       wh.addEventListener('pointerup',()=>{
+         dpadState.left=0; dpadState.right=0;
+         wh.style.transform='';
+       });
+       wh.addEventListener('pointerleave',()=>{
+         dpadState.left=0; dpadState.right=0;
+         wh.style.transform='';
+       });
+    }
+}
 
 // ════════════════════════════════════
 //  TOAST
