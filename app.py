@@ -320,10 +320,10 @@ html,body{width:100%;height:100vh;overflow:hidden;background:#04080f;font-family
 
 /* ════ DEVICE-ADAPTIVE CONTROLS ════ */
 #dpad{display:none!important}
-/* mcontrols wrapper hidden — individual elements positioned separately */
+/* mcontrols wrapper hidden - individual elements positioned separately */
 #mcontrols{display:none!important}
 
-/* ── Steering wheel — bottom-left ── */
+/* ── Steering wheel - bottom-left ── */
 #steering-wrap{
   position:fixed;left:12px;bottom:12px;z-index:60;
   display:none; /* shown by JS on touch devices */
@@ -362,7 +362,7 @@ html,body{width:100%;height:100vh;overflow:hidden;background:#04080f;font-family
   font-size:9px;letter-spacing:1.5px;color:#2a3d52;text-transform:uppercase;
 }
 
-/* ── Pedals — bottom-right ── */
+/* ── Pedals - bottom-right ── */
 #pedals{
   position:fixed;right:12px;bottom:12px;z-index:60;
   display:none; /* shown by JS on touch devices */
@@ -381,7 +381,7 @@ html,body{width:100%;height:100vh;overflow:hidden;background:#04080f;font-family
 #mc-accel{width:60px;height:60px;border:2px solid rgba(62,207,142,.4);color:#3ecf8e}
 #mc-accel.on{background:rgba(62,207,142,.22);border-color:#3ecf8e;color:#fff}
 
-/* Hint box — desktop only */
+/* Hint box - desktop only */
 #hint-box{position:fixed;bottom:16px;left:16px;display:none;background:rgba(4,8,15,.88);border:1px solid rgba(255,255,255,.06);border-radius:8px;padding:7px 13px;font-size:10px;color:#2e4058;z-index:50;line-height:2}
 
 /* ════ RESPONSIVE LANDING PAGE ════ */
@@ -391,7 +391,7 @@ html,body{width:100%;height:100vh;overflow:hidden;background:#04080f;font-family
   .lnav-links{display:none}
   .lnav-logo{font-size:13px}
   .lnav-cta{font-size:10px;padding:6px 12px}
-  /* Hero text — tighter for mobile */
+  /* Hero text - tighter for mobile */
   .profile-photo{width:88px;height:88px;margin-bottom:14px}
   .intro-name{font-size:clamp(30px,9vw,48px);letter-spacing:-1px}
   .intro-role{font-size:12px;margin-bottom:16px}
@@ -423,7 +423,7 @@ html,body{width:100%;height:100vh;overflow:hidden;background:#04080f;font-family
   .lcont-card{padding:14px 10px}
   .lcont-icon{font-size:20px;margin-bottom:6px}
   .lcont-val{font-size:11px}
-  /* Game UI — mobile adjustments */
+  /* Game UI - mobile adjustments */
   #mm-wrap{top:10px;right:10px;bottom:auto} /* minimap top-right on mobile */
   .mm-lbl{display:none} /* hide label to save space */
   #mm{width:90px;height:90px}
@@ -489,7 +489,7 @@ html,body{width:100%;height:100vh;overflow:hidden;background:#04080f;font-family
     <div class="avail-pill"><span class="avail-dot"></span>Open to full-time opportunities</div>
     <div class="intro-name">Mukund <span class="accent">Patel</span></div>
     <div class="intro-role"><strong>Data Scientist</strong> &nbsp;·&nbsp; <strong>AI Engineer</strong> &nbsp;·&nbsp; <strong>Analytics Professional</strong></div>
-    <div class="lsummary">MS Data Science graduate from <strong>Montclair State University</strong> (GPA 4.0) with hands-on experience at the <strong>MTA New York</strong> building data pipelines, and BI dashboards. I build end-to-end analytics solutions — from SQL pipelines and ML models to deployed AI applications — across transportation, finance, healthcare, retail, and logistics.</div>
+    <div class="lsummary">MS Data Science graduate from <strong>Montclair State University</strong> (GPA 4.0) with hands-on experience at the <strong>MTA New York</strong> building data pipelines, and BI dashboards. I build end-to-end analytics solutions - from SQL pipelines and ML models to deployed AI applications - across transportation, finance, healthcare, retail, and logistics.</div>
     <div class="domain-row">
       <span class="domain-tag">AI Agents &amp; LLMs</span>
       <span class="domain-tag">Revenue Management</span>
@@ -640,13 +640,13 @@ html,body{width:100%;height:100vh;overflow:hidden;background:#04080f;font-family
 </div>
 
 <div id="hint-box">
-  <span style="color:#8aaccc">W A S D</span> / Arrows — Drive &nbsp;·&nbsp; <span style="color:#8aaccc">Enter</span> — Open project
+  <span style="color:#8aaccc">W A S D</span> / Arrows - Drive &nbsp;·&nbsp; <span style="color:#8aaccc">Enter</span> - Open project
 </div>
 
 <!-- MOBILE CONTROLS (touch devices only) -->
 <div id="dpad" style="display:none"></div>
 <div id="mcontrols" style="display:none"></div>
-<!-- Steering wheel — bottom-left -->
+<!-- Steering wheel - bottom-left -->
 <div id="steering-wrap">
   <div id="mc-wheel">
     <div id="mc-wheel-spoke"></div>
@@ -655,7 +655,7 @@ html,body{width:100%;height:100vh;overflow:hidden;background:#04080f;font-family
   </div>
   <div id="mc-wheel-lbl">STEER</div>
 </div>
-<!-- Pedals: brake left, accel right — bottom-right -->
+<!-- Pedals: brake left, accel right - bottom-right -->
 <div id="pedals">
   <div class="mc-btn" id="mc-brake">▼<br><span style="font-size:8px;letter-spacing:1px;opacity:.75">BRK</span></div>
   <div class="mc-btn" id="mc-accel">▲<br><span style="font-size:8px;letter-spacing:1px;opacity:.75">GAS</span></div>
@@ -1018,7 +1018,7 @@ function makeDistrictSigns(){
     const startCol=Math.floor((5-cols)/2);
     const rowZ=bRowZ(row);
 
-    // Bar passes through buildings — slightly below the shortest building in this row
+    // Bar passes through buildings - slightly below the shortest building in this row
     const idxs=PROJECTS.map((p,i)=>p.district===dk?i:-1).filter(i=>i>=0);
     const minH=Math.min(...idxs.map(i=>BH_LIST[i%18]));
     const barY=minH*0.7+1.9; // passes through buildings at user-specified height
@@ -1032,7 +1032,7 @@ function makeDistrictSigns(){
       const hW     = hRight-hLeft;
       const hCX    = (hLeft+hRight)/2;
 
-      // Structural beam runs along the BOTTOM edge of the label — not through its centre
+      // Structural beam runs along the BOTTOM edge of the label - not through its centre
       const beamY = barY - barH/2 - 0.09;  // just below the label face
       const beam=new THREE.Mesh(
         new THREE.BoxGeometry(hW,0.12,0.12),
@@ -1111,12 +1111,12 @@ function makeBuilding(p,bx,bz,idx){
     new THREE.MeshLambertMaterial({color:0x0e1826}));
   pave.position.y=0.1;pave.receiveShadow=true;g.add(pave);
 
-  // Solid body — clean dark concrete, no style variations
+  // Solid body - clean dark concrete, no style variations
   const body=new THREE.Mesh(new THREE.BoxGeometry(bW,bH,bD),
     new THREE.MeshLambertMaterial({color:0x111824}));
   body.position.y=bH/2+0.2;body.castShadow=true;body.receiveShadow=true;g.add(body);
 
-  // Colored top cap — category color, full width
+  // Colored top cap - category color, full width
   const cap=new THREE.Mesh(new THREE.BoxGeometry(bW+0.1,0.6,bD+0.1),
     new THREE.MeshLambertMaterial({color:hc,emissive:hc,emissiveIntensity:0.5}));
   cap.position.y=bH+0.5;g.add(cap);
@@ -1136,7 +1136,7 @@ function makeBuilding(p,bx,bz,idx){
   g.add(pg);allParticleGroups.push({group:pg,building:null});
 
   // ── PERIMETER ENTRANCE ZONE ──
-  // Full rectangle around building — glowing floor plane
+  // Full rectangle around building - glowing floor plane
   const zoneW=bW+10,zoneD=bD+10;
   const eMat=new THREE.MeshBasicMaterial({color:hc,transparent:true,opacity:0.08,depthWrite:false});
   const ePlane=new THREE.Mesh(new THREE.PlaneGeometry(zoneW,zoneD),eMat);
@@ -1210,7 +1210,7 @@ function makePoster(g,p,dist,bW,bH,bD){
     // Start drawing from 18% down so text sits in lower portion
     let y=ch*0.18;
 
-    // Project name — bold white, wrapped
+    // Project name - bold white, wrapped
     const nameSz=cw*0.082;
     const nameFont=`900 ${nameSz}px Segoe UI,Arial`;
     const nameLines=wrap(p.name,nameFont,maxW);
@@ -1224,7 +1224,7 @@ function makePoster(g,p,dist,bW,bH,bD){
     ctx.fillRect(pad,y,maxW,2); ctx.globalAlpha=1;
     y+=nameSz*0.55;
 
-    // Category — district colour, wrapped
+    // Category - district colour, wrapped
     const catSz=nameSz*0.62;
     const catFont=`700 ${catSz}px Segoe UI,Arial`;
     const catLines=wrap(p.cat,catFont,maxW);
@@ -1311,12 +1311,12 @@ function buildCar(){
     wg.position.set(wx,wy,wz);
     wg.userData.isWheel=true;
 
-    // Inner spin group — this is what we rotate to spin the wheel
+    // Inner spin group - this is what we rotate to spin the wheel
     const spin=new THREE.Group();
     wg.add(spin);
     wg.userData.spin=spin;
 
-    // Tyre — cylinder lying on its side (axis along X = car width)
+    // Tyre - cylinder lying on its side (axis along X = car width)
     const tyre=new THREE.Mesh(new THREE.CylinderGeometry(0.42,0.42,0.26,20),yM);
     tyre.rotation.z=Math.PI/2; tyre.castShadow=true; spin.add(tyre);
 
@@ -1416,7 +1416,7 @@ function loop(){
     if(!blocked){carPos.x=nx;carPos.z=nz;}else{carSpeed*=-.25;}
 
     carGroup.position.x=carPos.x;carGroup.position.z=carPos.z;carGroup.rotation.y=carAngle;
-    // Spin wheels — rotate the inner spin group around Z axis (wheel's roll axis)
+    // Spin wheels - rotate the inner spin group around Z axis (wheel's roll axis)
     carWheels.forEach(wg=>{
       if(wg.userData.spin) wg.userData.spin.rotation.x+=carSpeed*2.5;
     });
@@ -1447,11 +1447,11 @@ function loop(){
     camera.lookAt(carPos.x+Math.sin(carAngle)*4,1.2,carPos.z+Math.cos(carAngle)*4);
   }
 
-  // Entrance detection + glow — perimeter zone around whole building
+  // Entrance detection + glow - perimeter zone around whole building
   nearEntry=null;let bestD=9999;
   buildings.forEach(b=>{
     const dx=carPos.x-b.cx,dz=carPos.z-b.cz;
-    // Distance to building perimeter (not centre) — use Chebyshev distance to rectangle
+    // Distance to building perimeter (not centre) - use Chebyshev distance to rectangle
     const px=Math.max(0,Math.abs(dx)-b.hw),pz=Math.max(0,Math.abs(dz)-b.hd);
     const d=Math.sqrt(px*px+pz*pz); // 0 when inside perimeter ring
     const inZone=d<5.5;
